@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
 import { AgendaService } from "./agenda.service";
 import { GoogleCalendarService } from "./google/google-calendar.service";
 import { CreateTareaDto } from "./dto/create-tarea.dto";
@@ -38,6 +49,7 @@ export class AgendaController {
   }
 
   @Delete("tareas/:id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   deleteTarea(@CurrentUser() user: AuthenticatedUser, @Param("id") id: string) {
     return this.agendaService.deleteTarea(user.id, id);
   }
@@ -53,6 +65,7 @@ export class AgendaController {
   }
 
   @Delete("google")
+  @HttpCode(HttpStatus.NO_CONTENT)
   disconnectGoogle(@CurrentUser() user: AuthenticatedUser) {
     return this.googleCalendarService.disconnect(user.id);
   }

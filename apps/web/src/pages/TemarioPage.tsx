@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SiteHeader } from "../components/SiteHeader";
 import { LoadingScreen } from "../components/LoadingScreen";
 import { listTemas } from "../lib/temario-client";
-import { OPOSICIONES } from "../data/oposiciones";
+import { OPOSICIONES } from "@oponow/shared-types";
 
 export function TemarioPage() {
   const { slug = "" } = useParams();

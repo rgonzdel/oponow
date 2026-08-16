@@ -3,8 +3,7 @@ import { SiteHeader } from "../components/SiteHeader";
 import { QuestionPreviewCard } from "../components/QuestionPreviewCard";
 import { OPOSICION_ICONS } from "../components/oposicion-icons";
 import { buttonClass } from "../components/button";
-import { OPOSICIONES } from "../data/oposiciones";
-import { AHORRO_ANUAL_PORCENTAJE, PLAN_FEATURES, PLAN_PRECIO } from "../data/pricing";
+import { AHORRO_ANUAL_PORCENTAJE, OPOSICIONES, PLAN_FEATURES, PLAN_PRECIO } from "@oponow/shared-types";
 
 const TRIAL_DAYS = 7;
 

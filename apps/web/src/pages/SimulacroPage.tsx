@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { SiteHeader } from "../components/SiteHeader";
 import { buttonClass } from "../components/button";
-import { OPOSICIONES } from "../data/oposiciones";
+import { OPOSICIONES } from "@oponow/shared-types";
 import simulacroData from "../data/tai-simulacro-2024.json";
 
 interface Pregunta {

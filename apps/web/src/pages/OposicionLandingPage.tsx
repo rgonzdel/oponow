@@ -6,13 +6,13 @@ import { Accordion, AccordionItem } from "../components/Accordion";
 import { OPOSICION_ICONS } from "../components/oposicion-icons";
 import { QuestionPreviewCard } from "../components/QuestionPreviewCard";
 import { buttonClass } from "../components/button";
-import { OPOSICIONES } from "../data/oposiciones";
 import {
   AHORRO_ANUAL_PORCENTAJE,
+  OPOSICIONES,
   PLAN_FEATURES,
   PLAN_PRECIO,
   type BillingCycle,
-} from "../data/pricing";
+} from "@oponow/shared-types";
 
 export function OposicionLandingPage() {
   const { slug = "" } = useParams();

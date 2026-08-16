@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
+    "@oponow/shared-types": "workspace:*",
     "@hookform/resolvers": "^3.9.1",
     "@tanstack/react-query": "^5.62.7",
     "react": "^18.3.1",

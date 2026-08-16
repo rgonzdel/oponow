@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { SiteHeader } from "../components/SiteHeader";
-import { OPOSICIONES } from "../data/oposiciones";
+import { OPOSICIONES } from "@oponow/shared-types";
 
 export function OposicionesPage() {
   const disponibles = OPOSICIONES.filter((o) => o.disponible);

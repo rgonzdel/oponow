@@ -10,8 +10,7 @@ import { LoadingScreen } from "../components/LoadingScreen";
 import { checkoutSchema, type CheckoutFormValues } from "../lib/schemas";
 import { ApiError } from "../lib/api-client";
 import { getSubscriptionStatus, subscribeWithTrial } from "../lib/billing-client";
-import { OPOSICIONES } from "../data/oposiciones";
-import { PLAN_PRECIO, type BillingCycle } from "../data/pricing";
+import { OPOSICIONES, PLAN_PRECIO, type BillingCycle } from "@oponow/shared-types";
 
 const TRIAL_DAYS = 7;
 

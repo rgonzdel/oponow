@@ -6,11 +6,13 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 interface AccessTokenPayload {
   sub: string;
   plan: string;
+  isAdmin?: boolean;
 }
 
 export interface AuthenticatedUser {
   id: string;
   plan: string;
+  isAdmin: boolean;
 }
 
 @Injectable()
@@ -24,6 +26,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: AccessTokenPayload): AuthenticatedUser {
-    return { id: payload.sub, plan: payload.plan };
+    return { id: payload.sub, plan: payload.plan, isAdmin: payload.isAdmin ?? false };
   }
 }

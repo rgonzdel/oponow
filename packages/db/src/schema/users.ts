@@ -18,6 +18,11 @@ export const usuarios = pgTable("usuarios", {
   emailVerified: boolean("email_verified").notNull().default(false),
   plan: planTipoEnum("plan").notNull().default("free"),
   planExpira: timestamp("plan_expira", { withTimezone: true }),
+  // Nunca se puede fijar desde el propio registro/API pública — solo se
+  // activa a mano en la base de datos. Viaja en el JWT (ver auth.service.ts)
+  // y se expone como GUC de sesión app.is_admin (ver rls-context.middleware)
+  // para las políticas *_admin_read/*_admin_update de policies.sql.
+  esAdmin: boolean("es_admin").notNull().default(false),
   // Identificador opaco para la URL del feed .ics de la agenda (ver
   // packages/db/src/schema/agenda.ts) — no es un secreto de sesión, es el
   // equivalente a un enlace de suscripción de calendario "de solo lectura

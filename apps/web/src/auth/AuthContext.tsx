@@ -10,6 +10,7 @@ import { apiFetch, setAccessToken } from "../lib/api-client";
 export interface AuthUser {
   id: string;
   plan: string;
+  isAdmin: boolean;
 }
 
 interface AuthTokensResponse {

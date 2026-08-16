@@ -18,6 +18,7 @@ const ANONYMOUS_USER_ID = "00000000-0000-0000-0000-000000000000";
 interface AccessTokenPayload {
   sub: string;
   plan: string;
+  isAdmin?: boolean;
 }
 
 /**
@@ -39,6 +40,7 @@ export class RlsContextMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     let userId: string | null = null;
     let plan: string | null = null;
+    let isAdmin = false;
 
     const authHeader = req.headers.authorization;
     if (authHeader?.startsWith("Bearer ")) {
@@ -49,6 +51,7 @@ export class RlsContextMiddleware implements NestMiddleware {
         );
         userId = payload.sub;
         plan = payload.plan;
+        isAdmin = payload.isAdmin ?? false;
       } catch {
         // Token ausente/inválido/expirado: seguimos como anónimos. Las
         // rutas protegidas con JwtAuthGuard devolverán 401 por su cuenta.
@@ -60,7 +63,8 @@ export class RlsContextMiddleware implements NestMiddleware {
     try {
       await reserved`SELECT
         set_config('app.current_user_id', ${userId ?? ANONYMOUS_USER_ID}, false),
-        set_config('app.current_plan', ${plan ?? ""}, false)`;
+        set_config('app.current_plan', ${plan ?? ""}, false),
+        set_config('app.is_admin', ${String(isAdmin)}, false)`;
     } catch (err) {
       reserved.release();
       next(err as Error);

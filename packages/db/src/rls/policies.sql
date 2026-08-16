@@ -94,6 +94,26 @@ DROP POLICY IF EXISTS tareas_agenda_auth_service ON tareas_agenda;
 CREATE POLICY tareas_agenda_auth_service ON tareas_agenda
   FOR SELECT TO auth_service USING (true);
 
+-- ===== Panel de administración =====
+-- app.is_admin lo fija RlsContextMiddleware a partir de usuarios.es_admin
+-- (viaja en el JWT) — nunca se puede activar desde la API pública. Políticas
+-- ADITIVAS junto a usuarios_self/suscripciones_oposicion_self (Postgres
+-- combina varias políticas permisivas del mismo comando con OR), así que no
+-- hace falta tocar las políticas de autopropiedad ya existentes.
+DROP POLICY IF EXISTS usuarios_admin_read ON usuarios;
+CREATE POLICY usuarios_admin_read ON usuarios
+  FOR SELECT USING (current_setting('app.is_admin', true) = 'true');
+
+DROP POLICY IF EXISTS usuarios_admin_update ON usuarios;
+CREATE POLICY usuarios_admin_update ON usuarios
+  FOR UPDATE
+  USING (current_setting('app.is_admin', true) = 'true')
+  WITH CHECK (current_setting('app.is_admin', true) = 'true');
+
+DROP POLICY IF EXISTS suscripciones_oposicion_admin_read ON suscripciones_oposicion;
+CREATE POLICY suscripciones_oposicion_admin_read ON suscripciones_oposicion
+  FOR SELECT USING (current_setting('app.is_admin', true) = 'true');
+
 -- ===== Catálogo público (leyes, artículos, oposiciones) =====
 -- Sin dato de usuario; RLS explícita igualmente por higiene y para que
 -- quede documentado que la decisión de "público" fue intencional.

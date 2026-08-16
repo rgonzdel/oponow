@@ -16,6 +16,7 @@ import { TestPage } from "./pages/TestPage";
 import { FallosPage } from "./pages/FallosPage";
 import { AgendaPage } from "./pages/AgendaPage";
 import { LegalPage } from "./pages/LegalPage";
+import { AdminPage } from "./pages/AdminPage";
 
 export function App() {
   return (
@@ -67,6 +68,14 @@ export function App() {
             }
           />
           <Route path="/legal/:slug" element={<LegalPage />} />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth>
+                <AdminPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/checkout"
             element={

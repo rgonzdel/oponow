@@ -78,7 +78,7 @@ export class AuthService {
       plan: "free",
     });
 
-    return this.issueTokens(db, userId, "free", userAgent);
+    return this.issueTokens(db, userId, "free", false, userAgent);
   }
 
   async login(dto: LoginDto, userAgent?: string): Promise<AuthTokens> {
@@ -87,6 +87,7 @@ export class AuthService {
         id: schema.usuarios.id,
         passwordHash: schema.usuarios.passwordHash,
         plan: schema.usuarios.plan,
+        esAdmin: schema.usuarios.esAdmin,
       })
       .from(schema.usuarios)
       .where(eq(schema.usuarios.email, dto.email))
@@ -107,9 +108,10 @@ export class AuthService {
     const db = getRequestDb();
     await db.execute(dsql`SELECT
       set_config('app.current_user_id', ${user.id}, false),
-      set_config('app.current_plan', ${user.plan}, false)`);
+      set_config('app.current_plan', ${user.plan}, false),
+      set_config('app.is_admin', ${String(user.esAdmin)}, false)`);
 
-    return this.issueTokens(db, user.id, user.plan, userAgent);
+    return this.issueTokens(db, user.id, user.plan, user.esAdmin, userAgent);
   }
 
   async refresh(refreshToken: string, userAgent?: string): Promise<AuthTokens> {
@@ -139,7 +141,7 @@ export class AuthService {
       .where(eq(schema.refreshTokens.id, stored.id));
 
     const [user] = await this.authDb
-      .select({ plan: schema.usuarios.plan })
+      .select({ plan: schema.usuarios.plan, esAdmin: schema.usuarios.esAdmin })
       .from(schema.usuarios)
       .where(eq(schema.usuarios.id, stored.usuarioId))
       .limit(1);
@@ -151,9 +153,10 @@ export class AuthService {
     const db = getRequestDb();
     await db.execute(dsql`SELECT
       set_config('app.current_user_id', ${stored.usuarioId}, false),
-      set_config('app.current_plan', ${user.plan}, false)`);
+      set_config('app.current_plan', ${user.plan}, false),
+      set_config('app.is_admin', ${String(user.esAdmin)}, false)`);
 
-    return this.issueTokens(db, stored.usuarioId, user.plan, userAgent);
+    return this.issueTokens(db, stored.usuarioId, user.plan, user.esAdmin, userAgent);
   }
 
   async logout(refreshToken: string): Promise<void> {
@@ -168,11 +171,13 @@ export class AuthService {
     db: Database,
     userId: string,
     plan: string,
+    isAdmin: boolean,
     userAgent?: string,
   ): Promise<AuthTokens> {
     const accessToken = await this.jwtService.signAsync({
       sub: userId,
       plan,
+      isAdmin,
     });
 
     const refreshToken = generateRefreshToken();

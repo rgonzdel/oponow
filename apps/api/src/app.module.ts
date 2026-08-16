@@ -16,6 +16,7 @@ import { BillingModule } from "./billing/billing.module";
 import { TemarioModule } from "./temario/temario.module";
 import { QuizModule } from "./quiz/quiz.module";
 import { AgendaModule } from "./agenda/agenda.module";
+import { AdminModule } from "./admin/admin.module";
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { AgendaModule } from "./agenda/agenda.module";
     TemarioModule,
     QuizModule,
     AgendaModule,
+    AdminModule,
   ],
   providers: [
     RlsContextMiddleware,

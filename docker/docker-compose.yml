@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: oponow_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-oponow}
+      POSTGRES_USER: ${POSTGRES_USER:-oponow_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_admin}
+      APP_USER: ${POSTGRES_APP_USER:-app_user}
+      APP_PASSWORD: ${POSTGRES_APP_PASSWORD:-change_me_app}
+      AUTH_SERVICE_USER: ${POSTGRES_AUTH_SERVICE_USER:-auth_service}
+      AUTH_SERVICE_PASSWORD: ${POSTGRES_AUTH_SERVICE_PASSWORD:-change_me_auth_service}
+    ports:
+      - "5432:5432"
+    volumes:
+      - oponow_postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-oponow_admin} -d ${POSTGRES_DB:-oponow}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  oponow_postgres_data:

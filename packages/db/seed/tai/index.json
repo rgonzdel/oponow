@@ -1,0 +1,42 @@
+{
+"cuerpo": "Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado (TAI) - Ingreso Libre",
+"descripcion": "Banco de preguntas compilado a partir de tres exámenes oficiales completos (convocatorias 2019, 2022 y 2024), cada uno con Primera Parte (test general, 80 preguntas + 5 de reserva) y dos Supuestos Prácticos (20 preguntas + 5 de reserva cada uno).",
+"total_preguntas": 405,
+"total_anuladas": 11,
+"examenes": [
+{
+"anio": 2019,
+"nombre": "2019 - TAI-LI - Oferta de Empleo Público 2019",
+"archivos": {
+"primera_parte": "2019-tai-li.primera-parte.json",
+"supuesto_1": "2019-tai-li.supuesto-1.json",
+"supuesto_2": "2019-tai-li.supuesto-2.json"
+},
+"total_preguntas": 135,
+"anuladas": 0
+},
+{
+"anio": 2022,
+"nombre": "2022 - TAI-L",
+"archivos": {
+"primera_parte": "2022-tai-l.primera-parte.json",
+"supuesto_1": "2022-tai-l.supuesto-1.json",
+"supuesto_2": "2022-tai-l.supuesto-2.json"
+},
+"total_preguntas": 135,
+"anuladas": 7
+},
+{
+"anio": 2024,
+"nombre": "2024 - TAI-L Modelo A",
+"archivos": {
+"primera_parte": "2024-tai-l.primera-parte.json",
+"supuesto_1": "2024-tai-l.supuesto-1.json",
+"supuesto_2": "2024-tai-l.supuesto-2.json"
+},
+"total_preguntas": 135,
+"anuladas": 4
+}
+],
+"schema_nota": "Cada archivo tiene { examen, seccion, [titulo, contexto para supuestos], preguntas: [{n, enunciado, opciones[4], correcta (índice 0-3 o null si anulada), anulada? }], reserva: [...] }. Pensado para convertirse en seed SQL de la tabla `preguntas` de Drizzle."
+}

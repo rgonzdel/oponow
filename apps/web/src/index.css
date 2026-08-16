@@ -1,0 +1,31 @@
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-ink text-ink-text antialiased;
+}
+
+::selection {
+  background-color: rgba(145, 132, 217, 0.35); /* accent DEFAULT, ver tailwind.config.js */
+  color: #e9e9ed; /* ink.text */
+}
+
+/* Contenido de temario servido por el backend (ver apps/api/src/temario) —
+   solo <h3>/<p> semánticos, la tipografía de lectura vive aquí. */
+@layer components {
+  .tema-content {
+    @apply text-[17px] leading-[1.75] text-neutral-200;
+  }
+  .tema-content p {
+    @apply mb-5 last:mb-0;
+  }
+  .tema-content h3 {
+    @apply mb-3 mt-9 text-[13px] font-semibold uppercase tracking-wide text-accent first:mt-0;
+  }
+}

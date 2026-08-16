@@ -18,11 +18,21 @@ export const usuarios = pgTable("usuarios", {
   emailVerified: boolean("email_verified").notNull().default(false),
   plan: planTipoEnum("plan").notNull().default("free"),
   planExpira: timestamp("plan_expira", { withTimezone: true }),
+  // Identificador opaco para la URL del feed .ics de la agenda (ver
+  // packages/db/src/schema/agenda.ts) — no es un secreto de sesión, es el
+  // equivalente a un enlace de suscripción de calendario "de solo lectura
+  // por quien lo tenga", igual que hacen Google Calendar/Notion con sus
+  // propios feeds. Cualquiera con la URL puede leer las tareas del usuario,
+  // por eso no se expone en ningún sitio salvo al propio dueño autenticado.
+  agendaFeedToken: uuid("agenda_feed_token")
+    .notNull()
+    .default(sql`gen_random_uuid()`),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
 }, (t) => [
   uniqueIndex("usuarios_email_idx").on(t.email),
+  uniqueIndex("usuarios_agenda_feed_token_idx").on(t.agendaFeedToken),
 ]);
 
 // Tokens de refresco: tabla separada (no un campo en `usuarios`) para

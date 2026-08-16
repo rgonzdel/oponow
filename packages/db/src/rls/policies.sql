@@ -80,6 +80,20 @@ CREATE POLICY sesiones_lectura_self ON sesiones_lectura
   USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
   WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
 
+ALTER TABLE tareas_agenda ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tareas_agenda_self ON tareas_agenda;
+CREATE POLICY tareas_agenda_self ON tareas_agenda
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
+-- El feed .ics público (sin JWT, ver apps/api/src/agenda) resuelve la
+-- identidad por agenda_feed_token vía auth_service y luego lee las tareas
+-- de ESE usuario con esta política — mismo patrón que
+-- usuarios_auth_service/refresh_tokens_auth_service_*.
+DROP POLICY IF EXISTS tareas_agenda_auth_service ON tareas_agenda;
+CREATE POLICY tareas_agenda_auth_service ON tareas_agenda
+  FOR SELECT TO auth_service USING (true);
+
 -- ===== Catálogo público (leyes, artículos, oposiciones) =====
 -- Sin dato de usuario; RLS explícita igualmente por higiene y para que
 -- quede documentado que la decisión de "público" fue intencional.

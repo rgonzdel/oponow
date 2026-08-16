@@ -33,12 +33,29 @@ export function DashboardPage() {
               {user ? (PLAN_LABEL[user.plan] ?? user.plan) : "…"}
             </span>
           </p>
-          <p className="mt-3 text-sm text-neutral-500">
-            Los tests con corrección todavía no están conectados aquí — solo
-            el temario, servido con marca de agua por bloques.
-          </p>
           <Link to="/oposiciones/tai/temario" className={buttonClass("primary", "mt-4 w-full")}>
             Ir al temario de TAI
+          </Link>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Link
+            to="/fallos"
+            className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+          >
+            <h2 className="text-sm font-medium text-ink-text">Seguimiento de fallos</h2>
+            <p className="mt-1 text-xs text-neutral-500">
+              Repasa las preguntas que has fallado, filtradas por fecha.
+            </p>
+          </Link>
+          <Link
+            to="/agenda"
+            className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+          >
+            <h2 className="text-sm font-medium text-ink-text">Agenda de estudio</h2>
+            <p className="mt-1 text-xs text-neutral-500">
+              Crea tareas y sincronízalas con Google Calendar o Apple Calendar.
+            </p>
           </Link>
         </div>
       </main>

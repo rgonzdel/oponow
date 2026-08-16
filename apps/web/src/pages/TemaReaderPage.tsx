@@ -121,6 +121,15 @@ export function TemaReaderPage() {
             </button>
           </div>
         )}
+
+        {tema && (
+          <Link
+            to={`/oposiciones/${slug}/temario/${temaId}/test`}
+            className={buttonClass("primary", "mt-8 w-full")}
+          >
+            Hacer test de este tema
+          </Link>
+        )}
       </main>
     </div>
   );

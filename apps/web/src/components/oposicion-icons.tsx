@@ -84,4 +84,9 @@ export const OPOSICION_ICONS = {
       <path d="M12 17h.01" />
     </Icon>
   ),
+  progreso: (
+    <Icon>
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+    </Icon>
+  ),
 };

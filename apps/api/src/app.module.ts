@@ -14,6 +14,8 @@ import { RlsContextMiddleware } from "./database/rls-context.middleware";
 import { AuthModule } from "./auth/auth.module";
 import { BillingModule } from "./billing/billing.module";
 import { TemarioModule } from "./temario/temario.module";
+import { QuizModule } from "./quiz/quiz.module";
+import { AgendaModule } from "./agenda/agenda.module";
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { TemarioModule } from "./temario/temario.module";
     AuthModule,
     BillingModule,
     TemarioModule,
+    QuizModule,
+    AgendaModule,
   ],
   providers: [
     RlsContextMiddleware,

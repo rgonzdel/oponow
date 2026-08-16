@@ -15,6 +15,13 @@
       "when": 1786871160082,
       "tag": "0001_overrated_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786895533521,
+      "tag": "0002_lonely_garia",
+      "breakpoints": true
     }
   ]
 }

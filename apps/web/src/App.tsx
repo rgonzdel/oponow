@@ -12,6 +12,10 @@ import { CheckoutPage } from "./pages/CheckoutPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { TestPage } from "./pages/TestPage";
+import { FallosPage } from "./pages/FallosPage";
+import { AgendaPage } from "./pages/AgendaPage";
+import { LegalPage } from "./pages/LegalPage";
 
 export function App() {
   return (
@@ -38,6 +42,31 @@ export function App() {
               </RequireAuth>
             }
           />
+          <Route
+            path="/oposiciones/:slug/temario/:temaId/test"
+            element={
+              <RequireAuth>
+                <TestPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/fallos"
+            element={
+              <RequireAuth>
+                <FallosPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/agenda"
+            element={
+              <RequireAuth>
+                <AgendaPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="/legal/:slug" element={<LegalPage />} />
           <Route
             path="/checkout"
             element={

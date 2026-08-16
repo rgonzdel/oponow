@@ -8,7 +8,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   intentos_test,
   respuestas_usuario,
   suscripciones_oposicion,
-  sesiones_lectura
+  sesiones_lectura,
+  tareas_agenda
 TO app_user;
 
 -- Contenido y catálogo: solo lectura desde la API en este paso. La

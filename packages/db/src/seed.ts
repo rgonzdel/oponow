@@ -19,6 +19,7 @@ import {
   TEMA10_BLOQUE_1_TRIBUNAL_CONSTITUCIONAL,
   TEMA11_BLOQUE_1_REFORMA,
 } from "./content/ce-titulos-2-10";
+import { sslModeFor } from "./ssl";
 
 config({ path: path.resolve(__dirname, "../../../.env") });
 
@@ -44,7 +45,7 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL no está definida (revisa tu .env)");
 
   // Rol admin: bypassa RLS, igual que las migraciones.
-  const client = postgres(url, { max: 1 });
+  const client = postgres(url, { max: 1, ssl: sslModeFor(url) });
   const db = drizzle(client, { schema });
 
   let taiId: string | undefined;

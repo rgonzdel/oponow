@@ -9,6 +9,7 @@
     "dev": "tsc -p tsconfig.json --watch",
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/migrate.ts",
+    "bootstrap-roles": "tsx src/bootstrap-roles.ts",
     "apply-rls": "tsx src/rls/apply-rls.ts",
     "seed": "tsx src/seed.ts",
     "studio": "drizzle-kit studio"

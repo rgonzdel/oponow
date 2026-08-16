@@ -1,6 +1,7 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";
+import { sslModeFor } from "./ssl";
 
 export type Sql = ReturnType<typeof postgres>;
 export type Database = ReturnType<typeof drizzle<typeof schema>>;
@@ -12,7 +13,10 @@ export type Database = ReturnType<typeof drizzle<typeof schema>>;
  * `app.current_plan` por request sin contaminar otras requests.
  */
 export function createRuntimeSql(connectionString: string): Sql {
-  return postgres(connectionString, { max: 10 });
+  return postgres(connectionString, {
+    max: 10,
+    ssl: sslModeFor(connectionString),
+  });
 }
 
 export function createDb(sql: Sql): Database {

@@ -4,16 +4,24 @@
 #
 #   app_user      -- NOBYPASSRLS. Lo usa la API para (casi) todo. Sujeto
 #                    íntegramente a las políticas RLS de packages/db/src/rls.
-#   auth_service  -- BYPASSRLS, pero con privilegios de columna mínimos
-#                    (solo usuarios y refresh_tokens). Resuelve el problema
-#                    de "huevo y gallina" del login: para verificar un email
-#                    + contraseña, o para rotar un refresh token, hace falta
-#                    leer la fila ANTES de conocer la identidad del llamante,
-#                    algo que una política "solo el dueño" no puede permitir
-#                    sin dejar de ser "solo el dueño". Es el mismo patrón que
-#                    usa Supabase internamente: GoTrue tiene su propia
-#                    conexión privilegiada a auth.users, separada del rol
+#   auth_service  -- NOBYPASSRLS, pero con privilegios de columna mínimos
+#                    (solo usuarios y refresh_tokens) + políticas RLS
+#                    permisivas dedicadas (ver packages/db/src/rls/policies.sql,
+#                    usuarios_auth_service / refresh_tokens_auth_service_*).
+#                    Resuelve el problema de "huevo y gallina" del login:
+#                    para verificar un email + contraseña, o para rotar un
+#                    refresh token, hace falta leer la fila ANTES de conocer
+#                    la identidad del llamante, algo que una política "solo
+#                    el dueño" no puede permitir sin dejar de ser "solo el
+#                    dueño". Es el mismo patrón que usa Supabase
+#                    internamente: GoTrue tiene su propia conexión
+#                    privilegiada a auth.users, separada del rol
 #                    anon/authenticated que usa el resto de la app.
+#                    (Antes este rol usaba BYPASSRLS en vez de políticas
+#                    dedicadas; se cambió porque algunos proveedores
+#                    gestionados, p.ej. Render, no dejan que un admin
+#                    no-superusuario conceda BYPASSRLS a otro rol — ver
+#                    packages/db/src/bootstrap-roles.ts.)
 #
 # Las migraciones (drizzle-kit) corren con el rol admin ($POSTGRES_USER),
 # que en este contenedor es superusuario.
@@ -28,7 +36,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
       CREATE ROLE ${APP_USER} WITH LOGIN PASSWORD '${APP_PASSWORD}' NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE;
     END IF;
     IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '${AUTH_SERVICE_USER}') THEN
-      CREATE ROLE ${AUTH_SERVICE_USER} WITH LOGIN PASSWORD '${AUTH_SERVICE_PASSWORD}' BYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE;
+      CREATE ROLE ${AUTH_SERVICE_USER} WITH LOGIN PASSWORD '${AUTH_SERVICE_PASSWORD}' NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE;
     END IF;
   END
   \$\$;

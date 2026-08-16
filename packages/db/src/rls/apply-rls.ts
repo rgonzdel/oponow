@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { config } from "dotenv";
 import postgres from "postgres";
+import { sslModeFor } from "../ssl";
 
 config({ path: path.resolve(__dirname, "../../../../.env") });
 
@@ -9,7 +10,7 @@ async function main() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL no está definida (revisa tu .env)");
 
-  const sql = postgres(url, { max: 1 });
+  const sql = postgres(url, { max: 1, ssl: sslModeFor(url) });
 
   try {
     for (const file of ["grants.sql", "auth-grants.sql", "policies.sql"]) {

@@ -14,11 +14,35 @@ CREATE POLICY usuarios_self ON usuarios
   USING (id = current_setting('app.current_user_id', true)::uuid)
   WITH CHECK (id = current_setting('app.current_user_id', true)::uuid);
 
+-- auth_service necesita leer usuarios ANTES de conocer la identidad
+-- (login/register comprueban el email antes de que exista un
+-- app.current_user_id que comparar). En un Postgres propio esto se
+-- resolvía con el atributo de rol BYPASSRLS; algunos proveedores
+-- gestionados (p.ej. Render) no dejan que un admin no-superusuario
+-- conceda BYPASSRLS, así que en su lugar usamos una política permisiva
+-- explícita solo para ese rol. auth-grants.sql ya restringe qué COLUMNAS
+-- puede ver — esta política solo abre qué FILAS. Combinadas dan el mismo
+-- aislamiento que BYPASSRLS. Es redundante donde auth_service sí tiene
+-- BYPASSRLS (docker/init/01-roles.sh en local), pero inofensiva.
+DROP POLICY IF EXISTS usuarios_auth_service ON usuarios;
+CREATE POLICY usuarios_auth_service ON usuarios
+  FOR SELECT TO auth_service USING (true);
+
 ALTER TABLE refresh_tokens ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS refresh_tokens_self ON refresh_tokens;
 CREATE POLICY refresh_tokens_self ON refresh_tokens
   USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
   WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
+-- Mismo motivo que usuarios_auth_service: refresh() busca el token por su
+-- hash (SELECT) y lo revoca (UPDATE revoked_at) antes de saber de quién es.
+DROP POLICY IF EXISTS refresh_tokens_auth_service_select ON refresh_tokens;
+CREATE POLICY refresh_tokens_auth_service_select ON refresh_tokens
+  FOR SELECT TO auth_service USING (true);
+
+DROP POLICY IF EXISTS refresh_tokens_auth_service_update ON refresh_tokens;
+CREATE POLICY refresh_tokens_auth_service_update ON refresh_tokens
+  FOR UPDATE TO auth_service USING (true) WITH CHECK (true);
 
 ALTER TABLE intentos_test ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS intentos_test_self ON intentos_test;

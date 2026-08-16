@@ -1,10 +1,11 @@
 import { Module } from "@nestjs/common";
 import { AgendaController } from "./agenda.controller";
-import { AgendaFeedController } from "./agenda-feed.controller";
 import { AgendaService } from "./agenda.service";
+import { GoogleCallbackController } from "./google/google-callback.controller";
+import { GoogleCalendarService } from "./google/google-calendar.service";
 
 @Module({
-  controllers: [AgendaController, AgendaFeedController],
-  providers: [AgendaService],
+  controllers: [AgendaController, GoogleCallbackController],
+  providers: [AgendaService, GoogleCalendarService],
 })
 export class AgendaModule {}

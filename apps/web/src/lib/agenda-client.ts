@@ -44,6 +44,14 @@ export function deleteTarea(id: string) {
   return apiFetch<void>(`/agenda/tareas/${id}`, { method: "DELETE" });
 }
 
-export function getFeedUrl() {
-  return apiFetch<{ url: string }>("/agenda/feed-url");
+export function getGoogleStatus() {
+  return apiFetch<{ connected: boolean }>("/agenda/google/status");
+}
+
+export function getGoogleAuthUrl() {
+  return apiFetch<{ url: string }>("/agenda/google/connect");
+}
+
+export function disconnectGoogle() {
+  return apiFetch<void>("/agenda/google", { method: "DELETE" });
 }

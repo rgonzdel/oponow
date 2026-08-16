@@ -9,7 +9,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   respuestas_usuario,
   suscripciones_oposicion,
   sesiones_lectura,
-  tareas_agenda
+  tareas_agenda,
+  google_calendar_conexiones
 TO app_user;
 
 -- Contenido y catálogo: solo lectura desde la API en este paso. La

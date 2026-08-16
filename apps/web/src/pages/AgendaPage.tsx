@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SiteHeader } from "../components/SiteHeader";
 import { LoadingScreen } from "../components/LoadingScreen";
@@ -8,7 +8,9 @@ import { ApiError } from "../lib/api-client";
 import {
   createTarea,
   deleteTarea,
-  getFeedUrl,
+  disconnectGoogle,
+  getGoogleAuthUrl,
+  getGoogleStatus,
   listTareas,
   updateTarea,
 } from "../lib/agenda-client";
@@ -25,13 +27,28 @@ function formatFecha(iso: string) {
 
 export function AgendaPage() {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [fecha, setFecha] = useState("");
-  const [copiado, setCopiado] = useState(false);
+
+  const googleResultado = searchParams.get("google");
+  useEffect(() => {
+    if (!googleResultado) return;
+    queryClient.invalidateQueries({ queryKey: ["agenda", "google-status"] });
+    const next = new URLSearchParams(searchParams);
+    next.delete("google");
+    setSearchParams(next, { replace: true });
+    // Solo al aterrizar desde el callback de Google — no depende de nada
+    // que cambie en cada render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const tareasQuery = useQuery({ queryKey: ["agenda", "tareas"], queryFn: listTareas });
-  const feedQuery = useQuery({ queryKey: ["agenda", "feed-url"], queryFn: getFeedUrl });
+  const googleStatusQuery = useQuery({
+    queryKey: ["agenda", "google-status"],
+    queryFn: getGoogleStatus,
+  });
 
   const crearMutation = useMutation({
     mutationFn: () =>
@@ -59,16 +76,22 @@ export function AgendaPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agenda", "tareas"] }),
   });
 
+  const conectarMutation = useMutation({
+    mutationFn: async () => {
+      const { url } = await getGoogleAuthUrl();
+      window.location.href = url;
+    },
+  });
+
+  const desconectarMutation = useMutation({
+    mutationFn: disconnectGoogle,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["agenda", "google-status"] }),
+  });
+
   if (tareasQuery.isLoading) return <LoadingScreen />;
 
   const tareas = tareasQuery.data ?? [];
-
-  async function copiarFeed() {
-    if (!feedQuery.data) return;
-    await navigator.clipboard.writeText(feedQuery.data.url);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
-  }
+  const conectado = googleStatusQuery.data?.connected ?? false;
 
   return (
     <div>
@@ -79,9 +102,49 @@ export function AgendaPage() {
           Agenda de estudio
         </h1>
         <p className="mt-2 text-sm text-neutral-400">
-          Crea tareas de estudio y suscríbete a tu calendario para verlas en
-          Google Calendar o Apple Calendar.
+          Crea tareas de estudio y sincronízalas con tu Google Calendar.
         </p>
+
+        {googleResultado === "connected" && (
+          <p className="mt-4 rounded-md border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-400">
+            Google Calendar conectado.
+          </p>
+        )}
+        {googleResultado === "error" && (
+          <p className="mt-4 rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-400">
+            No se pudo conectar con Google Calendar, inténtalo de nuevo.
+          </p>
+        )}
+
+        <div className="mt-6 flex items-center justify-between rounded-lg border border-ink-divider bg-ink-surface p-5">
+          <div>
+            <h2 className="text-sm font-medium text-ink-text">Google Calendar</h2>
+            <p className="mt-1 text-xs text-neutral-500">
+              {conectado
+                ? "Tus tareas se crean también como eventos en tu calendario de Google."
+                : "Conéctalo para que cada tarea aparezca automáticamente en tu Google Calendar."}
+            </p>
+          </div>
+          {conectado ? (
+            <button
+              type="button"
+              onClick={() => desconectarMutation.mutate()}
+              disabled={desconectarMutation.isPending}
+              className={buttonClass("secondary")}
+            >
+              {desconectarMutation.isPending ? "Desconectando…" : "Desconectar"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => conectarMutation.mutate()}
+              disabled={conectarMutation.isPending}
+              className={buttonClass("primary")}
+            >
+              Conectar con Google
+            </button>
+          )}
+        </div>
 
         <form
           onSubmit={(e) => {
@@ -163,36 +226,6 @@ export function AgendaPage() {
             </li>
           )}
         </ul>
-
-        <div className="mt-8 rounded-lg border border-ink-divider bg-ink-surface p-5">
-          <h2 className="text-sm font-medium text-ink-text">
-            Sincronizar con Google Calendar o Apple Calendar
-          </h2>
-          <p className="mt-2 text-xs text-neutral-400">
-            Copia este enlace y añádelo como calendario "por URL" en Google
-            Calendar (Otros calendarios → Desde URL) o en Apple Calendar
-            (Archivo → Nueva suscripción de calendario). Se actualizará solo
-            cuando añadas o edites tareas — el calendario tarda un rato en
-            volver a comprobarlo, no es al instante.
-          </p>
-          {feedQuery.data && (
-            <div className="mt-3 flex items-center gap-2">
-              <input
-                readOnly
-                value={feedQuery.data.url}
-                onFocus={(e) => e.currentTarget.select()}
-                className="flex-1 truncate rounded-md border border-ink-divider bg-ink px-3 py-2 text-xs text-neutral-300"
-              />
-              <button
-                type="button"
-                onClick={copiarFeed}
-                className={buttonClass("secondary")}
-              >
-                {copiado ? "Copiado ✓" : "Copiar"}
-              </button>
-            </div>
-          )}
-        </div>
 
         <Link to="/dashboard" className="mt-8 inline-block text-sm text-neutral-500 hover:text-ink-text">
           ← Volver al dashboard

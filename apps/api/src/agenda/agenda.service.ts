@@ -1,23 +1,14 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { eq } from "drizzle-orm";
-import { createDb, schema, type Database, type Sql } from "@oponow/db";
-import { AUTH_DATABASE_POOL } from "../database/database.module";
+import { schema } from "@oponow/db";
 import { getRequestDb } from "../database/request-context";
-import { generarFeedIcs } from "./ics.util";
+import { GoogleCalendarService } from "./google/google-calendar.service";
 import type { CreateTareaDto } from "./dto/create-tarea.dto";
 import type { UpdateTareaDto } from "./dto/update-tarea.dto";
 
 @Injectable()
 export class AgendaService {
-  private readonly authDb: Database;
-
-  constructor(
-    private readonly configService: ConfigService,
-    @Inject(AUTH_DATABASE_POOL) authPool: Sql,
-  ) {
-    this.authDb = createDb(authPool);
-  }
+  constructor(private readonly googleCalendarService: GoogleCalendarService) {}
 
   async listTareas(userId: string) {
     const db = getRequestDb();
@@ -39,10 +30,12 @@ export class AgendaService {
         fecha: new Date(dto.fecha),
       })
       .returning();
+
+    await this.googleCalendarService.syncCreate(userId, tarea);
     return tarea;
   }
 
-  async updateTarea(id: string, dto: UpdateTareaDto) {
+  async updateTarea(userId: string, id: string, dto: UpdateTareaDto) {
     const db = getRequestDb();
     // RLS (tareas_agenda_self) restringe el UPDATE a las filas del usuario
     // actual — si el id no es suyo (o no existe), esto afecta 0 filas.
@@ -57,55 +50,19 @@ export class AgendaService {
       .where(eq(schema.tareasAgenda.id, id))
       .returning();
     if (!tarea) throw new NotFoundException("Tarea no encontrada");
+
+    await this.googleCalendarService.syncUpdate(userId, tarea);
     return tarea;
   }
 
-  async deleteTarea(id: string): Promise<void> {
+  async deleteTarea(userId: string, id: string): Promise<void> {
     const db = getRequestDb();
     const [tarea] = await db
       .delete(schema.tareasAgenda)
       .where(eq(schema.tareasAgenda.id, id))
-      .returning({ id: schema.tareasAgenda.id });
+      .returning({ googleEventId: schema.tareasAgenda.googleEventId });
     if (!tarea) throw new NotFoundException("Tarea no encontrada");
-  }
 
-  async getFeedUrl(userId: string): Promise<{ url: string }> {
-    const db = getRequestDb();
-    const [user] = await db
-      .select({ token: schema.usuarios.agendaFeedToken })
-      .from(schema.usuarios)
-      .where(eq(schema.usuarios.id, userId))
-      .limit(1);
-    if (!user) throw new NotFoundException("Usuario no encontrado");
-
-    const baseUrl = this.configService.get<string>(
-      "PUBLIC_API_URL",
-      "http://localhost:3000",
-    );
-    return { url: `${baseUrl}/agenda/feed/${user.token}.ics` };
-  }
-
-  /**
-   * Sin JWT: la llamada un cliente de calendario (Google/Apple), que no
-   * manda cabeceras de autorización al suscribirse a una URL. La identidad
-   * se resuelve por el token opaco vía el rol auth_service — mismo patrón
-   * que login/refresh (ver auth.service.ts) — y de ahí en adelante se lee
-   * con la política tareas_agenda_auth_service.
-   */
-  async getFeedIcs(token: string): Promise<string> {
-    const [user] = await this.authDb
-      .select({ id: schema.usuarios.id })
-      .from(schema.usuarios)
-      .where(eq(schema.usuarios.agendaFeedToken, token))
-      .limit(1);
-    if (!user) throw new NotFoundException("Feed no encontrado");
-
-    const tareas = await this.authDb
-      .select()
-      .from(schema.tareasAgenda)
-      .where(eq(schema.tareasAgenda.usuarioId, user.id))
-      .orderBy(schema.tareasAgenda.fecha);
-
-    return generarFeedIcs(tareas);
+    await this.googleCalendarService.syncDelete(userId, tarea.googleEventId);
   }
 }

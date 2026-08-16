@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { AgendaService } from "./agenda.service";
+import { GoogleCalendarService } from "./google/google-calendar.service";
 import { CreateTareaDto } from "./dto/create-tarea.dto";
 import { UpdateTareaDto } from "./dto/update-tarea.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -9,7 +10,10 @@ import type { AuthenticatedUser } from "../auth/strategies/jwt.strategy";
 @Controller("agenda")
 @UseGuards(JwtAuthGuard)
 export class AgendaController {
-  constructor(private readonly agendaService: AgendaService) {}
+  constructor(
+    private readonly agendaService: AgendaService,
+    private readonly googleCalendarService: GoogleCalendarService,
+  ) {}
 
   @Get("tareas")
   listTareas(@CurrentUser() user: AuthenticatedUser) {
@@ -25,17 +29,31 @@ export class AgendaController {
   }
 
   @Patch("tareas/:id")
-  updateTarea(@Param("id") id: string, @Body() dto: UpdateTareaDto) {
-    return this.agendaService.updateTarea(id, dto);
+  updateTarea(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("id") id: string,
+    @Body() dto: UpdateTareaDto,
+  ) {
+    return this.agendaService.updateTarea(user.id, id, dto);
   }
 
   @Delete("tareas/:id")
-  deleteTarea(@Param("id") id: string) {
-    return this.agendaService.deleteTarea(id);
+  deleteTarea(@CurrentUser() user: AuthenticatedUser, @Param("id") id: string) {
+    return this.agendaService.deleteTarea(user.id, id);
   }
 
-  @Get("feed-url")
-  getFeedUrl(@CurrentUser() user: AuthenticatedUser) {
-    return this.agendaService.getFeedUrl(user.id);
+  @Get("google/status")
+  googleStatus(@CurrentUser() user: AuthenticatedUser) {
+    return this.googleCalendarService.getStatus(user.id);
+  }
+
+  @Get("google/connect")
+  async googleConnect(@CurrentUser() user: AuthenticatedUser) {
+    return { url: await this.googleCalendarService.getAuthUrl(user.id) };
+  }
+
+  @Delete("google")
+  disconnectGoogle(@CurrentUser() user: AuthenticatedUser) {
+    return this.googleCalendarService.disconnect(user.id);
   }
 }

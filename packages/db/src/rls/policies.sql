@@ -86,13 +86,11 @@ CREATE POLICY tareas_agenda_self ON tareas_agenda
   USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
   WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
 
--- El feed .ics público (sin JWT, ver apps/api/src/agenda) resuelve la
--- identidad por agenda_feed_token vía auth_service y luego lee las tareas
--- de ESE usuario con esta política — mismo patrón que
--- usuarios_auth_service/refresh_tokens_auth_service_*.
-DROP POLICY IF EXISTS tareas_agenda_auth_service ON tareas_agenda;
-CREATE POLICY tareas_agenda_auth_service ON tareas_agenda
-  FOR SELECT TO auth_service USING (true);
+ALTER TABLE google_calendar_conexiones ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS google_calendar_conexiones_self ON google_calendar_conexiones;
+CREATE POLICY google_calendar_conexiones_self ON google_calendar_conexiones
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
 
 -- ===== Panel de administración =====
 -- app.is_admin lo fija RlsContextMiddleware a partir de usuarios.es_admin

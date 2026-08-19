@@ -19,6 +19,18 @@ import {
   TEMA10_BLOQUE_1_TRIBUNAL_CONSTITUCIONAL,
   TEMA11_BLOQUE_1_REFORMA,
 } from "./content/ce-titulos-2-10";
+import {
+  AAE_TEMA1_BLOQUE1,
+  AAE_TEMA1_BLOQUE2,
+  AAE_TEMA8_BLOQUE1,
+  AAE_TEMA21_BLOQUE1,
+} from "./content/aae-temario";
+import { GSI_TEMA1_BLOQUE1, GSI_TEMA5_BLOQUE1, GSI_TEMA8_BLOQUE1 } from "./content/gsi-temario";
+import {
+  C1_TEMA1_BLOQUE1,
+  C1_TEMA18_BLOQUE1,
+  C1_TEMA38_BLOQUE1,
+} from "./content/c1-admin-temario";
 import { sslModeFor } from "./ssl";
 
 config({ path: path.resolve(__dirname, "../../../.env") });
@@ -36,6 +48,21 @@ const OPOSICIONES_SEED = [
     nombre: "Técnico Auxiliar de Informática",
     categoria: "Administración General del Estado — Grupo C1",
   },
+  {
+    slug: "auxiliar-administrativo",
+    nombre: "Auxiliar Administrativo del Estado",
+    categoria: "Administración General del Estado — Grupo C2",
+  },
+  {
+    slug: "gestion-sistemas-informacion",
+    nombre: "Gestión de Sistemas e Informática",
+    categoria: "Administración General del Estado — Grupo B",
+  },
+  {
+    slug: "administrativo-estado",
+    nombre: "Administrativo del Estado",
+    categoria: "Administración General del Estado — Grupo C1",
+  },
 ];
 
 const CONSTITUCION_BOE = "BOE-A-1978-31229";
@@ -48,7 +75,7 @@ async function main() {
   const client = postgres(url, { max: 1, ssl: sslModeFor(url) });
   const db = drizzle(client, { schema });
 
-  let taiId: string | undefined;
+  const idBySlug = new Map<string, string>();
 
   for (const oposicion of OPOSICIONES_SEED) {
     const [row] = await db
@@ -60,12 +87,20 @@ async function main() {
       })
       .returning({ id: schema.oposiciones.id });
     console.log(`Oposición sembrada: ${oposicion.slug}`);
-    if (oposicion.slug === "tai") taiId = row.id;
+    idBySlug.set(oposicion.slug, row.id);
   }
 
-  if (taiId) {
-    await seedTemarioDemo(db, taiId);
-  }
+  const taiId = idBySlug.get("tai");
+  if (taiId) await seedTemarioDemo(db, taiId);
+
+  const aaeId = idBySlug.get("auxiliar-administrativo");
+  if (aaeId) await seedTemarioAAE(db, aaeId);
+
+  const gsiId = idBySlug.get("gestion-sistemas-informacion");
+  if (gsiId) await seedTemarioGSI(db, gsiId);
+
+  const c1Id = idBySlug.get("administrativo-estado");
+  if (c1Id) await seedTemarioC1Admin(db, c1Id);
 
   await client.end();
 }
@@ -249,6 +284,99 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
   console.log(
     "Temario demo sembrado: 11 temas de TAI (Tema 1 gratuito, Temas 2-11 de pago) cubriendo la Constitución Española completa.",
   );
+}
+
+/**
+ * ~10% del temario oficial de cada oposición nueva (Auxiliar Administrativo,
+ * Gestión de Sistemas e Informática, Administrativo del Estado) — el resto
+ * de temas queda pendiente (ver packages/shared-types/src/oposiciones.ts,
+ * bloques[] refleja el recuento oficial completo aunque solo estos estén
+ * sembrados). Numeración y títulos oficiales según el BOE citado en cada
+ * archivo de content/; redacción propia.
+ */
+async function seedTemarioAAE(db: Db, oposicionId: string) {
+  const tema1Id = await upsertTema(db, {
+    oposicionId,
+    orden: 1,
+    titulo: "Tema 1 · La Constitución Española de 1978",
+    esGratuito: true,
+  });
+  await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: AAE_TEMA1_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema1Id, orden: 2, contenido: AAE_TEMA1_BLOQUE2 });
+
+  const tema8Id = await upsertTema(db, {
+    oposicionId,
+    orden: 8,
+    titulo: "Tema 8 · La Administración General del Estado",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema8Id, orden: 1, contenido: AAE_TEMA8_BLOQUE1 });
+
+  const tema21Id = await upsertTema(db, {
+    oposicionId,
+    orden: 21,
+    titulo: "Tema 21 · Informática básica",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema21Id, orden: 1, contenido: AAE_TEMA21_BLOQUE1 });
+
+  console.log("Temario sembrado: 3 temas de Auxiliar Administrativo del Estado.");
+}
+
+async function seedTemarioGSI(db: Db, oposicionId: string) {
+  const tema1Id = await upsertTema(db, {
+    oposicionId,
+    orden: 1,
+    titulo: "Tema 1 · Los contratos de las Administraciones públicas",
+    esGratuito: true,
+  });
+  await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: GSI_TEMA1_BLOQUE1 });
+
+  const tema5Id = await upsertTema(db, {
+    oposicionId,
+    orden: 5,
+    titulo: "Tema 5 · Ciberseguridad",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema5Id, orden: 1, contenido: GSI_TEMA5_BLOQUE1 });
+
+  const tema8Id = await upsertTema(db, {
+    oposicionId,
+    orden: 8,
+    titulo: "Tema 8 · Inteligencia artificial",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema8Id, orden: 1, contenido: GSI_TEMA8_BLOQUE1 });
+
+  console.log("Temario sembrado: 3 temas de Gestión de Sistemas e Informática.");
+}
+
+async function seedTemarioC1Admin(db: Db, oposicionId: string) {
+  const tema1Id = await upsertTema(db, {
+    oposicionId,
+    orden: 1,
+    titulo: "Tema 1 · La Constitución Española de 1978",
+    esGratuito: true,
+  });
+  await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: C1_TEMA1_BLOQUE1 });
+
+  const tema18Id = await upsertTema(db, {
+    oposicionId,
+    orden: 18,
+    titulo: "Tema 18 · Las Leyes del Procedimiento Administrativo Común",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema18Id, orden: 1, contenido: C1_TEMA18_BLOQUE1 });
+
+  const tema38Id = await upsertTema(db, {
+    oposicionId,
+    orden: 38,
+    titulo: "Tema 38 · Informática básica",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema38Id, orden: 1, contenido: C1_TEMA38_BLOQUE1 });
+
+  console.log("Temario sembrado: 3 temas de Administrativo del Estado.");
 }
 
 const TEMA1_BLOQUE_1_ESTRUCTURA = `## Aprobación y entrada en vigor

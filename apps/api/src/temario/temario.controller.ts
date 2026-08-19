@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Header, Param, Req, Res, UseGuards } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
-import type { Request } from "express";
+import type { Request, Response } from "express";
 import { TemarioService } from "./temario.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
@@ -32,5 +32,22 @@ export class TemarioController {
     @Req() req: Request,
   ) {
     return this.temarioService.getBloque(bloqueId, user.id, req.ip ?? "unknown");
+  }
+
+  @Get("temas/:temaId/pdf")
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  @Header("Content-Type", "application/pdf")
+  // Content-Disposition "inline" (no "attachment"): el navegador/visor lo
+  // muestra en línea en vez de ofrecer descargarlo por defecto.
+  @Header("Content-Disposition", "inline")
+  @Header("Cache-Control", "no-store")
+  async getTemaPdf(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("temaId") temaId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const pdf = await this.temarioService.getTemaPdf(temaId, user.id, req.ip ?? "unknown");
+    res.send(pdf);
   }
 }

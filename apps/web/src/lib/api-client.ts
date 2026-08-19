@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 // Access token SOLO en memoria (nunca localStorage/sessionStorage): si un
 // script inyectado (XSS) puede leer memoria de proceso ya ha ganado de

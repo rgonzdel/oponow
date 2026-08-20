@@ -1,11 +1,16 @@
 // El anillo abierto + cuña sustituye la "O" de Oponow: un test casi
 // completo, empujando hacia delante ("now"). Tal cual el sistema de marca.
+// Las letras de "ponow" salen animadas desde la cuña al montar el logo.
+const LETTERS = "ponow".split("");
+
 export function OponowLogo({
   size = 28,
   className,
+  animate = true,
 }: {
   size?: number;
   className?: string;
+  animate?: boolean;
 }) {
   return (
     <div className={`flex items-center gap-[1px] ${className ?? ""}`}>
@@ -29,7 +34,15 @@ export function OponowLogo({
         className="font-medium tracking-tight"
         style={{ fontSize: size * 0.82 }}
       >
-        ponow
+        {LETTERS.map((letter, i) => (
+          <span
+            key={i}
+            className={animate ? "oponow-letter" : undefined}
+            style={animate ? { animationDelay: `${80 + i * 55}ms` } : undefined}
+          >
+            {letter}
+          </span>
+        ))}
       </span>
     </div>
   );

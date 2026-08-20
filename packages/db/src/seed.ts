@@ -25,12 +25,42 @@ import {
   AAE_TEMA8_BLOQUE1,
   AAE_TEMA21_BLOQUE1,
 } from "./content/aae-temario";
+import {
+  AAE_TEMA2_BLOQUE1,
+  AAE_TEMA11_BLOQUE1,
+  AAE_TEMA13_BLOQUE1,
+  AAE_TEMA17_BLOQUE2,
+  AAE_TEMA25_BLOQUE2,
+} from "./content/aae-temario-2";
 import { GSI_TEMA1_BLOQUE1, GSI_TEMA5_BLOQUE1, GSI_TEMA8_BLOQUE1 } from "./content/gsi-temario";
+import { GSI_TEMA4_BLOQUE1, GSI_TEMA9_BLOQUE1 } from "./content/gsi-temario-2";
 import {
   C1_TEMA1_BLOQUE1,
   C1_TEMA18_BLOQUE1,
   C1_TEMA38_BLOQUE1,
 } from "./content/c1-admin-temario";
+import {
+  C1_TEMA3_BLOQUE1,
+  C1_TEMA16_BLOQUE3,
+  C1_TEMA19_BLOQUE3,
+  C1_TEMA23_BLOQUE4,
+  C1_TEMA33_BLOQUE5,
+} from "./content/c1-admin-temario-2";
+import {
+  TAI_BLOQUE2_TEMA1_INFORMATICA_BASICA,
+  TAI_BLOQUE2_TEMA4_SISTEMAS_OPERATIVOS,
+  TAI_BLOQUE3_TEMA2_LENGUAJES_PROGRAMACION,
+  TAI_BLOQUE3_TEMA7_APLICACIONES_WEB,
+  TAI_BLOQUE4_TEMA5_SEGURIDAD_SISTEMAS,
+  TAI_BLOQUE4_TEMA7_TCPIP_OSI,
+} from "./content/tai-temario-2";
+import {
+  CORREOS_TEMA1_BLOQUE1,
+  CORREOS_TEMA2_BLOQUE1,
+  CORREOS_TEMA3_BLOQUE2,
+  CORREOS_TEMA5_BLOQUE3,
+  CORREOS_TEMA6_BLOQUE3,
+} from "./content/correos-temario";
 import { sslModeFor } from "./ssl";
 
 config({ path: path.resolve(__dirname, "../../../.env") });
@@ -62,6 +92,11 @@ const OPOSICIONES_SEED = [
     slug: "administrativo-estado",
     nombre: "Administrativo del Estado",
     categoria: "Administración General del Estado — Grupo C1",
+  },
+  {
+    slug: "correos",
+    nombre: "Correos — Reparto y Atención al Cliente",
+    categoria: "Sociedad Estatal Correos y Telégrafos",
   },
 ];
 
@@ -101,6 +136,9 @@ async function main() {
 
   const c1Id = idBySlug.get("administrativo-estado");
   if (c1Id) await seedTemarioC1Admin(db, c1Id);
+
+  const correosId = idBySlug.get("correos");
+  if (correosId) await seedTemarioCorreos(db, correosId);
 
   await client.end();
 }
@@ -281,8 +319,60 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema11Id, orden: 1, contenido: TEMA11_BLOQUE_1_REFORMA });
 
+  const tema12Id = await upsertTema(db, {
+    oposicionId,
+    orden: 12,
+    titulo: "Tema 12 · Informática básica",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema12Id, orden: 1, contenido: TAI_BLOQUE2_TEMA1_INFORMATICA_BASICA });
+
+  const tema13Id = await upsertTema(db, {
+    oposicionId,
+    orden: 13,
+    titulo: "Tema 13 · Sistemas operativos",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema13Id, orden: 1, contenido: TAI_BLOQUE2_TEMA4_SISTEMAS_OPERATIVOS });
+
+  const tema14Id = await upsertTema(db, {
+    oposicionId,
+    orden: 14,
+    titulo: "Tema 14 · Lenguajes de programación",
+    esGratuito: false,
+  });
+  await upsertBloque(db, {
+    temaId: tema14Id,
+    orden: 1,
+    contenido: TAI_BLOQUE3_TEMA2_LENGUAJES_PROGRAMACION,
+  });
+
+  const tema15Id = await upsertTema(db, {
+    oposicionId,
+    orden: 15,
+    titulo: "Tema 15 · Aplicaciones web",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema15Id, orden: 1, contenido: TAI_BLOQUE3_TEMA7_APLICACIONES_WEB });
+
+  const tema16Id = await upsertTema(db, {
+    oposicionId,
+    orden: 16,
+    titulo: "Tema 16 · Seguridad de los sistemas de información",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema16Id, orden: 1, contenido: TAI_BLOQUE4_TEMA5_SEGURIDAD_SISTEMAS });
+
+  const tema17Id = await upsertTema(db, {
+    oposicionId,
+    orden: 17,
+    titulo: "Tema 17 · El modelo TCP/IP y OSI",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema17Id, orden: 1, contenido: TAI_BLOQUE4_TEMA7_TCPIP_OSI });
+
   console.log(
-    "Temario demo sembrado: 11 temas de TAI (Tema 1 gratuito, Temas 2-11 de pago) cubriendo la Constitución Española completa.",
+    "Temario demo sembrado: 17 temas de TAI (Tema 1 gratuito, Temas 2-17 de pago) — Constitución completa (Bloque I) + ampliación de los Bloques II-IV.",
   );
 }
 
@@ -304,6 +394,14 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: AAE_TEMA1_BLOQUE1 });
   await upsertBloque(db, { temaId: tema1Id, orden: 2, contenido: AAE_TEMA1_BLOQUE2 });
 
+  const tema2Id = await upsertTema(db, {
+    oposicionId,
+    orden: 2,
+    titulo: "Tema 2 · El Tribunal Constitucional",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema2Id, orden: 1, contenido: AAE_TEMA2_BLOQUE1 });
+
   const tema8Id = await upsertTema(db, {
     oposicionId,
     orden: 8,
@@ -311,6 +409,30 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema8Id, orden: 1, contenido: AAE_TEMA8_BLOQUE1 });
+
+  const tema11Id = await upsertTema(db, {
+    oposicionId,
+    orden: 11,
+    titulo: "Tema 11 · Las Leyes del Procedimiento Administrativo Común",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema11Id, orden: 1, contenido: AAE_TEMA11_BLOQUE1 });
+
+  const tema13Id = await upsertTema(db, {
+    oposicionId,
+    orden: 13,
+    titulo: "Tema 13 · El personal funcionario",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema13Id, orden: 1, contenido: AAE_TEMA13_BLOQUE1 });
+
+  const tema17Id = await upsertTema(db, {
+    oposicionId,
+    orden: 17,
+    titulo: "Tema 17 · Atención al público",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema17Id, orden: 1, contenido: AAE_TEMA17_BLOQUE2 });
 
   const tema21Id = await upsertTema(db, {
     oposicionId,
@@ -320,7 +442,15 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema21Id, orden: 1, contenido: AAE_TEMA21_BLOQUE1 });
 
-  console.log("Temario sembrado: 3 temas de Auxiliar Administrativo del Estado.");
+  const tema25Id = await upsertTema(db, {
+    oposicionId,
+    orden: 25,
+    titulo: "Tema 25 · Hojas de cálculo: Excel 365",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema25Id, orden: 1, contenido: AAE_TEMA25_BLOQUE2 });
+
+  console.log("Temario sembrado: 8 temas de Auxiliar Administrativo del Estado.");
 }
 
 async function seedTemarioGSI(db: Db, oposicionId: string) {
@@ -331,6 +461,14 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
     esGratuito: true,
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: GSI_TEMA1_BLOQUE1 });
+
+  const tema4Id = await upsertTema(db, {
+    oposicionId,
+    orden: 4,
+    titulo: "Tema 4 · Identificación y firma electrónica",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema4Id, orden: 1, contenido: GSI_TEMA4_BLOQUE1 });
 
   const tema5Id = await upsertTema(db, {
     oposicionId,
@@ -348,7 +486,15 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema8Id, orden: 1, contenido: GSI_TEMA8_BLOQUE1 });
 
-  console.log("Temario sembrado: 3 temas de Gestión de Sistemas e Informática.");
+  const tema9Id = await upsertTema(db, {
+    oposicionId,
+    orden: 9,
+    titulo: "Tema 9 · Técnicas de diseño de software y DevOps",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema9Id, orden: 1, contenido: GSI_TEMA9_BLOQUE1 });
+
+  console.log("Temario sembrado: 5 temas de Gestión de Sistemas e Informática.");
 }
 
 async function seedTemarioC1Admin(db: Db, oposicionId: string) {
@@ -360,6 +506,22 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: C1_TEMA1_BLOQUE1 });
 
+  const tema3Id = await upsertTema(db, {
+    oposicionId,
+    orden: 3,
+    titulo: "Tema 3 · Las Cortes Generales",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema3Id, orden: 1, contenido: C1_TEMA3_BLOQUE1 });
+
+  const tema16Id = await upsertTema(db, {
+    oposicionId,
+    orden: 16,
+    titulo: "Tema 16 · Las fuentes del derecho administrativo",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema16Id, orden: 1, contenido: C1_TEMA16_BLOQUE3 });
+
   const tema18Id = await upsertTema(db, {
     oposicionId,
     orden: 18,
@@ -367,6 +529,30 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema18Id, orden: 1, contenido: C1_TEMA18_BLOQUE1 });
+
+  const tema19Id = await upsertTema(db, {
+    oposicionId,
+    orden: 19,
+    titulo: "Tema 19 · Los contratos del sector público",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema19Id, orden: 1, contenido: C1_TEMA19_BLOQUE3 });
+
+  const tema23Id = await upsertTema(db, {
+    oposicionId,
+    orden: 23,
+    titulo: "Tema 23 · El personal al servicio de las Administraciones Públicas",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema23Id, orden: 1, contenido: C1_TEMA23_BLOQUE4 });
+
+  const tema33Id = await upsertTema(db, {
+    oposicionId,
+    orden: 33,
+    titulo: "Tema 33 · El presupuesto del Estado en España",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema33Id, orden: 1, contenido: C1_TEMA33_BLOQUE5 });
 
   const tema38Id = await upsertTema(db, {
     oposicionId,
@@ -376,7 +562,57 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema38Id, orden: 1, contenido: C1_TEMA38_BLOQUE1 });
 
-  console.log("Temario sembrado: 3 temas de Administrativo del Estado.");
+  console.log("Temario sembrado: 8 temas de Administrativo del Estado.");
+}
+
+/**
+ * Temario de Correos (Sociedad Estatal Correos y Telégrafos) — oposición
+ * nueva en el catálogo. Estructura reconstruida de fuentes públicas
+ * consistentes (ver cabecera de content/correos-temario.ts), no un anexo BOE
+ * literal. 5 de 12 temas sembrados (~42%).
+ */
+async function seedTemarioCorreos(db: Db, oposicionId: string) {
+  const tema1Id = await upsertTema(db, {
+    oposicionId,
+    orden: 1,
+    titulo: "Tema 1 · Productos y servicios postales",
+    esGratuito: true,
+  });
+  await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: CORREOS_TEMA1_BLOQUE1 });
+
+  const tema2Id = await upsertTema(db, {
+    oposicionId,
+    orden: 2,
+    titulo: "Tema 2 · Paquetería y logística",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema2Id, orden: 1, contenido: CORREOS_TEMA2_BLOQUE1 });
+
+  const tema5Id = await upsertTema(db, {
+    oposicionId,
+    orden: 5,
+    titulo: "Tema 5 · Clasificación y reparto",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema5Id, orden: 1, contenido: CORREOS_TEMA3_BLOQUE2 });
+
+  const tema10Id = await upsertTema(db, {
+    oposicionId,
+    orden: 10,
+    titulo: "Tema 10 · Normativa postal y protección de datos",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema10Id, orden: 1, contenido: CORREOS_TEMA5_BLOQUE3 });
+
+  const tema11Id = await upsertTema(db, {
+    oposicionId,
+    orden: 11,
+    titulo: "Tema 11 · Prevención de riesgos laborales",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema11Id, orden: 1, contenido: CORREOS_TEMA6_BLOQUE3 });
+
+  console.log("Temario sembrado: 5 temas de Correos.");
 }
 
 const TEMA1_BLOQUE_1_ESTRUCTURA = `## Aprobación y entrada en vigor

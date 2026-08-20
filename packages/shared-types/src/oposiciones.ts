@@ -148,4 +148,33 @@ export const OPOSICIONES: Oposicion[] = [
     aniosExamenes: [],
     totalPreguntas: 0,
   },
+  {
+    slug: "correos",
+    nombre: "Correos — Reparto y Atención al Cliente",
+    siglas: "CORREOS",
+    organismo: "Sociedad Estatal Correos y Telégrafos",
+    grupo: "Personal laboral",
+    disponible: true,
+    resumen:
+      "Reparto, clasificación y atención al cliente en la Sociedad Estatal Correos y Telégrafos, el operador del servicio postal universal en España.",
+    descripcion:
+      "Proceso selectivo de la Sociedad Estatal Correos y Telégrafos para personal de reparto, clasificación y atención al cliente. Sus funciones cubren la admisión, clasificación y entrega de correspondencia y paquetería, la atención al público en oficinas y puntos de conveniencia, y el cumplimiento de la normativa postal, de protección de datos y de prevención de riesgos laborales propia del puesto.",
+    requisitos:
+      "Graduado en Educación Secundaria Obligatoria (ESO), Graduado Escolar o equivalente. Para puestos de reparto motorizado, carné de conducir según convocatoria.",
+    estructuraExamen: [
+      "Temario en tres bloques (12 temas): Productos y Servicios Postales, Procesos Operativos y Atención al Cliente, y Normativa, Seguridad y PRL.",
+      "Estructura no reconstruida de un anexo BOE único (Correos es una sociedad estatal, no un cuerpo de la AGE) sino de fuentes públicas consistentes sobre el proceso selectivo — consulta siempre las bases de la convocatoria vigente para la estructura exacta del ejercicio.",
+    ],
+    bloques: [
+      { numero: "I", nombre: "Productos y Servicios Postales", temas: 4 },
+      { numero: "II", nombre: "Procesos Operativos y Atención al Cliente", temas: 5 },
+      { numero: "III", nombre: "Normativa, Seguridad y PRL", temas: 3 },
+    ],
+    plazasInfo:
+      "Convocatorias periódicas a lo largo del año, con volumen variable según campaña (refuerzos de Navidad y Black Friday incluidos). Cifra orientativa — consulta siempre la convocatoria vigente.",
+    sueldoInfo:
+      "Retribución fijada por el convenio colectivo de Correos según el grupo profesional y el puesto. Orientativo: 15.000–19.000 € brutos/año al inicio.",
+    aniosExamenes: [],
+    totalPreguntas: 0,
+  },
 ];

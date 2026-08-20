@@ -61,6 +61,45 @@ import {
   CORREOS_TEMA5_BLOQUE3,
   CORREOS_TEMA6_BLOQUE3,
 } from "./content/correos-temario";
+import {
+  TAI_TEMA12_PARTE2,
+  TAI_TEMA13_PARTE2,
+  TAI_TEMA14_PARTE2,
+  TAI_TEMA15_PARTE2,
+  TAI_TEMA16_PARTE2,
+  TAI_TEMA17_PARTE2,
+} from "./content/tai-temario-3";
+import {
+  AAE_TEMA2_PARTE2,
+  AAE_TEMA8_PARTE2,
+  AAE_TEMA11_PARTE2,
+  AAE_TEMA13_PARTE2,
+  AAE_TEMA17_PARTE2,
+  AAE_TEMA21_PARTE2,
+  AAE_TEMA25_PARTE2,
+} from "./content/aae-temario-3";
+import {
+  GSI_TEMA1_PARTE2,
+  GSI_TEMA4_PARTE2,
+  GSI_TEMA5_PARTE2,
+  GSI_TEMA8_PARTE2,
+  GSI_TEMA9_PARTE2,
+} from "./content/gsi-temario-3";
+import {
+  C1_TEMA3_PARTE2,
+  C1_TEMA16_PARTE2,
+  C1_TEMA19_PARTE2,
+  C1_TEMA23_PARTE2,
+  C1_TEMA33_PARTE2,
+  C1_TEMA38_PARTE2,
+} from "./content/c1-admin-temario-3";
+import {
+  CORREOS_TEMA1_PARTE2,
+  CORREOS_TEMA2_PARTE2,
+  CORREOS_TEMA5_PARTE2,
+  CORREOS_TEMA10_PARTE2,
+  CORREOS_TEMA11_PARTE2,
+} from "./content/correos-temario-2";
 import { sslModeFor } from "./ssl";
 
 config({ path: path.resolve(__dirname, "../../../.env") });
@@ -326,6 +365,7 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema12Id, orden: 1, contenido: TAI_BLOQUE2_TEMA1_INFORMATICA_BASICA });
+  await upsertBloque(db, { temaId: tema12Id, orden: 2, contenido: TAI_TEMA12_PARTE2 });
 
   const tema13Id = await upsertTema(db, {
     oposicionId,
@@ -334,6 +374,7 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema13Id, orden: 1, contenido: TAI_BLOQUE2_TEMA4_SISTEMAS_OPERATIVOS });
+  await upsertBloque(db, { temaId: tema13Id, orden: 2, contenido: TAI_TEMA13_PARTE2 });
 
   const tema14Id = await upsertTema(db, {
     oposicionId,
@@ -346,6 +387,7 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
     orden: 1,
     contenido: TAI_BLOQUE3_TEMA2_LENGUAJES_PROGRAMACION,
   });
+  await upsertBloque(db, { temaId: tema14Id, orden: 2, contenido: TAI_TEMA14_PARTE2 });
 
   const tema15Id = await upsertTema(db, {
     oposicionId,
@@ -354,6 +396,7 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema15Id, orden: 1, contenido: TAI_BLOQUE3_TEMA7_APLICACIONES_WEB });
+  await upsertBloque(db, { temaId: tema15Id, orden: 2, contenido: TAI_TEMA15_PARTE2 });
 
   const tema16Id = await upsertTema(db, {
     oposicionId,
@@ -362,6 +405,7 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema16Id, orden: 1, contenido: TAI_BLOQUE4_TEMA5_SEGURIDAD_SISTEMAS });
+  await upsertBloque(db, { temaId: tema16Id, orden: 2, contenido: TAI_TEMA16_PARTE2 });
 
   const tema17Id = await upsertTema(db, {
     oposicionId,
@@ -370,6 +414,7 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema17Id, orden: 1, contenido: TAI_BLOQUE4_TEMA7_TCPIP_OSI });
+  await upsertBloque(db, { temaId: tema17Id, orden: 2, contenido: TAI_TEMA17_PARTE2 });
 
   console.log(
     "Temario demo sembrado: 17 temas de TAI (Tema 1 gratuito, Temas 2-17 de pago) — Constitución completa (Bloque I) + ampliación de los Bloques II-IV.",
@@ -401,6 +446,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema2Id, orden: 1, contenido: AAE_TEMA2_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema2Id, orden: 2, contenido: AAE_TEMA2_PARTE2 });
 
   const tema8Id = await upsertTema(db, {
     oposicionId,
@@ -409,6 +455,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema8Id, orden: 1, contenido: AAE_TEMA8_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema8Id, orden: 2, contenido: AAE_TEMA8_PARTE2 });
 
   const tema11Id = await upsertTema(db, {
     oposicionId,
@@ -417,6 +464,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema11Id, orden: 1, contenido: AAE_TEMA11_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema11Id, orden: 2, contenido: AAE_TEMA11_PARTE2 });
 
   const tema13Id = await upsertTema(db, {
     oposicionId,
@@ -425,6 +473,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema13Id, orden: 1, contenido: AAE_TEMA13_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema13Id, orden: 2, contenido: AAE_TEMA13_PARTE2 });
 
   const tema17Id = await upsertTema(db, {
     oposicionId,
@@ -433,6 +482,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema17Id, orden: 1, contenido: AAE_TEMA17_BLOQUE2 });
+  await upsertBloque(db, { temaId: tema17Id, orden: 2, contenido: AAE_TEMA17_PARTE2 });
 
   const tema21Id = await upsertTema(db, {
     oposicionId,
@@ -441,6 +491,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema21Id, orden: 1, contenido: AAE_TEMA21_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema21Id, orden: 2, contenido: AAE_TEMA21_PARTE2 });
 
   const tema25Id = await upsertTema(db, {
     oposicionId,
@@ -449,6 +500,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema25Id, orden: 1, contenido: AAE_TEMA25_BLOQUE2 });
+  await upsertBloque(db, { temaId: tema25Id, orden: 2, contenido: AAE_TEMA25_PARTE2 });
 
   console.log("Temario sembrado: 8 temas de Auxiliar Administrativo del Estado.");
 }
@@ -461,6 +513,7 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
     esGratuito: true,
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: GSI_TEMA1_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema1Id, orden: 2, contenido: GSI_TEMA1_PARTE2 });
 
   const tema4Id = await upsertTema(db, {
     oposicionId,
@@ -469,6 +522,7 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema4Id, orden: 1, contenido: GSI_TEMA4_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema4Id, orden: 2, contenido: GSI_TEMA4_PARTE2 });
 
   const tema5Id = await upsertTema(db, {
     oposicionId,
@@ -477,6 +531,7 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema5Id, orden: 1, contenido: GSI_TEMA5_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema5Id, orden: 2, contenido: GSI_TEMA5_PARTE2 });
 
   const tema8Id = await upsertTema(db, {
     oposicionId,
@@ -485,6 +540,7 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema8Id, orden: 1, contenido: GSI_TEMA8_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema8Id, orden: 2, contenido: GSI_TEMA8_PARTE2 });
 
   const tema9Id = await upsertTema(db, {
     oposicionId,
@@ -493,6 +549,7 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema9Id, orden: 1, contenido: GSI_TEMA9_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema9Id, orden: 2, contenido: GSI_TEMA9_PARTE2 });
 
   console.log("Temario sembrado: 5 temas de Gestión de Sistemas e Informática.");
 }
@@ -513,6 +570,7 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema3Id, orden: 1, contenido: C1_TEMA3_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema3Id, orden: 2, contenido: C1_TEMA3_PARTE2 });
 
   const tema16Id = await upsertTema(db, {
     oposicionId,
@@ -521,6 +579,7 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema16Id, orden: 1, contenido: C1_TEMA16_BLOQUE3 });
+  await upsertBloque(db, { temaId: tema16Id, orden: 2, contenido: C1_TEMA16_PARTE2 });
 
   const tema18Id = await upsertTema(db, {
     oposicionId,
@@ -537,6 +596,7 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema19Id, orden: 1, contenido: C1_TEMA19_BLOQUE3 });
+  await upsertBloque(db, { temaId: tema19Id, orden: 2, contenido: C1_TEMA19_PARTE2 });
 
   const tema23Id = await upsertTema(db, {
     oposicionId,
@@ -545,6 +605,7 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema23Id, orden: 1, contenido: C1_TEMA23_BLOQUE4 });
+  await upsertBloque(db, { temaId: tema23Id, orden: 2, contenido: C1_TEMA23_PARTE2 });
 
   const tema33Id = await upsertTema(db, {
     oposicionId,
@@ -553,6 +614,7 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema33Id, orden: 1, contenido: C1_TEMA33_BLOQUE5 });
+  await upsertBloque(db, { temaId: tema33Id, orden: 2, contenido: C1_TEMA33_PARTE2 });
 
   const tema38Id = await upsertTema(db, {
     oposicionId,
@@ -561,6 +623,7 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema38Id, orden: 1, contenido: C1_TEMA38_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema38Id, orden: 2, contenido: C1_TEMA38_PARTE2 });
 
   console.log("Temario sembrado: 8 temas de Administrativo del Estado.");
 }
@@ -579,6 +642,7 @@ async function seedTemarioCorreos(db: Db, oposicionId: string) {
     esGratuito: true,
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: CORREOS_TEMA1_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema1Id, orden: 2, contenido: CORREOS_TEMA1_PARTE2 });
 
   const tema2Id = await upsertTema(db, {
     oposicionId,
@@ -587,6 +651,7 @@ async function seedTemarioCorreos(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema2Id, orden: 1, contenido: CORREOS_TEMA2_BLOQUE1 });
+  await upsertBloque(db, { temaId: tema2Id, orden: 2, contenido: CORREOS_TEMA2_PARTE2 });
 
   const tema5Id = await upsertTema(db, {
     oposicionId,
@@ -595,6 +660,7 @@ async function seedTemarioCorreos(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema5Id, orden: 1, contenido: CORREOS_TEMA3_BLOQUE2 });
+  await upsertBloque(db, { temaId: tema5Id, orden: 2, contenido: CORREOS_TEMA5_PARTE2 });
 
   const tema10Id = await upsertTema(db, {
     oposicionId,
@@ -603,6 +669,7 @@ async function seedTemarioCorreos(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema10Id, orden: 1, contenido: CORREOS_TEMA5_BLOQUE3 });
+  await upsertBloque(db, { temaId: tema10Id, orden: 2, contenido: CORREOS_TEMA10_PARTE2 });
 
   const tema11Id = await upsertTema(db, {
     oposicionId,
@@ -611,6 +678,7 @@ async function seedTemarioCorreos(db: Db, oposicionId: string) {
     esGratuito: false,
   });
   await upsertBloque(db, { temaId: tema11Id, orden: 1, contenido: CORREOS_TEMA6_BLOQUE3 });
+  await upsertBloque(db, { temaId: tema11Id, orden: 2, contenido: CORREOS_TEMA11_PARTE2 });
 
   console.log("Temario sembrado: 5 temas de Correos.");
 }

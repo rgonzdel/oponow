@@ -1,5 +1,6 @@
 import { createElement as h } from "react";
 import {
+  Circle,
   Document,
   Page,
   Path,
@@ -33,6 +34,7 @@ const AnyText = Text as any;
 const AnySvg = Svg as any;
 const AnyPath = Path as any;
 const AnyRect = Rect as any;
+const AnyCircle = Circle as any;
 
 // Tokens literales del sistema de marca "Nocturne" (mismos hex que
 // apps/web/tailwind.config.js) — el PDF usa el mismo fondo oscuro y el
@@ -65,7 +67,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  brandText: { fontSize: 11, fontWeight: 700, color: COLOR.inkText, marginLeft: 6 },
+  brandText: {
+    fontSize: 11,
+    lineHeight: 1,
+    fontWeight: 700,
+    color: COLOR.inkText,
+    marginLeft: 5,
+  },
   title: { fontSize: 20, fontWeight: 700, color: COLOR.inkText, marginBottom: 4 },
   subtitle: {
     fontSize: 10,
@@ -90,18 +98,20 @@ const styles = StyleSheet.create({
   },
 });
 
-function logoMark(size = 14) {
+// Versión propia (no la de apps/web/src/components/OponowLogo.tsx) del
+// anillo de marca para el PDF: aquí se dibuja como una simple corona
+// (círculo exterior + círculo interior del color de fondo de página), sin
+// paths de arco SVG ("A") ni strokeDasharray. A los 14-15px a los que se
+// renderiza esta marca en la cabecera del documento, el hueco+cuña del
+// logo web (pensado para tamaños más grandes) se percibía borroso/roto —
+// una corona sólida se ve nítida a cualquier tamaño y sigue leyéndose
+// como la "O" de Oponow junto al texto "ponow".
+function logoMark(size = 15) {
   return h(
     AnySvg,
     { width: size, height: size, viewBox: "0 0 44 44" },
-    h(AnyPath, {
-      d: "M37.98 27.82 A17 17 0 1 1 37.98 16.18",
-      stroke: COLOR.accent,
-      strokeWidth: 5,
-      strokeLinecap: "round",
-      fill: "none",
-    }),
-    h(AnyPath, { d: "M34 15 L44 22 L34 29 Z", fill: COLOR.accent }),
+    h(AnyCircle, { cx: 22, cy: 22, r: 18, fill: COLOR.accent }),
+    h(AnyCircle, { cx: 22, cy: 22, r: 11.5, fill: COLOR.ink }),
   );
 }
 

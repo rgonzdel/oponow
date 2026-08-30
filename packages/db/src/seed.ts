@@ -695,28 +695,53 @@ async function seedTemarioCorreos(db: Db, oposicionId: string) {
 }
 
 const TEMA1_BLOQUE_1_ESTRUCTURA = `## Aprobación y entrada en vigor
-La Constitución Española (CE) fue aprobada por las Cortes en sesiones plenarias del Congreso y el Senado el 31 de octubre de 1978, ratificada en referéndum el 6 de diciembre de 1978, sancionada por el Rey el 27 de diciembre y publicada en el BOE número 311, de 29 de diciembre de 1978, fecha de su entrada en vigor. Es la norma suprema del ordenamiento jurídico español: toda ley, reglamento o acto de los poderes públicos debe ajustarse a ella.
+La Constitución Española (CE) fue aprobada por las Cortes en sesiones plenarias del Congreso y el Senado el **31 de octubre de 1978**, ratificada en referéndum el **6 de diciembre de 1978**, sancionada por el Rey el **27 de diciembre** y publicada en el BOE número 311, de **29 de diciembre de 1978**, fecha de su entrada en vigor. Es la norma suprema del ordenamiento jurídico español: toda ley, reglamento o acto de los poderes públicos debe ajustarse a ella.
+
+#### Para recordar
+La Constitución no entró en vigor con el referéndum ni con la sanción real, sino con su **publicación en el BOE el 29 de diciembre de 1978**. La disposición final dice literalmente que entrará en vigor "el mismo día de la publicación de su texto oficial en el Boletín Oficial del Estado".
 
 ## Estructura formal
-Se compone de un preámbulo, un título preliminar, diez títulos numerados del I al X, cuatro disposiciones adicionales, nueve disposiciones transitorias, una disposición derogatoria y una disposición final. En total suma 169 artículos.
+Se compone de un preámbulo, un título preliminar, **diez títulos** numerados del I al X, **cuatro** disposiciones adicionales, **nueve** disposiciones transitorias, **una** derogatoria y **una** final. En total suma **169 artículos**.
 
 ## El preámbulo
 No tiene fuerza jurídica vinculante por sí mismo, pero orienta la interpretación del resto del texto: expresa la voluntad de garantizar la convivencia democrática, consolidar un Estado de derecho, proteger a españoles y pueblos de España en el ejercicio de sus derechos, promover el progreso, establecer una sociedad democrática avanzada y colaborar en el fortalecimiento de relaciones pacíficas entre los pueblos.
 
 ## Parte dogmática y parte orgánica
-Por su contenido, se distingue habitualmente entre una parte dogmática, que recoge los principios y derechos (título preliminar y título I), y una parte orgánica, que organiza los poderes del Estado (títulos II a IX). El título X, dedicado a la reforma constitucional, no encaja en ninguna de las dos categorías anteriores.
+Por su contenido, se distingue habitualmente entre una *parte dogmática*, que recoge los principios y derechos (título preliminar y título I), y una *parte orgánica*, que organiza los poderes del Estado (títulos II a IX). El título X, dedicado a la reforma constitucional, no encaja en ninguna de las dos categorías anteriores.
 
-## Los diez títulos
-I. De los derechos y deberes fundamentales (arts. 10 a 55); II. De la Corona (arts. 56 a 65); III. De las Cortes Generales (arts. 66 a 96); IV. Del Gobierno y de la Administración (arts. 97 a 107); V. De las relaciones entre el Gobierno y las Cortes Generales (arts. 108 a 116); VI. Del Poder Judicial (arts. 117 a 127); VII. Economía y Hacienda (arts. 128 a 136); VIII. De la Organización Territorial del Estado (arts. 137 a 158); IX. Del Tribunal Constitucional (arts. 159 a 165); X. De la reforma constitucional (arts. 166 a 169).
+#### Tabla · Los diez títulos
+| Título | Artículos | Contenido |
+| --- | --- | --- |
+| Preliminar | 1 – 9 | Definición del Estado, valores superiores, principios constitucionales |
+| I | 10 – 55 | Derechos y deberes fundamentales |
+| II | 56 – 65 | De la Corona |
+| III | 66 – 96 | De las Cortes Generales |
+| IV | 97 – 107 | Del Gobierno y de la Administración |
+| V | 108 – 116 | Relaciones entre el Gobierno y las Cortes Generales |
+| VI | 117 – 127 | Del Poder Judicial |
+| VII | 128 – 136 | Economía y Hacienda |
+| VIII | 137 – 158 | De la Organización Territorial del Estado |
+| IX | 159 – 165 | Del Tribunal Constitucional |
+| X | 166 – 169 | De la reforma constitucional |
 
 ## Qué cubre este tema
-Este primer tema se centra en el título preliminar y en el título I, que son la base de todo lo demás: definen qué tipo de Estado es España, qué valores lo sustentan y qué derechos y deberes tienen las personas frente a los poderes públicos. Los títulos II a X, sobre la organización concreta de la Corona, las Cortes, el Gobierno, el Poder Judicial y el resto de instituciones, se desarrollan en temas posteriores.`;
+Este primer tema se centra en el título preliminar y en el título I, que son la base de todo lo demás: definen qué tipo de Estado es España, qué valores lo sustentan y qué derechos y deberes tienen las personas frente a los poderes públicos. Los títulos II a X, sobre la organización concreta de la Corona, las Cortes, el Gobierno, el Poder Judicial y el resto de instituciones, se desarrollan en temas posteriores.
+
+#### Pregunta de repaso
+¿En qué fecha entró en vigor la Constitución y con qué acto concreto?
+
+---
+
+Entró en vigor el 29 de diciembre de 1978, fecha de su publicación en el BOE (número 311) — no con el referéndum del 6 de diciembre ni con la sanción real del 27 de diciembre, que son actos previos del mismo proceso.`;
 
 const TEMA1_BLOQUE_2_TITULO_PRELIMINAR = `## Título preliminar (artículos 1 a 9)
 Fija los rasgos de identidad del Estado español antes de entrar en el desarrollo de derechos o de instituciones concretas.
 
 ## Artículo 1 · Estado social y democrático de Derecho
-Es el más citado de todo el texto: en su apartado 1 define a España como un Estado social y democrático de Derecho, que propugna como valores superiores de su ordenamiento jurídico la libertad, la justicia, la igualdad y el pluralismo político. El apartado 2 sitúa la soberanía nacional en el pueblo español, del que emanan los poderes del Estado. El apartado 3 establece que la forma política del Estado español es la Monarquía parlamentaria.
+Es el más citado de todo el texto: en su apartado 1 define a España como un **Estado social y democrático de Derecho**, que propugna como valores superiores de su ordenamiento jurídico la **libertad, la justicia, la igualdad y el pluralismo político** —en ese orden—. El apartado 2 sitúa la **soberanía nacional en el pueblo español**, del que emanan los poderes del Estado. El apartado 3 establece que la **forma política** del Estado español es la **Monarquía parlamentaria**.
+
+#### Mnemotecnia
+El orden de los valores superiores del art. 1.1 se recuerda como **"Li-Ju-I-P"**: *Libertad, Justicia, Igualdad, Pluralismo* político. No incluyas aquí la solidaridad (art. 2) ni la dignidad de la persona (art. 10.1): son valores de otros artículos, y el examen los mezcla a propósito.
 
 ## Artículo 2 · Unidad de la Nación y derecho a la autonomía
 Recoge el llamado principio dispositivo: la Constitución se fundamenta en la indisoluble unidad de la Nación española, patria común e indivisible de todos los españoles, y al mismo tiempo reconoce y garantiza el derecho a la autonomía de las nacionalidades y regiones que la integran y la solidaridad entre todas ellas. Es la base sobre la que se construye después, en el título VIII, el Estado de las Autonomías.
@@ -740,7 +765,25 @@ Dice lo mismo, con matices, para los sindicatos de trabajadores y las asociacion
 Se ocupa de las Fuerzas Armadas (Ejército de Tierra, Armada y Ejército del Aire), cuya misión es garantizar la soberanía e independencia de España, defender su integridad territorial y el ordenamiento constitucional; una ley orgánica regula las bases de la organización militar.
 
 ## Artículo 9 · Sujeción al ordenamiento y principio de legalidad
-Cierra el título preliminar con tres apartados clave para cualquier empleado público. El 9.1 sujeta a ciudadanos y poderes públicos a la Constitución y al resto del ordenamiento jurídico. El 9.2 encomienda a los poderes públicos promover las condiciones para que la libertad y la igualdad del individuo y de los grupos en que se integra sean reales y efectivas, remover los obstáculos que impidan o dificulten su plenitud, y facilitar la participación de todos los ciudadanos en la vida política, económica, cultural y social. El 9.3 garantiza el principio de legalidad, la jerarquía normativa, la publicidad de las normas, la irretroactividad de las disposiciones sancionadoras no favorables o restrictivas de derechos individuales, la seguridad jurídica, la responsabilidad y la interdicción de la arbitrariedad de los poderes públicos — este último apartado es, junto con el artículo 103.1 del título IV, uno de los fundamentos jurídicos de cómo debe comportarse cualquier Administración Pública, incluida la gestión de sus sistemas de información.`;
+Cierra el título preliminar con tres apartados clave para cualquier empleado público. El **9.1** sujeta a ciudadanos y poderes públicos a la Constitución y al resto del ordenamiento jurídico. El **9.2** encomienda a los poderes públicos promover las condiciones para que la libertad y la igualdad del individuo y de los grupos en que se integra sean reales y efectivas, remover los obstáculos que impidan o dificulten su plenitud, y facilitar la participación de todos los ciudadanos en la vida política, económica, cultural y social. El **9.3** garantiza el principio de legalidad, la jerarquía normativa, la publicidad de las normas, la irretroactividad de las disposiciones sancionadoras no favorables o restrictivas de derechos individuales, la seguridad jurídica, la responsabilidad y la interdicción de la arbitrariedad de los poderes públicos — este último apartado es, junto con el artículo 103.1 del título IV, uno de los fundamentos jurídicos de cómo debe comportarse cualquier Administración Pública, incluida la gestión de sus sistemas de información.
+
+#### Tabla · Los siete principios del artículo 9.3
+| # | Principio |
+| --- | --- |
+| 1 | Legalidad |
+| 2 | Jerarquía normativa |
+| 3 | Publicidad de las normas |
+| 4 | Irretroactividad de lo sancionador desfavorable |
+| 5 | Seguridad jurídica |
+| 6 | Responsabilidad de los poderes públicos |
+| 7 | Interdicción de la arbitrariedad |
+
+#### Pregunta de repaso
+¿La irretroactividad que garantiza el artículo 9.3 alcanza a todas las disposiciones sancionadoras, o solo a algunas?
+
+---
+
+Solo a las **no favorables o restrictivas de derechos individuales**. Una disposición sancionadora que rebaje una sanción sí puede aplicarse con carácter retroactivo, porque en ese caso favorece al afectado.`;
 
 const TEMA1_BLOQUE_3_DERECHOS_FUNDAMENTALES = `## Título I (artículos 10 a 55)
 "De los derechos y deberes fundamentales" es el título más extenso de la Constitución y el que con más frecuencia aparece en los exámenes. Se divide en cinco capítulos: I. De los españoles y los extranjeros; II. Derechos y libertades (con dos secciones); III. De los principios rectores de la política social y económica; IV. De las garantías de las libertades y derechos fundamentales; V. De la suspensión de los derechos y libertades.
@@ -752,7 +795,10 @@ Abre el título con una idea de fondo: la dignidad de la persona, los derechos i
 El capítulo I regula la nacionalidad. El artículo 11 establece que la nacionalidad española se adquiere, conserva y pierde de acuerdo con la ley, y que ningún español de origen puede ser privado de su nacionalidad. El artículo 12 fija la mayoría de edad en los 18 años. El artículo 13 dice que los extranjeros gozarán en España de las libertades públicas según los tratados y la ley, que solo los españoles son titulares de los derechos del artículo 23 (salvo excepción por reciprocidad para el sufragio municipal) y que la extradición solo se concede en cumplimiento de un tratado o de la ley, quedando excluidos los delitos políticos.
 
 ## Artículo 14 · Igualdad ante la ley
-Abre la sección 1ª del capítulo II —"De los derechos fundamentales y de las libertades públicas", artículos 15 a 29, la parte más protegida del texto, que solo puede desarrollarse por ley orgánica y cuenta con recurso de amparo ante el Tribunal Constitucional— declarando a los españoles iguales ante la ley, sin que pueda prevalecer discriminación alguna por razón de nacimiento, raza, sexo, religión, opinión o cualquier otra condición o circunstancia personal o social.
+Encabeza el capítulo II, justo antes de la **sección 1ª** —"De los derechos fundamentales y de las libertades públicas", artículos **15 a 29**, la parte más protegida del texto, que solo puede desarrollarse por ley orgánica y cuenta con recurso de amparo ante el Tribunal Constitucional—, declarando a los españoles iguales ante la ley, sin que pueda prevalecer discriminación alguna por razón de nacimiento, raza, sexo, religión, opinión o cualquier otra condición o circunstancia personal o social.
+
+#### Para recordar
+El artículo 14 **no forma parte, formalmente, de la sección 1ª** (que empieza en el art. 15) — y sin embargo **sí tiene recurso de amparo**, porque el artículo 53.2 lo menciona expresamente junto a esa sección. Es una de las preguntas trampa más repetidas del temario.
 
 ## Artículo 15 · Vida e integridad física y moral
 Reconoce el derecho a la vida y a la integridad física y moral, prohíbe la tortura y las penas o tratos inhumanos o degradantes, y abole la pena de muerte salvo lo que puedan disponer las leyes penales militares para tiempos de guerra.
@@ -761,7 +807,7 @@ Reconoce el derecho a la vida y a la integridad física y moral, prohíbe la tor
 Garantiza la libertad ideológica, religiosa y de culto, sin más limitación que el mantenimiento del orden público; nadie puede ser obligado a declarar su ideología, religión o creencias, y ninguna confesión tiene carácter estatal, sin perjuicio de la cooperación con la Iglesia Católica y las demás confesiones.
 
 ## Artículo 17 · Libertad y seguridad
-Protege la libertad y la seguridad: la detención preventiva no puede durar más del tiempo estrictamente necesario y en ningún caso más de 72 horas, el detenido debe ser informado de forma inmediata y comprensible de sus derechos y de las razones de la detención, y se garantiza el procedimiento de habeas corpus.
+Protege la libertad y la seguridad: la detención preventiva no puede durar más del tiempo estrictamente necesario y en ningún caso más de **72 horas**, el detenido debe ser informado de forma inmediata y comprensible de sus derechos y de las razones de la detención, y se garantiza el procedimiento de *habeas corpus*.
 
 ## Artículo 18 · Honor, intimidad y domicilio
 Protege el honor, la intimidad personal y familiar y la propia imagen; declara inviolable el domicilio, que solo puede registrarse con consentimiento del titular, resolución judicial o en caso de flagrante delito; garantiza el secreto de las comunicaciones salvo resolución judicial, y encarga a la ley limitar el uso de la informática para garantizar el honor, la intimidad y el pleno ejercicio de los derechos de las personas.
@@ -797,10 +843,20 @@ Reconoce el derecho a la educación y la libertad de enseñanza; la enseñanza b
 Reconoce el derecho a sindicarse libremente y el derecho a la huelga de los trabajadores para la defensa de sus intereses, garantizando el mantenimiento de los servicios esenciales de la comunidad.
 
 ## Artículo 29 · Derecho de petición
-Cierra la sección con el derecho de petición individual y colectiva, siempre por escrito, ante los poderes públicos.`;
+Cierra la sección con el derecho de petición individual y colectiva, siempre por escrito, ante los poderes públicos.
+
+#### Pregunta de repaso
+El artículo 12 fija la mayoría de edad en 18 años, pero ¿en qué capítulo y artículo del título I se encuentra, y forma parte de la sección más protegida (arts. 15-29)?
+
+---
+
+Está en el **artículo 12**, dentro del **capítulo I** ("De los españoles y los extranjeros", arts. 11 a 13) — **no** en la sección 1ª del capítulo II. Por eso no lleva aparejado recurso de amparo directo.`;
 
 const TEMA1_BLOQUE_4_DEBERES_CIUDADANOS = `## Sección 2ª del capítulo II (artículos 30 a 38)
-"De los derechos y deberes de los ciudadanos" tiene un grado de protección menor que la sección 1ª: se desarrolla por ley ordinaria y no tiene recurso de amparo directo, aunque sigue vinculando a todos los poderes públicos.
+"De los derechos y deberes de los ciudadanos" tiene un grado de protección **menor** que la sección 1ª: se desarrolla por **ley ordinaria** y **no tiene recurso de amparo directo**, aunque sigue vinculando a todos los poderes públicos.
+
+#### Para recordar
+No confundas esta sección con la 1ª: aquí la reserva es de **ley ordinaria** (no orgánica) y **no cabe amparo** ante el Tribunal Constitucional, solo recurso de inconstitucionalidad.
 
 ## Artículo 30 · Defensa de España y objeción de conciencia
 Reconoce el derecho y el deber de los españoles de defender España; regula la objeción de conciencia y prevé la posibilidad de un servicio civil sustitutorio.
@@ -827,10 +883,20 @@ Remite a la ley la regulación de las peculiaridades propias del régimen juríd
 Garantiza el derecho a la negociación colectiva laboral entre representantes de trabajadores y empresarios, y reconoce el derecho de unos y otros a adoptar medidas de conflicto colectivo, con las garantías necesarias para asegurar el funcionamiento de los servicios esenciales de la comunidad.
 
 ## Artículo 38 · Libertad de empresa
-Reconoce la libertad de empresa en el marco de una economía de mercado, que los poderes públicos garantizan y protegen de acuerdo con las exigencias de la economía general.`;
+Reconoce la libertad de empresa en el marco de una economía de mercado, que los poderes públicos garantizan y protegen de acuerdo con las exigencias de la economía general.
+
+#### Pregunta de repaso
+Un ciudadano quiere recurrir en amparo ante el Tribunal Constitucional por una presunta vulneración de su derecho a la negociación colectiva (art. 37.1). ¿Puede hacerlo?
+
+---
+
+No. El artículo 37.1 pertenece a la **sección 2ª** del capítulo II (arts. 30-38), que **no tiene recurso de amparo**. Solo los derechos del artículo 14 y de la sección 1ª (arts. 15-29) gozan de esa vía reforzada.`;
 
 const TEMA1_BLOQUE_5_PRINCIPIOS_RECTORES = `## Capítulo III (artículos 39 a 52)
-"De los principios rectores de la política social y económica" tiene la protección más débil de todo el título I: informa la legislación, la práctica judicial y la actuación de los poderes públicos, pero solo puede alegarse ante los tribunales ordinarios de acuerdo con lo que dispongan las leyes que los desarrollen — no da lugar, por sí mismo, a un derecho subjetivo directamente exigible como los de la sección 1ª.
+"De los principios rectores de la política social y económica" tiene la protección **más débil** de todo el título I: informa la legislación, la práctica judicial y la actuación de los poderes públicos, pero solo puede alegarse ante los tribunales ordinarios de acuerdo con lo que dispongan las leyes que los desarrollen — no da lugar, por sí mismo, a un derecho subjetivo directamente exigible como los de la sección 1ª.
+
+#### Para recordar
+Los principios de este capítulo (vivienda, medio ambiente, tercera edad, consumidores...) **no son "derechos" en sentido estricto**: nadie puede exigirlos directamente ante un juez invocando solo el artículo de la Constitución, solo a través de la ley que los desarrolle.
 
 ## Artículo 39 · Familia e infancia
 Asegura la protección social, económica y jurídica de la familia y de la infancia.
@@ -872,22 +938,40 @@ Garantiza mediante pensiones adecuadas y periódicamente actualizadas la suficie
 Garantiza la defensa de los consumidores y usuarios, protegiendo su seguridad, salud y legítimos intereses económicos.
 
 ## Artículo 52 · Organizaciones profesionales
-Remite a la ley la regulación de las organizaciones profesionales que contribuyan a la defensa de los intereses económicos que les sean propios, con estructura y funcionamiento democráticos.`;
+Remite a la ley la regulación de las organizaciones profesionales que contribuyan a la defensa de los intereses económicos que les sean propios, con estructura y funcionamiento democráticos.
+
+#### Pregunta de repaso
+¿Puede un ciudadano exigir directamente ante los tribunales, invocando solo el artículo 47 de la Constitución, el derecho a una vivienda digna?
+
+---
+
+No. El artículo 47 es un principio rector del capítulo III: solo puede alegarse ante la jurisdicción ordinaria **de acuerdo con lo que dispongan las leyes que lo desarrollen** (art. 53.3), no de forma autónoma.`;
 
 const TEMA1_BLOQUE_6_GARANTIAS = `## Capítulo IV (artículos 53 y 54)
 "De las garantías de las libertades y derechos fundamentales" explica cómo se protege en la práctica todo lo anterior — es la clave para entender por qué unos derechos "pesan" más que otros dentro del mismo título I.
 
 ## Artículo 53 · Los tres niveles de protección
-El apartado 53.1 vincula a todos los poderes públicos los derechos y libertades reconocidos en el capítulo II; solo por ley, que en todo caso debe respetar su contenido esencial, puede regularse su ejercicio, y esa regulación se tutela de acuerdo con el artículo 161.1.a) (el recurso de inconstitucionalidad). El apartado 53.2 añade una vía reforzada, exclusiva de los derechos del artículo 14 y de la sección 1ª del capítulo II (artículos 15 a 29), más la objeción de conciencia del artículo 30.2: cualquier ciudadano puede recabar su tutela ante los tribunales ordinarios por un procedimiento basado en los principios de preferencia y sumariedad y, en su caso, a través del recurso de amparo ante el Tribunal Constitucional. El apartado 53.3 aclara que los principios del capítulo III solo informan la legislación positiva, la práctica judicial y la actuación de los poderes públicos, y solo pueden alegarse ante la jurisdicción ordinaria de acuerdo con lo que dispongan las leyes que los desarrollen.
+El apartado **53.1** vincula a todos los poderes públicos los derechos y libertades reconocidos en el capítulo II; solo por ley, que en todo caso debe respetar su contenido esencial, puede regularse su ejercicio, y esa regulación se tutela de acuerdo con el artículo 161.1.a) (el recurso de inconstitucionalidad). El apartado **53.2** añade una vía reforzada, exclusiva de los derechos del artículo 14 y de la sección 1ª del capítulo II (artículos 15 a 29), más la objeción de conciencia del artículo 30.2: cualquier ciudadano puede recabar su tutela ante los tribunales ordinarios por un procedimiento basado en los principios de preferencia y sumariedad y, en su caso, a través del recurso de amparo ante el Tribunal Constitucional. El apartado **53.3** aclara que los principios del capítulo III solo informan la legislación positiva, la práctica judicial y la actuación de los poderes públicos, y solo pueden alegarse ante la jurisdicción ordinaria de acuerdo con lo que dispongan las leyes que los desarrollen.
 
-## En resumen: tres niveles de protección
-El máximo, para el artículo 14 y la sección 1ª del capítulo II (ley orgánica + tutela ordinaria preferente y sumaria + recurso de amparo); uno intermedio, para el resto de derechos y deberes del capítulo II, artículos 30 a 38 (reserva de ley ordinaria + recurso de inconstitucionalidad, sin amparo); y uno mínimo, para los principios rectores del capítulo III (sin reserva de ley ni recurso directo ante el Tribunal Constitucional).
+#### Tabla · Los tres niveles de protección (art. 53)
+| Nivel | Derechos | Reserva de ley | Vía de tutela |
+| --- | --- | --- | --- |
+| Máximo | Art. 14 y sección 1ª (arts. 15-29) | Ley orgánica | Tutela ordinaria preferente y sumaria + recurso de amparo |
+| Intermedio | Sección 2ª (arts. 30-38) | Ley ordinaria, respetando el contenido esencial | Recurso de inconstitucionalidad, sin amparo |
+| Mínimo | Principios rectores (capítulo III, arts. 39-52) | Sin reserva de ley específica | Solo ante la jurisdicción ordinaria, según lo que digan las leyes que los desarrollen |
 
 ## Artículo 54 · El Defensor del Pueblo
 Crea la figura del Defensor del Pueblo: un alto comisionado de las Cortes Generales, designado por estas para la defensa de los derechos del título I, que puede supervisar la actividad de la Administración y dar cuenta a las Cortes Generales.
 
 ## Artículo 55 · Suspensión de derechos y libertades
-El capítulo V permite suspender determinados derechos (entre ellos los de los artículos 17, 18.2 y 18.3, 19, 20.1.a) y 20.1.d), 20.5, 21, 28.2 y 37.2) cuando se declaren los estados de excepción o de sitio regulados en el artículo 116, con la excepción de que el artículo 17.3 no puede suspenderse durante el estado de excepción. El apartado 55.2 prevé además una suspensión individual, para personas concretas relacionadas con investigaciones sobre bandas armadas o elementos terroristas, sujeta a intervención judicial y control parlamentario; el uso injustificado o abusivo de esta facultad genera responsabilidad penal por violación de los derechos y libertades reconocidos en las leyes.`;
+El capítulo V permite suspender determinados derechos (entre ellos los de los artículos 17, 18.2 y 18.3, 19, 20.1.a) y 20.1.d), 20.5, 21, 28.2 y 37.2) cuando se declaren los estados de **excepción o de sitio** regulados en el artículo 116, con la excepción de que el **artículo 17.3 no puede suspenderse** durante el estado de excepción. El apartado 55.2 prevé además una **suspensión individual**, para personas concretas relacionadas con investigaciones sobre bandas armadas o elementos terroristas, sujeta a intervención judicial y control parlamentario; el uso injustificado o abusivo de esta facultad genera responsabilidad penal por violación de los derechos y libertades reconocidos en las leyes.
+
+#### Caso práctico
+Durante un estado de alarma decretado por una emergencia sanitaria, el Gobierno pretende suspender el derecho de reunión del artículo 21. ¿Es correcto?
+
+---
+
+No. El artículo 55 solo permite la suspensión general de derechos durante los estados de **excepción o de sitio**, nunca durante el **estado de alarma** — en este último los derechos pueden limitarse (por ejemplo, restringir la circulación), pero no suspenderse formalmente. Es una de las distinciones más preguntadas de todo el tema.`;
 
 async function upsertLey(
   db: Db,

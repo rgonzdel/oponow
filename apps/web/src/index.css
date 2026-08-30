@@ -60,4 +60,41 @@ body {
   .tema-content a {
     @apply text-accent hover:text-accent-300;
   }
+
+  /* Cajas generadas por apps/api/src/temario/watermark.util.ts a partir de
+     los encabezados especiales "Para recordar" / "Mnemotecnia" / "Caso
+     práctico" / "Pregunta de repaso". */
+  .tema-box {
+    @apply my-6 rounded-lg border border-ink-divider bg-ink-surface p-5;
+  }
+  .tema-box p {
+    @apply mb-0;
+  }
+  .tema-box p + p {
+    @apply mt-2.5;
+  }
+  .tema-box__label {
+    @apply mb-2.5 block text-[11px] font-semibold uppercase tracking-wide text-accent-300;
+  }
+  .tema-box--mnemotecnia {
+    background: linear-gradient(180deg, rgba(145, 132, 217, 0.09), transparent);
+  }
+  .tema-box--caso {
+    @apply border-accent-700;
+  }
+  .tema-box--caso .tema-box__label {
+    @apply text-accent;
+  }
+  .tema-box details {
+    @apply mt-3 border-t border-ink-divider pt-3;
+  }
+  .tema-box summary {
+    @apply cursor-pointer text-[13px] font-medium text-accent;
+  }
+  .tema-box summary::-webkit-details-marker {
+    display: none;
+  }
+  .tema-box details[open] summary {
+    @apply mb-2.5;
+  }
 }

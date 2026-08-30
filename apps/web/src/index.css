@@ -26,6 +26,10 @@ body {
     @apply mb-5 last:mb-0;
   }
   .tema-content h3 {
-    @apply mb-3 mt-9 text-[13px] font-semibold uppercase tracking-wide text-accent first:mt-0;
+    @apply mt-10 mb-4 flex items-center gap-2.5 text-[21px] font-medium leading-tight tracking-tight text-ink-text first:mt-0;
+  }
+  .tema-content h3::before {
+    content: "";
+    @apply h-2 w-2 flex-none rounded-[2px] bg-accent;
   }
 }

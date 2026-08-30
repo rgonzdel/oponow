@@ -18,6 +18,10 @@ export interface SubscribePayload {
   cardName: string;
 }
 
+export function listMySubscriptions() {
+  return apiFetch<SubscriptionStatus[]>("/billing/subscriptions");
+}
+
 export function getSubscriptionStatus(oposicionSlug: string) {
   return apiFetch<SubscriptionStatus>(
     `/billing/subscriptions/${oposicionSlug}`,

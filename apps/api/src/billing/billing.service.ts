@@ -27,6 +27,31 @@ export class BillingService {
     @Inject(PAYMENT_GATEWAY) private readonly gateway: PaymentGateway,
   ) {}
 
+  async listActive(userId: string): Promise<SubscriptionStatus[]> {
+    const db = getRequestDb();
+
+    const rows = await db
+      .select({
+        oposicionSlug: schema.oposiciones.slug,
+        oposicionNombre: schema.oposiciones.nombre,
+        estado: schema.suscripcionesOposicion.estado,
+        trialEndsAt: schema.suscripcionesOposicion.trialEndsAt,
+      })
+      .from(schema.suscripcionesOposicion)
+      .innerJoin(
+        schema.oposiciones,
+        eq(schema.oposiciones.id, schema.suscripcionesOposicion.oposicionId),
+      )
+      .where(
+        and(
+          eq(schema.suscripcionesOposicion.usuarioId, userId),
+          eq(schema.suscripcionesOposicion.activa, true),
+        ),
+      );
+
+    return rows.map((row) => ({ ...row, subscribed: true }));
+  }
+
   async getStatus(
     userId: string,
     oposicionSlug: string,

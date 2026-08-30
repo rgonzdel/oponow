@@ -11,6 +11,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "db:generate": "pnpm --filter @oponow/db generate",
+    "db:bootstrap-roles": "pnpm --filter @oponow/db bootstrap-roles",
     "db:migrate": "pnpm --filter @oponow/db migrate",
     "db:rls": "pnpm --filter @oponow/db apply-rls",
     "db:studio": "pnpm --filter @oponow/db studio"

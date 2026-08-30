@@ -11,6 +11,11 @@ import type { AuthenticatedUser } from "../auth/strategies/jwt.strategy";
 export class BillingController {
   constructor(private readonly billingService: BillingService) {}
 
+  @Get("subscriptions")
+  listActive(@CurrentUser() user: AuthenticatedUser): Promise<SubscriptionStatus[]> {
+    return this.billingService.listActive(user.id);
+  }
+
   @Get("subscriptions/:oposicionSlug")
   getStatus(
     @CurrentUser() user: AuthenticatedUser,

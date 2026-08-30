@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../auth/AuthContext";
 import { OponowLogo } from "../components/OponowLogo";
 import { buttonClass } from "../components/button";
+import { listMySubscriptions } from "../lib/billing-client";
 
 const PLAN_LABEL: Record<string, string> = {
   free: "Free",
@@ -11,6 +13,16 @@ const PLAN_LABEL: Record<string, string> = {
 
 export function DashboardPage() {
   const { user, logout } = useAuth();
+
+  // Solo el plan Lite tiene una única oposición elegida; Free y VIP ven el
+  // catálogo completo (Free por sus temas gratuitos sueltos, VIP porque ya
+  // tiene acceso a todas).
+  const subscriptionsQuery = useQuery({
+    queryKey: ["billing", "subscriptions", "mine"],
+    queryFn: listMySubscriptions,
+    enabled: user?.plan === "lite",
+  });
+  const liteOposicion = subscriptionsQuery.data?.[0];
 
   return (
     <div>
@@ -33,9 +45,18 @@ export function DashboardPage() {
               {user ? (PLAN_LABEL[user.plan] ?? user.plan) : "…"}
             </span>
           </p>
-          <Link to="/oposiciones/tai/temario" className={buttonClass("primary", "mt-4 w-full")}>
-            Ir al temario de TAI
-          </Link>
+          {liteOposicion ? (
+            <Link
+              to={`/oposiciones/${liteOposicion.oposicionSlug}/temario`}
+              className={buttonClass("primary", "mt-4 w-full")}
+            >
+              Ir al temario de {liteOposicion.oposicionNombre}
+            </Link>
+          ) : (
+            <Link to="/oposiciones" className={buttonClass("primary", "mt-4 w-full")}>
+              Ver oposiciones
+            </Link>
+          )}
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">

@@ -32,6 +32,7 @@ import {
   AAE_TEMA17_BLOQUE2,
   AAE_TEMA25_BLOQUE2,
 } from "./content/aae-temario-2";
+import { AAE_TEMA3_BLOQUE2, AAE_TEMA3_PREGUNTAS } from "./content/aae-temario-4";
 import { GSI_TEMA1_BLOQUE1, GSI_TEMA5_BLOQUE1, GSI_TEMA8_BLOQUE1 } from "./content/gsi-temario";
 import { GSI_TEMA4_BLOQUE1, GSI_TEMA9_BLOQUE1 } from "./content/gsi-temario-2";
 import {
@@ -448,6 +449,16 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
   await upsertBloque(db, { temaId: tema2Id, orden: 1, contenido: AAE_TEMA2_BLOQUE1 });
   await upsertBloque(db, { temaId: tema2Id, orden: 2, contenido: AAE_TEMA2_PARTE2 });
 
+  const tema3Id = await upsertTema(db, {
+    oposicionId,
+    orden: 3,
+    titulo: "Tema 3 · Las Cortes Generales. El Defensor del Pueblo",
+    esGratuito: false,
+  });
+  await upsertBloque(db, { temaId: tema3Id, orden: 1, contenido: TEMA4_BLOQUE_1_CORTES_CAMARAS });
+  await upsertBloque(db, { temaId: tema3Id, orden: 2, contenido: AAE_TEMA3_BLOQUE2 });
+  await upsertPreguntas(db, tema3Id, AAE_TEMA3_PREGUNTAS);
+
   const tema8Id = await upsertTema(db, {
     oposicionId,
     orden: 8,
@@ -502,7 +513,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
   await upsertBloque(db, { temaId: tema25Id, orden: 1, contenido: AAE_TEMA25_BLOQUE2 });
   await upsertBloque(db, { temaId: tema25Id, orden: 2, contenido: AAE_TEMA25_PARTE2 });
 
-  console.log("Temario sembrado: 8 temas de Auxiliar Administrativo del Estado.");
+  console.log("Temario sembrado: 9 temas de Auxiliar Administrativo del Estado (Tema 3 con banco de preguntas).");
 }
 
 async function seedTemarioGSI(db: Db, oposicionId: string) {
@@ -931,6 +942,52 @@ async function upsertTema(
 
   const [row] = await db.insert(schema.temas).values(data).returning({ id: schema.temas.id });
   return row.id;
+}
+
+interface PreguntaSeed {
+  enunciado: string;
+  opciones: string[];
+  respuestaCorrecta: number;
+  justificacionIa?: string;
+  dificultad?: number;
+}
+
+// Idempotente por (tema_id, enunciado) — no hay una columna única declarada
+// para ese par en el schema (las preguntas no tienen slug propio), así que
+// se comprueba a mano antes de insertar, igual que el resto de upsert* de
+// este fichero.
+async function upsertPreguntas(
+  db: Db,
+  temaId: string,
+  preguntas: PreguntaSeed[],
+): Promise<void> {
+  for (const p of preguntas) {
+    const [existente] = await db
+      .select({ id: schema.preguntas.id })
+      .from(schema.preguntas)
+      .where(and(eq(schema.preguntas.temaId, temaId), eq(schema.preguntas.enunciado, p.enunciado)))
+      .limit(1);
+    if (existente) {
+      await db
+        .update(schema.preguntas)
+        .set({
+          opciones: p.opciones,
+          respuestaCorrecta: p.respuestaCorrecta,
+          justificacionIa: p.justificacionIa,
+          dificultad: p.dificultad,
+        })
+        .where(eq(schema.preguntas.id, existente.id));
+      continue;
+    }
+    await db.insert(schema.preguntas).values({
+      temaId,
+      enunciado: p.enunciado,
+      opciones: p.opciones,
+      respuestaCorrecta: p.respuestaCorrecta,
+      justificacionIa: p.justificacionIa,
+      dificultad: p.dificultad,
+    });
+  }
 }
 
 async function upsertBloque(

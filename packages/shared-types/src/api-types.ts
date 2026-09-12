@@ -34,6 +34,7 @@ export interface IntentoIniciado {
 export interface RespuestaResultado {
   esCorrecta: boolean;
   respuestaCorrecta: number;
+  justificacionIa: string | null;
 }
 
 export interface ResumenIntento {

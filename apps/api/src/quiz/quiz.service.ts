@@ -24,6 +24,7 @@ export interface IntentoIniciado {
 export interface RespuestaResultado {
   esCorrecta: boolean;
   respuestaCorrecta: number;
+  justificacionIa: string | null;
 }
 
 export interface ResumenIntento {
@@ -145,6 +146,7 @@ export class QuizService {
       .select({
         id: schema.preguntas.id,
         respuestaCorrecta: schema.preguntas.respuestaCorrecta,
+        justificacionIa: schema.preguntas.justificacionIa,
       })
       .from(schema.preguntas)
       .where(eq(schema.preguntas.id, dto.preguntaId))
@@ -178,7 +180,11 @@ export class QuizService {
       });
     }
 
-    return { esCorrecta, respuestaCorrecta: pregunta.respuestaCorrecta };
+    return {
+      esCorrecta,
+      respuestaCorrecta: pregunta.respuestaCorrecta,
+      justificacionIa: pregunta.justificacionIa,
+    };
   }
 
   async finalizar(intentoId: string): Promise<ResumenIntento> {

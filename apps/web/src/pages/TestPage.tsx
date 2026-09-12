@@ -18,6 +18,7 @@ interface RespuestaLocal {
   opcionElegida: number;
   esCorrecta: boolean;
   respuestaCorrecta: number;
+  justificacionIa: string | null;
 }
 
 export function TestPage() {
@@ -81,10 +82,14 @@ export function TestPage() {
     if (!intentoId || !current || respuestaActual || enviando) return;
     setEnviando(true);
     try {
-      const { esCorrecta, respuestaCorrecta } = await responder(intentoId, current.id, i);
+      const { esCorrecta, respuestaCorrecta, justificacionIa } = await responder(
+        intentoId,
+        current.id,
+        i,
+      );
       setRespuestas((prev) => ({
         ...prev,
-        [current.id]: { opcionElegida: i, esCorrecta, respuestaCorrecta },
+        [current.id]: { opcionElegida: i, esCorrecta, respuestaCorrecta, justificacionIa },
       }));
     } catch {
       setErrorMsg("No se pudo guardar tu respuesta, inténtalo de nuevo.");
@@ -173,6 +178,17 @@ export function TestPage() {
                     );
                   })}
                 </div>
+
+                {respuestaActual && !respuestaActual.esCorrecta && respuestaActual.justificacionIa && (
+                  <div className="mt-4 rounded-lg border border-ink-divider bg-ink p-4">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-accent-300">
+                      Por qué es incorrecta
+                    </span>
+                    <p className="mt-1.5 text-sm leading-relaxed text-neutral-200">
+                      {respuestaActual.justificacionIa}
+                    </p>
+                  </div>
+                )}
 
                 {errorMsg && (
                   <p className="mt-4 text-sm text-red-400">{errorMsg}</p>

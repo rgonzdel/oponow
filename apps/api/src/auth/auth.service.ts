@@ -29,6 +29,21 @@ export interface AuthTokens {
 const INVALID_CREDENTIALS = "Credenciales inválidas";
 const INVALID_REFRESH = "Refresh token inválido o expirado";
 
+// Perfil "ligero" de OWASP para Argon2id (m=19456 KiB, t=2, p=1) en vez de
+// los valores por defecto de la librería (m=65536, t=3, p=4) — con CPU
+// compartida y limitada (Render), 4 hilos en paralelo no tienen 4 núcleos
+// reales que usar y solo añaden contención, sin más seguridad real; este
+// perfil sigue estando dentro de lo que OWASP considera seguro. argon2.verify
+// no necesita estas opciones: los parámetros van codificados en el propio
+// hash almacenado, así que los hashes ya existentes (con los valores
+// antiguos) se siguen verificando igual sin ningún cambio.
+const ARGON2_OPTIONS = {
+  type: argon2.argon2id,
+  memoryCost: 19456,
+  timeCost: 2,
+  parallelism: 1,
+} as const;
+
 @Injectable()
 export class AuthService {
   private readonly authDb: Database;
@@ -57,9 +72,7 @@ export class AuthService {
       throw new ConflictException("Ya existe una cuenta con este email");
     }
 
-    const passwordHash = await argon2.hash(dto.password, {
-      type: argon2.argon2id,
-    });
+    const passwordHash = await argon2.hash(dto.password, ARGON2_OPTIONS);
     const userId = randomUUID();
 
     // La request llegó como anónima (RlsContextMiddleware, sin JWT
@@ -96,7 +109,7 @@ export class AuthService {
     if (!user) {
       // Igualamos el tiempo de respuesta al caso "contraseña incorrecta"
       // para no filtrar por timing qué emails existen.
-      await argon2.hash(dto.password, { type: argon2.argon2id });
+      await argon2.hash(dto.password, ARGON2_OPTIONS);
       throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
 

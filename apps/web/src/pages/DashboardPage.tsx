@@ -14,15 +14,16 @@ const PLAN_LABEL: Record<string, string> = {
 export function DashboardPage() {
   const { user, logout } = useAuth();
 
-  // Solo el plan Lite tiene una única oposición elegida; Free y VIP ven el
-  // catálogo completo (Free por sus temas gratuitos sueltos, VIP porque ya
-  // tiene acceso a todas).
+  // Lite y VIP están igual de atados a la oposición concreta que eligieron
+  // al suscribirse (VIP es solo la versión ya pagada de esa misma
+  // suscripción, no acceso a todas las oposiciones) — solo Free, sin
+  // ninguna suscripción activa, ve el catálogo completo.
   const subscriptionsQuery = useQuery({
     queryKey: ["billing", "subscriptions", "mine"],
     queryFn: listMySubscriptions,
-    enabled: user?.plan === "lite",
+    enabled: user?.plan === "lite" || user?.plan === "vip",
   });
-  const liteOposicion = subscriptionsQuery.data?.[0];
+  const miOposicion = subscriptionsQuery.data?.[0];
 
   return (
     <div>
@@ -45,12 +46,12 @@ export function DashboardPage() {
               {user ? (PLAN_LABEL[user.plan] ?? user.plan) : "…"}
             </span>
           </p>
-          {liteOposicion ? (
+          {miOposicion ? (
             <Link
-              to={`/oposiciones/${liteOposicion.oposicionSlug}/temario`}
+              to={`/oposiciones/${miOposicion.oposicionSlug}/temario`}
               className={buttonClass("primary", "mt-4 w-full")}
             >
-              Ir al temario de {liteOposicion.oposicionNombre}
+              Ir al temario de {miOposicion.oposicionNombre}
             </Link>
           ) : (
             <Link to="/oposiciones" className={buttonClass("primary", "mt-4 w-full")}>

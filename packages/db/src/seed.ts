@@ -4,6 +4,9 @@ import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { and, eq } from "drizzle-orm";
 import * as schema from "./schema";
+import { CE_TEMA1_PREGUNTAS } from "./content/ce-tema1-preguntas";
+import { GSI_TEMA1_PREGUNTAS } from "./content/gsi-tema1-preguntas";
+import { CORREOS_TEMA1_PREGUNTAS } from "./content/correos-tema1-preguntas";
 import {
   TEMA3_BLOQUE_1_CORONA,
   TEMA4_BLOQUE_1_CORTES_CAMARAS,
@@ -257,6 +260,7 @@ async function seedTemarioDemo(db: Db, oposicionId: string) {
     orden: 6,
     contenido: TEMA1_BLOQUE_6_GARANTIAS,
   });
+  await upsertPreguntas(db, tema1Id, CE_TEMA1_PREGUNTAS);
 
   const tema2Id = await upsertTema(db, {
     oposicionId,
@@ -439,6 +443,7 @@ async function seedTemarioAAE(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: AAE_TEMA1_BLOQUE1 });
   await upsertBloque(db, { temaId: tema1Id, orden: 2, contenido: AAE_TEMA1_BLOQUE2 });
+  await upsertPreguntas(db, tema1Id, CE_TEMA1_PREGUNTAS);
 
   const tema2Id = await upsertTema(db, {
     oposicionId,
@@ -525,6 +530,7 @@ async function seedTemarioGSI(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: GSI_TEMA1_BLOQUE1 });
   await upsertBloque(db, { temaId: tema1Id, orden: 2, contenido: GSI_TEMA1_PARTE2 });
+  await upsertPreguntas(db, tema1Id, GSI_TEMA1_PREGUNTAS);
 
   const tema4Id = await upsertTema(db, {
     oposicionId,
@@ -573,6 +579,7 @@ async function seedTemarioC1Admin(db: Db, oposicionId: string) {
     esGratuito: true,
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: C1_TEMA1_BLOQUE1 });
+  await upsertPreguntas(db, tema1Id, CE_TEMA1_PREGUNTAS);
 
   const tema3Id = await upsertTema(db, {
     oposicionId,
@@ -654,6 +661,7 @@ async function seedTemarioCorreos(db: Db, oposicionId: string) {
   });
   await upsertBloque(db, { temaId: tema1Id, orden: 1, contenido: CORREOS_TEMA1_BLOQUE1 });
   await upsertBloque(db, { temaId: tema1Id, orden: 2, contenido: CORREOS_TEMA1_PARTE2 });
+  await upsertPreguntas(db, tema1Id, CORREOS_TEMA1_PREGUNTAS);
 
   const tema2Id = await upsertTema(db, {
     oposicionId,

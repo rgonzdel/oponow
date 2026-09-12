@@ -25,6 +25,7 @@ export interface RespuestaResultado {
   esCorrecta: boolean;
   respuestaCorrecta: number;
   justificacionIa: string | null;
+  mnemotecnia: string | null;
 }
 
 export interface ResumenIntento {
@@ -147,6 +148,7 @@ export class QuizService {
         id: schema.preguntas.id,
         respuestaCorrecta: schema.preguntas.respuestaCorrecta,
         justificacionIa: schema.preguntas.justificacionIa,
+        mnemotecnia: schema.preguntas.mnemotecnia,
       })
       .from(schema.preguntas)
       .where(eq(schema.preguntas.id, dto.preguntaId))
@@ -184,6 +186,7 @@ export class QuizService {
       esCorrecta,
       respuestaCorrecta: pregunta.respuestaCorrecta,
       justificacionIa: pregunta.justificacionIa,
+      mnemotecnia: pregunta.mnemotecnia,
     };
   }
 

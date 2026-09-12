@@ -35,6 +35,7 @@ export interface RespuestaResultado {
   esCorrecta: boolean;
   respuestaCorrecta: number;
   justificacionIa: string | null;
+  mnemotecnia: string | null;
 }
 
 export interface ResumenIntento {

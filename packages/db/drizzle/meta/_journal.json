@@ -36,6 +36,13 @@
       "when": 1786902778536,
       "tag": "0004_worthless_silverclaw",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789241242289,
+      "tag": "0005_overconfident_skin",
+      "breakpoints": true
     }
   ]
 }

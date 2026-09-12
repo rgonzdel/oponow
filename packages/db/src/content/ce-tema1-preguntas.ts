@@ -19,6 +19,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 1.1 CE dispone que España se constituye en un Estado social y democrático de Derecho, «que propugna como valores superiores de su ordenamiento jurídico la libertad, la justicia, la igualdad y el pluralismo político». La dignidad de la persona no es un valor superior del art. 1.1, sino el fundamento del orden político y de la paz social conforme al art. 10.1 CE.",
+    mnemotecnia:
+      "Acrónimo LI-JU-I-P: LIbertad, JUsticia, Igualdad y Pluralismo político, los 4 valores superiores del art. 1.1.",
     dificultad: 1,
   },
   {
@@ -33,6 +35,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 1.2 CE establece literalmente que «la soberanía nacional reside en el pueblo español, del que emanan los poderes del Estado». La Nación española aparece en el art. 2 CE con un sentido distinto (fundamento de la indisoluble unidad), y las Cortes Generales representan al pueblo español (art. 66.1 CE), pero no son titulares de la soberanía.",
+    mnemotecnia:
+      "El PUEBLO es el jefe: en el 1.2 la soberanía reside en el pueblo español, no en la Nación (art. 2) ni en las Cortes (art. 66).",
     dificultad: 1,
   },
   {
@@ -47,6 +51,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 1.3 CE dispone que «la forma política del Estado español es la Monarquía parlamentaria». El Estado social y democrático de Derecho es la definición contenida en el art. 1.1 CE, referida a la forma de Estado y no a la forma política.",
+    mnemotecnia:
+      "1, 2, 3: Estado social y democrático (1.1), soberanía popular (1.2) y forma política Monarquía PARlamentaria (1.3, va con \"Parlamento\").",
     dificultad: 1,
   },
   {
@@ -61,6 +67,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 2 CE se fundamenta en «la indisoluble unidad de la Nación española, patria común e indivisible de todos los españoles», y «reconoce y garantiza el derecho a la autonomía de las nacionalidades y regiones que la integran y la solidaridad entre todas ellas». La autonomía de municipios y provincias se garantiza en el art. 137 CE, ya en el Título VIII.",
+    mnemotecnia:
+      "El artículo 2 tiene 2 mitades: unidad indisoluble de la Nación + autonomía y solidaridad de nacionalidades y regiones (los municipios y provincias se autonomizan más adelante, en el 137).",
     dificultad: 2,
   },
   {
@@ -75,6 +83,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 3.1 CE establece que «el castellano es la lengua española oficial del Estado. Todos los españoles tienen el deber de conocerla y el derecho a usarla». El binomio es, por tanto, deber de conocimiento y derecho de uso, nunca a la inversa.",
+    mnemotecnia:
+      "DEber de Conocer, DEcido Usar: con el castellano el deber va con conocer y el derecho con usar, nunca al revés.",
     dificultad: 1,
   },
   {
@@ -89,6 +99,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 3.3 CE dispone que «la riqueza de las distintas modalidades lingüísticas de España es un patrimonio cultural que será objeto de especial respeto y protección». La conservación y el enriquecimiento del patrimonio histórico, cultural y artístico se contemplan, con otra formulación, en el art. 46 CE.",
+    mnemotecnia:
+      "El 3.3 habla de modalidades LINGÜÍSTICAS: patrimonio CULTURAL de especial respeto y protección (el patrimonio histórico-artístico, que se conserva, es cosa del art. 46).",
     dificultad: 2,
   },
   {
@@ -103,6 +115,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 4.1 CE señala que «la bandera de España está formada por tres franjas horizontales, roja, amarilla y roja, siendo la amarilla de doble anchura que cada una de las rojas». El art. 4.2 añade que los Estatutos podrán reconocer banderas y enseñas propias de las Comunidades Autónomas, que se utilizarán junto a la bandera de España.",
+    mnemotecnia:
+      "Bandera como sándwich: roja-amarilla-roja, y el relleno (amarilla) pesa el doble que cada roja.",
     dificultad: 2,
   },
   {
@@ -117,6 +131,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 5 CE establece de forma escueta y literal que «la capital del Estado es la villa de Madrid». El texto constitucional emplea el término «villa», no «ciudad», y no remite su determinación a ninguna norma posterior.",
+    mnemotecnia:
+      "Villa con V de art. 5 de veras: la capital es la VILLA de Madrid, no \"la ciudad\".",
     dificultad: 1,
   },
   {
@@ -131,6 +147,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 6 CE afirma que la creación de los partidos políticos y el ejercicio de su actividad «son libres dentro del respeto a la Constitución y a la ley», por lo que no cabe exigir autorización previa. Las tres opciones restantes reproducen el contenido literal del propio art. 6 CE.",
+    mnemotecnia:
+      "Partidos libres desde la cuna: su creación y actividad son libres, sin autorización previa (solo se pide respeto a la Constitución y la ley).",
     dificultad: 2,
   },
   {
@@ -145,6 +163,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 7 CE menciona a «los sindicatos de trabajadores y las asociaciones empresariales». Los Colegios Profesionales se regulan en el art. 36 CE y las organizaciones profesionales en el art. 52 CE, ambos ya dentro del Título I.",
+    mnemotecnia:
+      "Los 7 magníficos del art. 7: sindicatoS de trabajadores + asociaciones empresariales, el tándem laboral clásico.",
     dificultad: 2,
   },
   {
@@ -159,6 +179,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 8.1 CE atribuye a las Fuerzas Armadas, constituidas por el Ejército de Tierra, la Armada y el Ejército del Aire, la misión de «garantizar la soberanía e independencia de España, defender su integridad territorial y el ordenamiento constitucional». La protección del libre ejercicio de los derechos y libertades y la garantía de la seguridad ciudadana corresponden a las Fuerzas y Cuerpos de Seguridad (art. 104.1 CE).",
+    mnemotecnia:
+      "El 8 tiene forma de escudo: las FFAA garantizan soberanía, independencia, integridad territorial y orden constitucional; proteger derechos y seguridad ciudadana es tarea de la Policía (art. 104).",
     dificultad: 2,
   },
   {
@@ -173,6 +195,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 9.3 CE garantiza el principio de legalidad, la jerarquía normativa, la publicidad de las normas, la irretroactividad de las disposiciones sancionadoras no favorables o restrictivas de derechos individuales, la seguridad jurídica, la responsabilidad y la interdicción de la arbitrariedad de los poderes públicos. La igualdad ante la ley se proclama en el art. 14 CE, no en el art. 9.3.",
+    mnemotecnia:
+      "El 9.3 no lleva la I: enumera legalidad, jerarquía, publicidad, irretroactividad desfavorable, seguridad jurídica, responsabilidad e interdicción de la arbitrariedad, pero la Igualdad se queda en el art. 14.",
     dificultad: 2,
   },
   {
@@ -187,6 +211,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "La exigencia de estructura interna y funcionamiento democráticos se recoge de forma expresa en los arts. 6 (partidos políticos), 7 (sindicatos y asociaciones empresariales), 36 (Colegios Profesionales) y 52 CE (organizaciones profesionales). El art. 22 CE, que reconoce el derecho de asociación, no incorpora esa exigencia: se limita a declarar ilegales las asociaciones con fines o medios delictivos y a prohibir las secretas y las de carácter paramilitar.",
+    mnemotecnia:
+      "Democráticos por dentro: 6, 7, 36 y 52 sí lo exigen; el 22 (asociación) solo prohíbe secretas y paramilitares, sin pedir estructura democrática.",
     dificultad: 3,
   },
   {
@@ -201,6 +227,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 10.1 CE señala que «la dignidad de la persona, los derechos inviolables que le son inherentes, el libre desarrollo de la personalidad, el respeto a la ley y a los derechos de los demás son fundamento del orden político y de la paz social». Los valores superiores de la primera opción corresponden al art. 1.1 CE.",
+    mnemotecnia:
+      "El 10.1 son los cimientos (fundamento del orden político y la paz social): dignidad + derechos inviolables + libre desarrollo + respeto a la ley y a los demás; los valores superiores (libertad, justicia...) son del art. 1.1, no del 10.",
     dificultad: 1,
   },
   {
@@ -215,6 +243,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 10.2 CE impone la interpretación «de conformidad con la Declaración Universal de Derechos Humanos y los tratados y acuerdos internacionales sobre las mismas materias ratificados por España». El precepto exige la ratificación y no cita nominalmente ningún otro texto.",
+    mnemotecnia:
+      "El 10.2 mira hacia fuera: interpreta los derechos según la Declaración Universal y los tratados YA RATIFICADOS por España (si no está ratificado, no cuenta).",
     dificultad: 2,
   },
   {
@@ -229,6 +259,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 11.2 CE dispone que «ningún español de origen podrá ser privado de su nacionalidad», garantía que se circunscribe a los españoles de origen. El art. 11.1 remite la adquisición, conservación y pérdida a la ley, y el art. 11.3 permite que los españoles se naturalicen en esos países «sin perder su nacionalidad de origen».",
+    mnemotecnia:
+      "DE ORIGEN, para siempre: el español DE ORIGEN nunca puede ser privado de su nacionalidad (art. 11.2).",
     dificultad: 2,
   },
   {
@@ -243,6 +275,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 12 CE establece, sin matices ni remisiones a otras normas, que «los españoles son mayores de edad a los dieciocho años».",
+    mnemotecnia:
+      "Doce como dieciocho: el artículo 12 fija la mayoría de edad en 18 años, sin excepciones ni letra pequeña.",
     dificultad: 1,
   },
   {
@@ -257,6 +291,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 13.2 CE reserva a los españoles la titularidad de los derechos del art. 23 «salvo lo que, atendiendo a criterios de reciprocidad, pueda establecerse por tratado o ley para el derecho de sufragio activo y pasivo en las elecciones municipales». La excepción se limita a las elecciones municipales y no distingue por nacionalidad de origen.",
+    mnemotecnia:
+      "Solo lo MUNICIPAL se comparte: el sufragio de extranjeros por reciprocidad se limita a las elecciones municipales (art. 13.2).",
     dificultad: 3,
   },
   {
@@ -271,6 +307,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 14 CE proclama que «los españoles son iguales ante la ley, sin que pueda prevalecer discriminación alguna por razón de nacimiento, raza, sexo, religión, opinión o cualquier otra condición o circunstancia personal o social». La enumeración es abierta, pero los motivos expresamente citados son exactamente esos cinco.",
+    mnemotecnia:
+      "Acrónimo NA-RA-SE-RE-OP: NAcimiento, RAza, SExo, REligión, OPinión, los motivos de discriminación prohibidos del art. 14.",
     dificultad: 1,
   },
   {
@@ -285,6 +323,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 14 CE abre el Capítulo segundo del Título I, antes de que comience la Sección 1.ª («De los derechos fundamentales y de las libertades públicas»), que arranca en el art. 15. Pese a ello, el art. 53.2 CE permite recabar la tutela de «los derechos reconocidos en el artículo 14 y la Sección primera del Capítulo segundo» ante los Tribunales ordinarios y, en su caso, mediante recurso de amparo ante el Tribunal Constitucional.",
+    mnemotecnia:
+      "El 14 abre la puerta pero se queda fuera: encabeza el Capítulo II antes de la Sección 1.ª, pero el art. 53.2 le regala amparo igualmente.",
     dificultad: 3,
   },
   {
@@ -299,6 +339,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 15 CE reconoce el derecho a la vida y a la integridad física y moral y añade que «queda abolida la pena de muerte, salvo lo que puedan disponer las leyes penales militares para tiempos de guerra». Es la única excepción que contempla el texto constitucional.",
+    mnemotecnia:
+      "Solo una excepción a la pena de muerte: las leyes penales MILITARES en tiempo de GUERRA (art. 15).",
     dificultad: 2,
   },
   {
@@ -313,6 +355,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 16.3 CE establece que «ninguna confesión tendrá carácter estatal. Los poderes públicos tendrán en cuenta las creencias religiosas de la sociedad española y mantendrán las consiguientes relaciones de cooperación con la Iglesia Católica y las demás confesiones». La Constitución impone, por tanto, la cooperación, no su prohibición.",
+    mnemotecnia:
+      "Ninguna confesión es \"la oficial\", pero el Estado SÍ coopera: relaciones de cooperación con la Iglesia Católica y las demás confesiones (art. 16.3).",
     dificultad: 1,
   },
   {
@@ -327,6 +371,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 17.2 CE fija el plazo máximo de setenta y dos horas, transcurrido el cual «el detenido deberá ser puesto en libertad o a disposición de la autoridad judicial». El propio precepto no prevé prórroga alguna de ese plazo.",
+    mnemotecnia:
+      "17 y 2 se leen al revés: 72 horas es el plazo máximo de la detención preventiva (art. 17.2).",
     dificultad: 1,
   },
   {
@@ -341,6 +387,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 18.2 CE declara que «el domicilio es inviolable. Ninguna entrada o registro podrá hacerse en él sin consentimiento del titular o resolución judicial, salvo en caso de flagrante delito». Son, pues, tres los títulos habilitantes, sin que baste una autorización gubernativa o fiscal.",
+    mnemotecnia:
+      "Acrónimo CRF del domicilio: Consentimiento, Resolución judicial o Flagrante delito, las tres únicas puertas de entrada (art. 18.2).",
     dificultad: 1,
   },
   {
@@ -355,6 +403,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 20.5 CE es terminante: «sólo podrá acordarse el secuestro de publicaciones, grabaciones y otros medios de información en virtud de resolución judicial». Se trata de una reserva exclusivamente jurisdiccional, coherente con la prohibición de censura previa del art. 20.2 CE.",
+    mnemotecnia:
+      "Secuestro de publicaciones: solo el JUEZ puede, nunca el gobernador ni la autoridad gubernativa (art. 20.5).",
     dificultad: 2,
   },
   {
@@ -369,6 +419,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 21.2 CE permite la prohibición únicamente «cuando existan razones fundadas de alteración del orden público, con peligro para personas o bienes». Además, el art. 21.1 aclara que el ejercicio del derecho de reunión pacífica y sin armas «no necesitará autorización previa»: lo que se exige es comunicación, no autorización.",
+    mnemotecnia:
+      "Reunión: se comunica, no se pide permiso; solo se prohíbe si hay riesgo real para personas o bienes por alteración del orden público (art. 21.2).",
     dificultad: 2,
   },
   {
@@ -383,6 +435,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 22.5 CE prohíbe «las asociaciones secretas y las de carácter paramilitar». La inscripción registral del art. 22.3 lo es «a los solos efectos de publicidad», por lo que su ausencia no convierte la asociación en prohibida, y el precepto tampoco exige estructura interna democrática.",
+    mnemotecnia:
+      "Prohibidas por partida doble: SEcretas y PAramilitares, las dos únicas asociaciones vetadas por el art. 22.5 (SE-PA).",
     dificultad: 1,
   },
   {
@@ -397,6 +451,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 23.2 CE reconoce el derecho a acceder en condiciones de igualdad a las funciones y cargos públicos «con los requisitos que señalen las leyes». Los principios de mérito y capacidad para el acceso a la función pública se enuncian en el art. 103.3 CE, ya fuera del Título I.",
+    mnemotecnia:
+      "Acceso a cargos públicos con los requisitos que fije la LEY (art. 23.2); mérito y capacidad llegan más tarde, en el art. 103.3.",
     dificultad: 2,
   },
   {
@@ -411,6 +467,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 24.2 CE enumera el derecho al Juez ordinario predeterminado por la ley, a la defensa y a la asistencia de letrado, a ser informados de la acusación formulada, a un proceso público sin dilaciones indebidas y con todas las garantías, a utilizar los medios de prueba pertinentes, a no declarar contra sí mismos, a no confesarse culpables y a la presunción de inocencia. La doble instancia penal no figura en el texto constitucional.",
+    mnemotecnia:
+      "El 24.2 no tiene \"bis\": enumera juez predeterminado, defensa, información de la acusación, proceso público sin dilaciones, pruebas, no autoincriminación y presunción de inocencia, pero NO la doble instancia.",
     dificultad: 2,
   },
   {
@@ -425,6 +483,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 25.3 CE establece que «la Administración civil no podrá imponer sanciones que, directa o subsidiariamente, impliquen privación de libertad». La prohibición se refiere de forma expresa a la Administración civil, lo que deja al margen el ámbito sometido a disciplina militar.",
+    mnemotecnia:
+      "Solo la Administración CIVIL tiene las manos atadas: no puede imponer sanciones privativas de libertad (art. 25.3); la disciplina militar queda aparte.",
     dificultad: 3,
   },
   {
@@ -439,6 +499,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 26 CE dispone que «se prohíben los Tribunales de Honor en el ámbito de la Administración civil y de las organizaciones profesionales». El precepto no extiende la prohibición al ámbito militar.",
+    mnemotecnia:
+      "Tribunales de Honor prohibidos en dos sitios: Administración CIVIL y organizaciones PROFESIONALES (art. 26); el ámbito militar no entra.",
     dificultad: 1,
   },
   {
@@ -453,6 +515,7 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 27.4 CE declara, sin matiz ni remisión alguna, que «la enseñanza básica es obligatoria y gratuita». La Constitución no fija edades ni condiciona la gratuidad al tipo de centro.",
+    mnemotecnia: "Enseñanza básica: OBLIGATORIA + GRATIS, sin matices ni edades (art. 27.4).",
     dificultad: 1,
   },
   {
@@ -467,6 +530,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 28.1 CE permite que la ley «limite o exceptúe» el ejercicio del derecho de sindicación a las Fuerzas o Institutos armados o a los demás Cuerpos sometidos a disciplina militar. Por su parte, el art. 29.2 CE precisa que sus miembros podrán ejercer el derecho de petición «sólo individualmente y con arreglo a lo dispuesto en su legislación específica».",
+    mnemotecnia:
+      "Militares: sindicación SÍ limitable por ley, petición SOLO individual (arts. 28.1 y 29.2).",
     dificultad: 3,
   },
   {
@@ -481,6 +546,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 30.1 CE establece que «los españoles tienen el derecho y el deber de defender a España». El art. 30.2 remite a la ley la fijación de las obligaciones militares y la regulación, con las debidas garantías, de la objeción de conciencia.",
+    mnemotecnia:
+      "Defender a España: derecho Y deber a la vez (art. 30.1), como las dos caras de una misma moneda.",
     dificultad: 1,
   },
   {
@@ -495,6 +562,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 31.1 CE dispone que «todos contribuirán al sostenimiento de los gastos públicos de acuerdo con su capacidad económica mediante un sistema tributario justo inspirado en los principios de igualdad y progresividad que, en ningún caso, tendrá alcance confiscatorio».",
+    mnemotecnia:
+      "El sistema tributario nunca puede ser CONFISCATORIO: esa es la única prohibición absoluta del art. 31.1.",
     dificultad: 1,
   },
   {
@@ -509,6 +578,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 33.3 CE señala que «nadie podrá ser privado de sus bienes y derechos sino por causa justificada de utilidad pública o interés social, mediante la correspondiente indemnización y de conformidad con lo dispuesto por las leyes». El texto habla de «la correspondiente indemnización», sin imponer que sea necesariamente previa.",
+    mnemotecnia:
+      "Para privar de bienes hacen falta 3 llaves: utilidad pública o interés social + indemnización + conforme a las leyes (art. 33.3).",
     dificultad: 2,
   },
   {
@@ -523,6 +594,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 34.2 CE remite expresamente a «lo dispuesto en los apartados 2 y 4 del artículo 22», esto es, la ilegalidad de las que persigan fines o utilicen medios tipificados como delito (art. 22.2) y la exigencia de resolución judicial motivada para su disolución o suspensión (art. 22.4).",
+    mnemotecnia:
+      "Fundaciones = mitad del art. 22: solo se les aplican los apartados 2 (ilegalidad si hay delito) y 4 (disolución solo judicial), no el 22 entero (art. 34.2).",
     dificultad: 3,
   },
   {
@@ -537,6 +610,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 35.2 CE dispone que «la ley regulará un estatuto de los trabajadores». La negociación colectiva laboral se contempla en el art. 37.1 CE y los Colegios Profesionales en el art. 36 CE.",
+    mnemotecnia:
+      "El 35 da un \"estatuto\": la ley regula un ESTATUTO DE LOS TRABAJADORES (no de negociación colectiva, que es el art. 37).",
     dificultad: 2,
   },
   {
@@ -551,6 +626,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 38 CE establece que «se reconoce la libertad de empresa en el marco de la economía de mercado», añadiendo que los poderes públicos garantizan y protegen su ejercicio y la defensa de la productividad, de acuerdo con las exigencias de la economía general y, en su caso, de la planificación.",
+    mnemotecnia:
+      "Libertad de empresa en el marco de la economía DE MERCADO, sin apellidos como \"social\" (art. 38).",
     dificultad: 1,
   },
   {
@@ -565,6 +642,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 39.2 CE asegura «la protección integral de los hijos, iguales éstos ante la ley con independencia de su filiación, y de las madres, cualquiera que sea su estado civil», añadiendo que la ley posibilitará la investigación de la paternidad. La remisión a los acuerdos internacionales se contiene en el art. 39.4 CE y se refiere a los niños.",
+    mnemotecnia:
+      "El 39.2 protege igual a todos los hijos (con independencia de su filiación) y a todas las madres (cualquiera que sea su estado civil).",
     dificultad: 2,
   },
   {
@@ -579,6 +658,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 41 CE menciona de forma expresa y singular el desempleo: los poderes públicos mantendrán un régimen público de Seguridad Social para todos los ciudadanos que garantice prestaciones suficientes ante situaciones de necesidad, «especialmente en caso de desempleo». El precepto concluye señalando que la asistencia y prestaciones complementarias serán libres.",
+    mnemotecnia:
+      "La Seguridad Social del art. 41 destaca el DESEMPLEO como situación de necesidad especialmente protegida.",
     dificultad: 1,
   },
   {
@@ -593,6 +674,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 45.3 CE dispone que «para quienes violen lo dispuesto en el apartado anterior, en los términos que la ley fije se establecerán sanciones penales o, en su caso, administrativas, así como la obligación de reparar el daño causado». El art. 45.1 configura el medio ambiente adecuado a la vez como derecho a disfrutarlo y como deber de conservarlo.",
+    mnemotecnia:
+      "Medio ambiente: quien lo daña recibe sanción PENAL o ADMINISTRATIVA, más la obligación de REPARAR (art. 45.3), como pagar la multa y arreglar el destrozo.",
     dificultad: 2,
   },
   {
@@ -607,6 +690,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 47 CE cierra su redacción indicando que «la comunidad participará en las plusvalías que genere la acción urbanística de los entes públicos». Además, al ubicarse en el Capítulo tercero, su alegación ante la Jurisdicción ordinaria sólo procede de acuerdo con lo que dispongan las leyes que lo desarrollen (art. 53.3 CE).",
+    mnemotecnia:
+      "Vivienda: la comunidad se lleva su parte de las PLUSVALÍAS urbanísticas (art. 47), el remate final del artículo.",
     dificultad: 1,
   },
   {
@@ -621,6 +706,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 49.1 CE, en la redacción dada por la reforma constitucional de 15 de febrero de 2024, establece que «las personas con discapacidad ejercen los derechos previstos en este Título en condiciones de libertad e igualdad reales y efectivas. Se regulará por ley la protección especial que sea necesaria para dicho ejercicio». La referencia a la previsión, tratamiento, rehabilitación e integración pertenece a la redacción originaria de 1978, hoy sustituida.",
+    mnemotecnia:
+      "Reforma de 2024: las personas con discapacidad EJERCEN los derechos del Título I en libertad e igualdad reales y efectivas (ya no se habla de \"tratamiento y rehabilitación\", texto antiguo derogado).",
     dificultad: 3,
   },
   {
@@ -635,6 +722,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 51.1 CE menciona expresamente «la seguridad, la salud y los legítimos intereses económicos» de los consumidores y usuarios. La promoción de la información y la educación de estos se contempla, de manera separada, en el art. 51.2 CE.",
+    mnemotecnia:
+      "Consumidores: SEGURIDAD, SALUD e INTERESES ECONÓMICOS legítimos (art. 51.1); la información y educación llegan después, en el 51.2.",
     dificultad: 1,
   },
   {
@@ -649,6 +738,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 53.1 CE establece que los derechos y libertades del Capítulo segundo «vinculan a todos los poderes públicos» y que «sólo por ley, que en todo caso deberá respetar su contenido esencial, podrá regularse el ejercicio de tales derechos y libertades», tutelándose de acuerdo con lo previsto en el art. 161.1.a) CE. La reserva de ley orgánica del art. 81.1 CE se ciñe al desarrollo de los derechos fundamentales y libertades públicas, ámbito más reducido que el del Capítulo segundo completo.",
+    mnemotecnia:
+      "Los derechos del Capítulo II atan a TODOS los poderes públicos y solo una LEY puede tocarlos, respetando siempre el contenido esencial (art. 53.1).",
     dificultad: 2,
   },
   {
@@ -663,6 +754,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 3,
     justificacionIa:
       "El art. 53.2 CE permite recabar la tutela de «los derechos reconocidos en el artículo 14 y la Sección primera del Capítulo segundo» por un procedimiento basado en los principios de preferencia y sumariedad y, en su caso, mediante recurso de amparo, y añade expresamente que «este último recurso será aplicable a la objeción de conciencia reconocida en el artículo 30». Los principios del Capítulo tercero quedan fuera, conforme al art. 53.3 CE.",
+    mnemotecnia:
+      "El amparo protege al 14 + Sección 1.ª, y por extensión también a la objeción de conciencia del art. 30 (así lo dice expresamente el art. 53.2).",
     dificultad: 3,
   },
   {
@@ -677,6 +770,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 0,
     justificacionIa:
       "El art. 54 CE prevé que una ley orgánica regule la institución del Defensor del Pueblo «como alto comisionado de las Cortes Generales, designado por éstas para la defensa de los derechos comprendidos en este Título», pudiendo supervisar la actividad de la Administración y dando cuenta a las Cortes Generales. La designación corresponde a las Cortes Generales, no sólo al Congreso.",
+    mnemotecnia:
+      "Defensor del Pueblo = comisionado de las CORTES (no del Gobierno ni del Tribunal Constitucional), que lo designan para vigilar a la Administración (art. 54).",
     dificultad: 1,
   },
   {
@@ -691,6 +786,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 2,
     justificacionIa:
       "El art. 55.1 CE enumera de forma tasada los derechos susceptibles de suspensión: los artículos 17, 18 apartados 2 y 3, 19, 20 apartados 1.a) y 1.d) y 5, 21, 28 apartado 2 y 37 apartado 2. El art. 24 CE no aparece en esa relación, por lo que la tutela judicial efectiva no es suspendible.",
+    mnemotecnia:
+      "El 24 no se suspende: la lista tasada de derechos suspendibles del art. 55.1 no incluye la tutela judicial efectiva.",
     dificultad: 3,
   },
   {
@@ -705,6 +802,8 @@ export const CE_TEMA1_PREGUNTAS =
     respuestaCorrecta: 1,
     justificacionIa:
       "El art. 55.2 CE reserva a una ley orgánica la determinación de la forma y los casos en que, «de forma individual y con la necesaria intervención judicial y el adecuado control parlamentario», pueden suspenderse los derechos de los artículos 17.2 y 18.2 y 3 para personas determinadas, en relación con las investigaciones correspondientes a la actuación de bandas armadas o elementos terroristas. El precepto no exige la declaración previa de ningún estado excepcional y añade que la utilización injustificada o abusiva de esas facultades producirá responsabilidad penal.",
+    mnemotecnia:
+      "Suspensión individual antiterrorista: solo por LEY ORGÁNICA, para los arts. 17.2 y 18.2 y 3, con control judicial y parlamentario (art. 55.2).",
     dificultad: 3,
   },
 ]

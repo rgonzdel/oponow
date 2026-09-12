@@ -28,6 +28,9 @@ export const preguntas = pgTable("preguntas", {
   // Índice (0-based) de la opción correcta dentro de `opciones`.
   respuestaCorrecta: smallint("respuesta_correcta").notNull(),
   justificacionIa: text("justificacion_ia"),
+  // Truco de memoria (acrónimo, rima, asociación...) para fijar el dato que
+  // pregunta el enunciado — se muestra en el test junto a la justificación.
+  mnemotecnia: text("mnemotecnia"),
   // Para el futuro generador adaptativo de tests fallados (VIP).
   dificultad: smallint("dificultad"),
   createdAt: timestamp("created_at", { withTimezone: true })

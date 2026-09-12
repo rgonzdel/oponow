@@ -19,6 +19,7 @@ interface RespuestaLocal {
   esCorrecta: boolean;
   respuestaCorrecta: number;
   justificacionIa: string | null;
+  mnemotecnia: string | null;
 }
 
 export function TestPage() {
@@ -82,14 +83,14 @@ export function TestPage() {
     if (!intentoId || !current || respuestaActual || enviando) return;
     setEnviando(true);
     try {
-      const { esCorrecta, respuestaCorrecta, justificacionIa } = await responder(
+      const { esCorrecta, respuestaCorrecta, justificacionIa, mnemotecnia } = await responder(
         intentoId,
         current.id,
         i,
       );
       setRespuestas((prev) => ({
         ...prev,
-        [current.id]: { opcionElegida: i, esCorrecta, respuestaCorrecta, justificacionIa },
+        [current.id]: { opcionElegida: i, esCorrecta, respuestaCorrecta, justificacionIa, mnemotecnia },
       }));
     } catch {
       setErrorMsg("No se pudo guardar tu respuesta, inténtalo de nuevo.");
@@ -178,6 +179,17 @@ export function TestPage() {
                     );
                   })}
                 </div>
+
+                {respuestaActual && respuestaActual.mnemotecnia && (
+                  <div className="mt-4 rounded-lg border border-accent/30 bg-accent-800/20 p-4">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-accent-300">
+                      Regla mnemotécnica
+                    </span>
+                    <p className="mt-1.5 text-sm leading-relaxed text-neutral-200">
+                      {respuestaActual.mnemotecnia}
+                    </p>
+                  </div>
+                )}
 
                 {respuestaActual && !respuestaActual.esCorrecta && respuestaActual.justificacionIa && (
                   <div className="mt-4 rounded-lg border border-ink-divider bg-ink p-4">

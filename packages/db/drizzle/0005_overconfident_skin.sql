@@ -1,0 +1,1 @@
+ALTER TABLE "preguntas" ADD COLUMN "mnemotecnia" text;

@@ -1041,6 +1041,7 @@ interface PreguntaSeed {
   opciones: string[];
   respuestaCorrecta: number;
   justificacionIa?: string;
+  mnemotecnia?: string;
   dificultad?: number;
 }
 
@@ -1066,6 +1067,7 @@ async function upsertPreguntas(
           opciones: p.opciones,
           respuestaCorrecta: p.respuestaCorrecta,
           justificacionIa: p.justificacionIa,
+          mnemotecnia: p.mnemotecnia,
           dificultad: p.dificultad,
         })
         .where(eq(schema.preguntas.id, existente.id));
@@ -1077,6 +1079,7 @@ async function upsertPreguntas(
       opciones: p.opciones,
       respuestaCorrecta: p.respuestaCorrecta,
       justificacionIa: p.justificacionIa,
+      mnemotecnia: p.mnemotecnia,
       dificultad: p.dificultad,
     });
   }

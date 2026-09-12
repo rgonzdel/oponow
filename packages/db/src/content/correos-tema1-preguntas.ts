@@ -19,6 +19,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El artículo 1.1 de la Ley 43/2010 fija como objeto la regulación de los servicios postales con el fin de garantizar la prestación del servicio postal universal, satisfacer las necesidades de comunicación postal dentro de España y de España con el extranjero, y asegurar la libre competencia en el sector en condiciones adecuadas de calidad, eficacia y eficiencia, con pleno respeto de los derechos de los usuarios y de los operadores postales y sus trabajadores.",
+    mnemotecnia: "Art. 1 abre la ley con el PARA QUÉ: piensa en las 3 U/C del objeto — Universal, Uso (comunicación) y libre Competencia.",
     dificultad: 1,
   },
   {
@@ -31,6 +32,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 2 de la Ley 43/2010 declara que los servicios postales son servicios de interés económico general que se prestan en régimen de libre competencia, sin perjuicio de que estén sometidos a obligaciones de servicio público los incluidos en el servicio postal universal encomendados al operador designado y los que se impongan a los titulares de autorizaciones administrativas singulares.",
+    mnemotecnia: "Art. 2: 'dos caras de la misma moneda' — interés económico general Y libre competencia a la vez.",
     dificultad: 1,
   },
   {
@@ -43,6 +45,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 3.2 de la Ley 43/2010 define el envío postal e incluye expresamente, además de los envíos de correspondencia, la publicidad directa, los libros, catálogos, diarios, publicaciones periódicas y los paquetes postales que contengan mercancías con o sin valor comercial, cualquiera que sea su peso.",
+    mnemotecnia: "Art. 3.2 → 'sin báscula': sea cual sea el peso, si lleva mercancía es envío postal.",
     dificultad: 2,
   },
   {
@@ -55,6 +58,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 3.3 de la Ley 43/2010 define el envío de correspondencia como la comunicación materializada en forma escrita sobre un soporte físico de cualquier naturaleza, y precisa expresamente que la publicidad directa, los libros, catálogos, diarios y publicaciones periódicas no tendrán la consideración de envíos de correspondencia.",
+    mnemotecnia: "Recuerda el acrónimo PLCDP fuera de la correspondencia: Publicidad, Libros, Catálogos, Diarios, Publicaciones — lo que se LEE no es correspondencia.",
     dificultad: 2,
   },
   {
@@ -67,6 +71,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El artículo 3.4 de la Ley 43/2010 define el servicio de envío certificado como aquel que, previo pago de una cantidad predeterminada a tanto alzado, comporta una garantía fija contra los riesgos de pérdida, robo o deterioro, y que facilita al remitente, en su caso y a petición de este, una prueba de depósito del envío postal o de su entrega al destinatario.",
+    mnemotecnia: "Certificado = 'CERTeza a precio fijo': tanto alzado + prueba de depósito y entrega.",
     dificultad: 1,
   },
   {
@@ -79,6 +84,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 3,
     justificacionIa: "El artículo 3.5 de la Ley 43/2010 define el servicio de envío con valor declarado como aquel que permite asegurar el envío por el valor declarado por el remitente, en caso de pérdida, robo o deterioro.",
+    mnemotecnia: "Valor declarado = 'lo que TÚ declares, eso te cubren' en caso de pérdida, robo o deterioro.",
     dificultad: 1,
   },
   {
@@ -91,6 +97,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El artículo 4 de la Ley 43/2010 excluye de su ámbito de aplicación los servicios realizados en régimen de autoprestación, así como los servicios relativos a los envíos sin dirección postal del destinatario, precisando cuándo se entiende que existe autoprestación.",
+    mnemotecnia: "Art. 4 = 'fuera de juego': autoprestación (te lo envías tú mismo) y envíos sin dirección postal.",
     dificultad: 2,
   },
   {
@@ -103,6 +110,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 5 de la Ley 43/2010 dispone que los operadores postales deberán realizar la prestación de los servicios con plena garantía del secreto de las comunicaciones postales, de conformidad con lo dispuesto en los artículos 18.3 y 55.2 de la Constitución Española y en el artículo 579 de la Ley de Enjuiciamiento Criminal.",
+    mnemotecnia: "Art. 5 = el candado triple del secreto postal: memoriza '18-55-579' (arts. 18.3 y 55.2 CE + art. 579 LECrim).",
     dificultad: 1,
   },
   {
@@ -115,6 +123,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El artículo 6.2 de la Ley 43/2010 establece que, sin perjuicio del derecho a la propiedad de los envíos postales reconocido en el artículo 13, los envíos postales solo podrán ser detenidos o interceptados y, en su caso, abiertos por resolución motivada de la autoridad judicial conforme a la ley.",
+    mnemotecnia: "Art. 6.2 = solo un JUEZ con resolución motivada puede abrir tu envío, nadie más.",
     dificultad: 1,
   },
   {
@@ -127,6 +136,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 6.3 de la Ley 43/2010 limita el alcance de dicha intervención al reconocimiento externo, visual o mediante máquinas, tanto de los envíos como de la documentación que los acompañe, precisando que no afectará en ningún caso al secreto e inviolabilidad de los envíos postales y que se garantizará la destrucción inmediata de las imágenes tomadas.",
+    mnemotecnia: "Art. 6.3 = 'mirar sin tocar': solo reconocimiento externo, visual o con máquinas, nunca abrir el envío.",
     dificultad: 3,
   },
   {
@@ -139,6 +149,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 10.2 de la Ley 43/2010 exige procedimientos sencillos, gratuitos y no discriminatorios y dispone que, en todo caso, las reclamaciones deberán ser resueltas conforme a derecho y notificadas a los interesados en el plazo máximo de un mes desde la fecha de su presentación, de la que el prestador del servicio deberá dar siempre recibo al interesado.",
+    mnemotecnia: "Art. 10.2 = 'diez... y un mes': las reclamaciones se resuelven y notifican en el plazo máximo de un mes.",
     dificultad: 2,
   },
   {
@@ -151,6 +162,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 10.4 de la Ley 43/2010 atribuye al organismo regulador el conocimiento de las controversias entre usuarios y operadores en el ámbito del servicio postal universal siempre que no se hayan sometido a las Juntas Arbitrales de Consumo, y fija un plazo de un mes para reclamar desde la respuesta del operador o desde la finalización del plazo para responder, debiendo resolverse en el plazo máximo de tres meses desde su presentación.",
+    mnemotecnia: "Art. 10.4 = el patrón '1 y 3': un mes para reclamar ante el regulador, tres meses para que lo resuelva.",
     dificultad: 3,
   },
   {
@@ -163,6 +175,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 12.1 de la Ley 43/2010 reconoce a los usuarios el derecho, salvo caso de fuerza mayor, a percibir indemnización en caso de pérdida, robo, destrucción o deterioro de los envíos certificados o con valor declarado, mediante el pago de una cantidad predeterminada por el operador postal en el primer caso, y de una cantidad proporcional a la declarada por el remitente en el segundo.",
+    mnemotecnia: "Art. 12.1 = certificado con precio FIJO, valor declarado PROPORCIONAL a lo declarado.",
     dificultad: 2,
   },
   {
@@ -175,6 +188,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El artículo 13 de la Ley 43/2010 establece que los envíos postales serán de titularidad del remitente a efectos postales en tanto no lleguen a poder del destinatario, quien podrá, mediante el pago del precio correspondiente, recuperarlos o modificar su dirección, salvo en los supuestos de imposibilidad material.",
+    mnemotecnia: "Art. 13 = 'trece, tuyo hasta que llegue': el envío es del remitente hasta que llega a poder del destinatario.",
     dificultad: 1,
   },
   {
@@ -187,6 +201,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 14 de la Ley 43/2010 reconoce el derecho a presentar solicitudes, escritos y comunicaciones dirigidas a las Administraciones Públicas únicamente a través de las oficinas del operador designado para la prestación del servicio postal universal, que deberá recibirlos y dirigirlos al destinatario con carácter preferente y acreditar su presentación y entrega, surtiendo los mismos efectos que en el registro del órgano administrativo al que se dirijan.",
+    mnemotecnia: "Art. 14 = la ventanilla postal: solo a través del operador designado tus escritos valen como registro de la Administración.",
     dificultad: 2,
   },
   {
@@ -199,6 +214,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 16 de la Ley 43/2010 obliga al operador designado a facilitar al remitente de cualquier envío certificado, a petición del mismo y previo pago del importe que corresponda, resguardo acreditativo de su admisión donde conste la fecha y hora de su presentación, y asimismo de su recepción por el destinatario.",
+    mnemotecnia: "Art. 16 = doble resguardo: uno al admitir el certificado, otro al confirmarse su entrega.",
     dificultad: 1,
   },
   {
@@ -211,6 +227,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 3,
     justificacionIa: "El artículo 20 de la Ley 43/2010 define el servicio postal universal como el conjunto de servicios postales de calidad determinada en la ley y sus reglamentos de desarrollo, prestados en régimen ordinario y permanente en todo el territorio nacional y a precio asequible para todos los usuarios.",
+    mnemotecnia: "Art. 20 = 'veinte, universal para todos': calidad tasada + régimen ordinario y permanente + precio asequible.",
     dificultad: 1,
   },
   {
@@ -223,6 +240,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 21.1.a) de la Ley 43/2010 incluye en el ámbito del servicio postal universal las cartas y tarjetas postales que contengan comunicaciones escritas en cualquier tipo de soporte de hasta dos kilogramos de peso.",
+    mnemotecnia: "Art. 21.1.a): cartas hasta 2 kg — el '2' del kilo acompaña al '21' del artículo.",
     dificultad: 1,
   },
   {
@@ -235,6 +253,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 21.1.b) de la Ley 43/2010 incluye en el ámbito del servicio postal universal los paquetes postales, con o sin valor comercial, de hasta veinte kilogramos de peso, junto con los servicios accesorios de certificado y valor declarado.",
+    mnemotecnia: "Art. 21.1.b): paquetes hasta 20 kg — mismo '2' que el artículo, pero con un cero más (20 en vez de 2).",
     dificultad: 1,
   },
   {
@@ -247,6 +266,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El artículo 23.a) de la Ley 43/2010 obliga al operador u operadores designados a realizar, al menos, una recogida en los puntos de acceso a la red postal todos los días laborables, de lunes a viernes, con independencia de la densidad de población e incluso en zonas rurales.",
+    mnemotecnia: "Art. 23 = recogida de lunes a viernes SIEMPRE, hasta en el pueblo más remoto: ni la ruralidad la libra.",
     dificultad: 1,
   },
   {
@@ -259,6 +279,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 24 de la Ley 43/2010 dispone que las entregas se practicarán, al menos, todos los días laborables, de lunes a viernes, salvo en el caso de concurrir circunstancias o condiciones geográficas especiales, conforme a lo previsto en la ley y en su normativa de desarrollo.",
+    mnemotecnia: "Art. 24 sigue al 23: si el 23 es recogida de lunes a viernes, el 24 es entrega de lunes a viernes (salvo geografía especial).",
     dificultad: 1,
   },
   {
@@ -271,6 +292,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 22.4 de la Ley 43/2010 establece que la actuación del operador designado gozará de la presunción de veracidad y fehaciencia en la distribución, entrega y recepción o rehúse o imposibilidad de entrega de notificaciones de órganos administrativos y judiciales, tanto las realizadas por medios físicos como telemáticos.",
+    mnemotecnia: "Art. 22.4 = el cartero de notificaciones 'no miente': presunción de veracidad y fehaciencia en la entrega judicial/administrativa.",
     dificultad: 2,
   },
   {
@@ -283,6 +305,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 33.a) de la Ley 43/2010 garantiza al operador designado el derecho a la utilización exclusiva de la denominación «Correos», del término «España», del emblema consistente en una cornamusa en la que figure además la corona de España, o de cualquier otro signo que lo identifique o identifique el carácter de los servicios que preste en tal ámbito.",
+    mnemotecnia: "Art. 33.a) = 'treinta y tres, la marca es mía': nombre 'Correos', 'España' y el cuerno (cornamusa) con corona, en exclusiva.",
     dificultad: 2,
   },
   {
@@ -295,6 +318,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 34.1 de la Ley 43/2010 dispone que los precios de los servicios postales prestados bajo régimen de obligaciones de servicio público deberán ser asequibles, transparentes y no discriminatorios y fijarse teniendo en cuenta los costes reales del servicio, de modo que ofrezcan incentivos para la prestación eficiente del mismo.",
+    mnemotecnia: "Art. 34.1 = las tres T-A-N del precio del SPU: Transparente, Asequible, No discriminatorio.",
     dificultad: 1,
   },
   {
@@ -307,6 +331,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 42 de la Ley 43/2010 exige autorización administrativa singular para la ejecución de cualesquiera prestaciones en relación con los servicios incluidos en el ámbito del servicio postal universal, en los términos definidos en el artículo 21.1; en cambio, el artículo 40.1 reserva la declaración responsable para quienes pretendan prestar servicios postales no incluidos en dicho ámbito.",
+    mnemotecnia: "Art. 42 va con el 40: declaración responsable (art. 40, fuera del SPU) vs autorización singular (art. 42, dentro del SPU).",
     dificultad: 2,
   },
   {
@@ -319,6 +344,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El artículo 50 de la Ley 43/2010 configura como Autoridad Nacional de Reglamentación Postal al Gobierno, a los órganos superiores y directivos del ministerio competente y a la Comisión Nacional del Sector Postal, atribuyendo en su apartado 2 a esta última la supervisión y regulación del mercado postal. Las funciones de aquella Comisión fueron asumidas posteriormente por la Comisión Nacional de los Mercados y la Competencia, por lo que las referencias legales al organismo regulador postal deben entenderse hechas a la CNMC.",
+    mnemotecnia: "Art. 50 = 'medio siglo de regulador': nació como Comisión Nacional del Sector Postal y hoy es la CNMC.",
     dificultad: 2,
   },
   {
@@ -331,6 +357,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El artículo 62.1 de la Ley 43/2010 establece que las infracciones leves se sancionarán con multa de 200 a 8.000 euros, las graves con multa de 8.001 a 80.000 euros y las muy graves con multa de 80.001 a 400.000 euros.",
+    mnemotecnia: "Art. 62.1 = escalera de ceros: leve 200-8.000 € / grave 8.001-80.000 € / muy grave 80.001-400.000 € (cada tramo añade un cero).",
     dificultad: 3,
   },
   {
@@ -343,6 +370,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El artículo 68.2 de la Ley 43/2010 fija el plazo de prescripción de las infracciones en tres años para las muy graves, dos años para las graves y seis meses para las leves, computándose desde el día en que la infracción se hubiera cometido.",
+    mnemotecnia: "Art. 68.2 = cuenta atrás 3-2-0,5: muy grave 3 años, grave 2 años, leve 6 meses de prescripción.",
     dificultad: 3,
   },
 
@@ -357,6 +385,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "Correos es una sociedad anónima mercantil estatal de capital íntegramente público, adscrita al sector público empresarial a través de la SEPI. Esa configuración explica que actúe en el mercado con forma societaria y en régimen de competencia, y al mismo tiempo asuma las obligaciones de servicio público propias del operador al que el Estado ha encomendado el servicio postal universal.",
+    mnemotecnia: "Correos = empresa con traje de empresa pero dueño el Estado (vía SEPI): compite en el mercado y carga con el servicio universal.",
     dificultad: 1,
   },
   {
@@ -369,6 +398,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "La diferencia operativa está en la trazabilidad y en la prueba: el envío certificado se registra en la admisión, genera un resguardo y su entrega se documenta con la firma o identificación de quien lo recibe. La carta ordinaria, en cambio, sigue un circuito de tratamiento masivo y se deposita en el buzón domiciliario sin dejar constancia individual de la entrega.",
+    mnemotecnia: "Certificada = 'con recibo y firma', ordinaria = 'al buzón y adiós': la primera deja rastro, la segunda no.",
     dificultad: 1,
   },
   {
@@ -381,6 +411,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "La modalidad urgente no cambia la naturaleza del envío ni sus límites de admisión: actúa sobre el proceso, dando prioridad en la clasificación, el transporte y el reparto para acortar el plazo respecto del circuito ordinario. Es una modalidad de tratamiento, compatible con otras como el certificado.",
+    mnemotecnia: "Urgente = 'acelera, no agranda': da prioridad en el camino, no cambia peso ni naturaleza del envío.",
     dificultad: 1,
   },
   {
@@ -393,6 +424,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El acuse de recibo es un servicio adicional que se contrata sobre un envío registrado y cuya función es devolver al remitente la prueba documental de la entrega, con la firma o identificación de quien la recibe. No cubre el valor del contenido, que es la función del valor declarado, ni acelera el plazo, que es función de las modalidades urgentes.",
+    mnemotecnia: "Acuse de recibo = la foto de la firma que vuelve a casa del remitente, como prueba de entrega.",
     dificultad: 2,
   },
   {
@@ -405,6 +437,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "La publicidad directa es un producto de comunicación comercial masiva: el remitente entrega grandes volúmenes de piezas homogéneas destinadas a un colectivo amplio, lo que permite un tratamiento industrializado en admisión y reparto y una política comercial distinta de la de la correspondencia individual.",
+    mnemotecnia: "Publicidad directa = 'buzoneo a lo grande': lo mismo para muchos destinatarios, no correspondencia individual.",
     dificultad: 2,
   },
   {
@@ -417,6 +450,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 3,
     justificacionIa: "La distinción comercial básica es el contenido y, con él, todo el proceso asociado: la correspondencia transporta comunicaciones y documentación, con formatos planos y tratamiento altamente automatizado, mientras que la paquetería mueve mercancías, con formatos volumétricos, manipulación específica y una operativa de entrega distinta.",
+    mnemotecnia: "Correspondencia = letras que se leen; paquetería = cosas que se usan.",
     dificultad: 1,
   },
   {
@@ -429,6 +463,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "Citypaq es la red de taquillas automatizadas de Correos: el usuario elige un terminal como dirección de entrega o de devolución y recoge o deposita el paquete cuando le conviene, mediante un código. Es una solución de entrega desatendida pensada para evitar las entregas fallidas por ausencia en el domicilio.",
+    mnemotecnia: "Citypaq = taquilla inteligente en la ciudad: recógelo tú, cuando quieras, con un código.",
     dificultad: 1,
   },
   {
@@ -441,6 +476,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "La logística inversa es el flujo de mercancía en sentido contrario al habitual: del cliente final de vuelta al vendedor. Engloba devoluciones, cambios, recogidas a domicilio o en punto de conveniencia y su reintegración al circuito del remitente, y es un servicio clave para el comercio electrónico, donde la devolución forma parte de la experiencia de compra.",
+    mnemotecnia: "Logística inversa = la marcha atrás del paquete: del cliente de vuelta a la tienda (devoluciones, cambios, recogidas).",
     dificultad: 1,
   },
   {
@@ -453,6 +489,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "La última milla es el tramo final de la cadena, desde el centro de distribución hasta el destinatario. Es el más atomizado y el que concentra mayor coste unitario, porque implica multitud de paradas y entregas individuales, y por eso es donde se concentran las soluciones alternativas como los puntos de recogida o las taquillas automatizadas.",
+    mnemotecnia: "Última milla = el tramo final y el más caro del reparto: del centro de distribución a tu puerta.",
     dificultad: 2,
   },
   {
@@ -465,6 +502,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 3,
     justificacionIa: "Los puntos de conveniencia y las oficinas colaboradoras son establecimientos de terceros integrados en la red que permiten admitir y entregar envíos. Su valor operativo está en la capilaridad y en la amplitud horaria: acercan el servicio al usuario y amplían las franjas de recogida sin necesidad de abrir nuevas oficinas propias.",
+    mnemotecnia: "Puntos de conveniencia = 'Correos donde ya vas': más cerca, más horario, sin abrir oficina nueva.",
     dificultad: 2,
   },
   {
@@ -477,6 +515,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "La entrega en punto de recogida consolida en una sola parada lo que en domicilio serían muchas entregas dispersas, y evita el principal motivo de fracaso del reparto, que es la ausencia del destinatario. Esa consolidación reduce los kilómetros por envío, las reentregas y el coste de la última milla.",
+    mnemotecnia: "Punto de recogida = muchas entregas en una sola parada: menos reentregas por ausencia.",
     dificultad: 2,
   },
   {
@@ -489,6 +528,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "La diferencia es de organización, no de derecho al servicio: en el medio rural la baja densidad y las largas distancias entre puntos de entrega obligan a diseñar secciones de reparto más extensas y con medios de locomoción distintos. La cobertura debe garantizarse igualmente, y es precisamente esa asimetría de costes la que justifica el carácter de obligación de servicio público.",
+    mnemotecnia: "Zona rural = más kilómetros, mismos derechos: cambia el medio de reparto, no la obligación de servicio.",
     dificultad: 2,
   },
   {
@@ -501,6 +541,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "El apartado postal es un casillero que el usuario contrata en una oficina y que actúa como dirección de destino: los envíos se depositan allí y el titular los recoge cuando le conviene. Es una alternativa a la entrega domiciliaria, habitual en empresas y en usuarios que reciben volúmenes elevados de correspondencia.",
+    mnemotecnia: "Apartado postal = tu buzón dentro de la oficina: tú vas a buscarlo, no te lo llevan a casa.",
     dificultad: 1,
   },
   {
@@ -513,6 +554,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El reembolso es un servicio adicional de cobro: el operador no entrega el envío hasta que el destinatario abona la cantidad fijada por el remitente, y después liquida ese importe al remitente. Es un servicio de valor añadido vinculado a la venta a distancia, distinto de la indemnización y del aseguramiento del contenido.",
+    mnemotecnia: "Reembolso = 'paga y te lo doy': se cobra al destinatario antes de entregar y luego se liquida al remitente.",
     dificultad: 2,
   },
   {
@@ -525,6 +567,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "Lo que distingue al burofax de un certificado ordinario es que, además de acreditar la entrega, permite certificar el texto exactamente remitido. Por eso se emplea en comunicaciones con efectos jurídicos, como requerimientos, reclamaciones o preavisos, donde interesa poder probar qué se dijo y no solo que se entregó.",
+    mnemotecnia: "Burofax = lo que se dice queda escrito y probado: acredita contenido Y entrega, ideal para el tráfico jurídico.",
     dificultad: 2,
   },
   {
@@ -537,6 +580,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El seguimiento se apoya en un código único asociado al envío que se lee en cada hito del proceso (admisión, tratamiento, salida a reparto, entrega). Su función es dar visibilidad del estado del envío al remitente y al destinatario; no revela el contenido ni sustituye la acreditación de la entrega.",
+    mnemotecnia: "Tracking = el código cuenta el viaje del envío, no revela su contenido.",
     dificultad: 1,
   },
   {
@@ -549,6 +593,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 3,
     justificacionIa: "Un envío registrado exige acreditar quién lo recibe, de modo que no puede dejarse en el buzón. La práctica operativa es dejar un aviso de llegada que informa al destinatario del intento de entrega y del lugar donde puede recoger el envío, quedando este depositado a su disposición durante un plazo antes de devolverlo al remitente.",
+    mnemotecnia: "Sin nadie en casa = aviso de llegada y el envío espera en la oficina durante un plazo antes de devolverse.",
     dificultad: 1,
   },
   {
@@ -561,6 +606,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "En el franqueo en destino, quien deposita el envío no paga en el momento de la admisión: el coste lo soporta el cliente destinatario que ha contratado previamente esta modalidad con el operador. Es un sistema pensado para respuestas comerciales, encuestas o devoluciones, donde interesa que el remitente pueda enviar sin desembolso.",
+    mnemotecnia: "Franqueo en destino = paga quien recibe, no quien manda.",
     dificultad: 3,
   },
   {
@@ -573,6 +619,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 1,
     justificacionIa: "El giro es un servicio de naturaleza financiera prestado a través de la red postal: el imponente entrega una cantidad en una oficina y el operador la pone a disposición del beneficiario. Su interés operativo es que aprovecha la capilaridad de la red postal para hacer llegar dinero a lugares y personas sin necesidad de intermediación bancaria.",
+    mnemotecnia: "Giro postal = dinero que viaja como una carta, de un imponente a un beneficiario.",
     dificultad: 2,
   },
   {
@@ -585,6 +632,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 2,
     justificacionIa: "El fulfillment integra el almacén en la cadena de entrega: el operador guarda el stock del cliente y, cuando entra un pedido, lo localiza, lo prepara, lo embala y lo introduce directamente en la red de distribución. Permite al vendedor externalizar toda la operativa física y acortar el tiempo entre la compra y la salida del envío.",
+    mnemotecnia: "Fulfillment = el almacén se convierte en tienda: guarda el stock, prepara y despacha cada pedido.",
     dificultad: 3,
   },
   {
@@ -597,6 +645,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 3,
     justificacionIa: "La digitalización de las comunicaciones ha reducido de forma sostenida el volumen de correspondencia física, mientras que la compra en línea ha impulsado la paquetería y los servicios logísticos asociados. Ese cambio de mix explica la reorientación comercial de los operadores postales hacia la paquetería, los puntos de recogida y la logística de devoluciones.",
+    mnemotecnia: "E-commerce = menos cartas, más cajas: el negocio postal gira de la correspondencia hacia la paquetería.",
     dificultad: 2,
   },
   {
@@ -609,6 +658,7 @@ export const CORREOS_TEMA1_PREGUNTAS =
     ],
     respuestaCorrecta: 0,
     justificacionIa: "Cada intento de entrega fallido obliga a repetir la visita o a gestionar un depósito en oficina, duplicando el coste del tramo más caro de la cadena. Permitir al destinatario reprogramar la fecha, cambiar a un punto de recogida o autorizar otra forma de entrega aumenta la tasa de éxito en el primer intento y reduce esas repeticiones.",
+    mnemotecnia: "Entrega flexible = tú decides cuándo y dónde: menos reintentos, menos coste en la última milla.",
     dificultad: 3,
   },
 ]

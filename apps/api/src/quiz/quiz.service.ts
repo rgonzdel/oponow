@@ -63,15 +63,49 @@ function inicioDeHoy(): Date {
   return hoy;
 }
 
+// La API corre en UTC (Render), pero los días de estudio de un opositor son
+// días naturales españoles: sin fijar la zona, un test hecho a la 1 de la
+// madrugada contaría para el día anterior y rompería la racha.
+const ZONA_HORARIA = "Europe/Madrid";
+const MS_POR_DIA = 24 * 60 * 60 * 1000;
+
+// "en-CA" produce directamente el formato YYYY-MM-DD.
+const formateadorDeDia = new Intl.DateTimeFormat("en-CA", {
+  timeZone: ZONA_HORARIA,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** Día natural español ("YYYY-MM-DD") al que pertenece un instante. */
 function claveDeDia(fecha: Date): string {
-  return fecha.toISOString().slice(0, 10);
+  return formateadorDeDia.format(fecha);
+}
+
+/**
+ * Ancla un día natural al mediodía UTC de esa fecha. Restar 24 h a un
+ * mediodía siempre cae en el mediodía del día anterior, también en los dos
+ * domingos del año en que cambia la hora — que es justo lo que rompería un
+ * recorrido hecho a base de medianoches.
+ */
+function anclaDeClave(clave: string): Date {
+  const [anio, mes, dia] = clave.split("-").map(Number);
+  return new Date(Date.UTC(anio, mes - 1, dia, 12));
+}
+
+function claveDeAncla(ancla: Date): string {
+  return ancla.toISOString().slice(0, 10);
+}
+
+function diaAnterior(ancla: Date): Date {
+  return new Date(ancla.getTime() - MS_POR_DIA);
 }
 
 function claveDePeriodo(fecha: Date, groupBy: FallosGroupBy): string {
-  const iso = fecha.toISOString();
-  if (groupBy === "year") return iso.slice(0, 4);
-  if (groupBy === "month") return iso.slice(0, 7);
-  return claveDeDia(fecha);
+  const dia = claveDeDia(fecha);
+  if (groupBy === "year") return dia.slice(0, 4);
+  if (groupBy === "month") return dia.slice(0, 7);
+  return dia;
 }
 
 /**
@@ -80,16 +114,16 @@ function claveDePeriodo(fecha: Date, groupBy: FallosGroupBy): string {
  * la racha sigue "viva" (no se corta hasta que se salta un día entero).
  */
 function calcularRacha(diasConIntento: Set<string>): number {
-  const cursor = inicioDeHoy();
-  if (!diasConIntento.has(claveDeDia(cursor))) {
-    cursor.setDate(cursor.getDate() - 1);
-    if (!diasConIntento.has(claveDeDia(cursor))) return 0;
+  let cursor = anclaDeClave(claveDeDia(new Date()));
+  if (!diasConIntento.has(claveDeAncla(cursor))) {
+    cursor = diaAnterior(cursor);
+    if (!diasConIntento.has(claveDeAncla(cursor))) return 0;
   }
 
   let racha = 0;
-  while (diasConIntento.has(claveDeDia(cursor))) {
+  while (diasConIntento.has(claveDeAncla(cursor))) {
     racha += 1;
-    cursor.setDate(cursor.getDate() - 1);
+    cursor = diaAnterior(cursor);
   }
   return racha;
 }
@@ -332,9 +366,17 @@ export class QuizService {
       .where(eq(schema.usuarios.id, userId))
       .limit(1);
 
-    const desde = new Date();
-    desde.setHours(0, 0, 0, 0);
-    desde.setDate(desde.getDate() - (dias - 1));
+    // Ventana de `dias` días naturales españoles terminando hoy. A SQL se le
+    // pide una cota inferior holgada (un día más) y el recorte fino lo hace
+    // la clave de día, para que tests y fallos cuenten exactamente el mismo
+    // periodo que la racha.
+    const clavesVentana = new Set<string>();
+    let ancla = anclaDeClave(claveDeDia(new Date()));
+    for (let i = 0; i < dias; i += 1) {
+      clavesVentana.add(claveDeAncla(ancla));
+      ancla = diaAnterior(ancla);
+    }
+    const cotaInferior = ancla;
 
     const intentosCompletados = await db
       .select({ fecha: schema.intentosTest.fecha })
@@ -350,12 +392,14 @@ export class QuizService {
 
     const diasConIntento = new Set(intentosCompletados.map((i) => claveDeDia(i.fecha)));
     const streak = calcularRacha(diasConIntento);
-    const testsRealizados = intentosCompletados.filter((i) => i.fecha >= desde).length;
+    const testsRealizados = intentosCompletados.filter((i) =>
+      clavesVentana.has(claveDeDia(i.fecha)),
+    ).length;
 
     let fallos: number | null = null;
     if (user && user.plan !== "free") {
       const filasFallos = await db
-        .select({ id: schema.respuestasUsuario.id })
+        .select({ fecha: schema.respuestasUsuario.fecha })
         .from(schema.respuestasUsuario)
         .innerJoin(
           schema.intentosTest,
@@ -365,10 +409,10 @@ export class QuizService {
           and(
             eq(schema.intentosTest.usuarioId, userId),
             eq(schema.respuestasUsuario.esCorrecta, false),
-            gte(schema.respuestasUsuario.fecha, desde),
+            gte(schema.respuestasUsuario.fecha, cotaInferior),
           ),
         );
-      fallos = filasFallos.length;
+      fallos = filasFallos.filter((f) => clavesVentana.has(claveDeDia(f.fecha))).length;
     }
 
     return { streak, testsRealizados, fallos, dias };

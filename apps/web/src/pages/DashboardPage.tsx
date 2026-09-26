@@ -41,7 +41,7 @@ export function DashboardPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-10">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr_320px] lg:items-start">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr] lg:items-start">
           <div className="lg:order-2">
             <div className="rounded-lg border border-ink-divider bg-ink-surface p-6">
               <p className="text-ink-text">
@@ -100,10 +100,12 @@ export function DashboardPage() {
           <div className="lg:order-1">
             <ResumenWidget />
           </div>
+        </div>
 
-          <div className="lg:order-3">
-            <MiniCalendar />
-          </div>
+        {/* A lo ancho: las casillas necesitan sitio para previsualizar las
+            tareas de cada día, en una columna estrecha no caben. */}
+        <div className="mt-6">
+          <MiniCalendar />
         </div>
       </main>
     </div>

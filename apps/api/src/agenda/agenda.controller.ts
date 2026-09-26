@@ -8,12 +8,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import { AgendaService } from "./agenda.service";
 import { GoogleCalendarService } from "./google/google-calendar.service";
 import { CreateTareaDto } from "./dto/create-tarea.dto";
 import { UpdateTareaDto } from "./dto/update-tarea.dto";
+import { ListGoogleEventosQueryDto } from "./dto/list-google-eventos-query.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import type { AuthenticatedUser } from "../auth/strategies/jwt.strategy";
@@ -57,6 +59,18 @@ export class AgendaController {
   @Get("google/status")
   googleStatus(@CurrentUser() user: AuthenticatedUser) {
     return this.googleCalendarService.getStatus(user.id);
+  }
+
+  @Get("google/eventos")
+  listGoogleEventos(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ListGoogleEventosQueryDto,
+  ) {
+    return this.googleCalendarService.listEventos(
+      user.id,
+      new Date(query.desde),
+      new Date(query.hasta),
+    );
   }
 
   @Get("google/connect")

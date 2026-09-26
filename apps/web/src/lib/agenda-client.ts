@@ -1,4 +1,7 @@
+import type { GoogleEventOcurrencia } from "@oponow/shared-types";
 import { apiFetch } from "./api-client";
+
+export type { GoogleEventOcurrencia } from "@oponow/shared-types";
 
 export interface Tarea {
   id: string;
@@ -54,4 +57,9 @@ export function getGoogleAuthUrl() {
 
 export function disconnectGoogle() {
   return apiFetch<void>("/agenda/google", { method: "DELETE" });
+}
+
+export function listGoogleEventos(desde: string, hasta: string) {
+  const qs = new URLSearchParams({ desde, hasta });
+  return apiFetch<GoogleEventOcurrencia[]>(`/agenda/google/eventos?${qs.toString()}`);
 }

@@ -10,10 +10,12 @@ import {
   createGoogleEvent,
   deleteGoogleEvent,
   exchangeCodeForTokens,
+  listGoogleEvents,
   refreshAccessToken,
   revokeGoogleToken,
   updateGoogleEvent,
   type GoogleEventInput,
+  type GoogleEventOcurrencia,
 } from "./google-calendar.client";
 
 interface OauthState {
@@ -203,6 +205,25 @@ export class GoogleCalendarService {
       await updateGoogleEvent(accessToken, tarea.googleEventId, this.toEventInput(tarea));
     } catch (err) {
       this.logger.warn(`No se pudo actualizar el evento de Google de la tarea ${tarea.id}: ${err}`);
+    }
+  }
+
+  /**
+   * Solo lectura, best-effort: si no hay conexión o Google falla, devuelve
+   * `[]` en vez de lanzar — es un complemento no crítico al mini-calendario,
+   * que siempre puede mostrar las tareas locales igualmente.
+   */
+  async listEventos(userId: string, desde: Date, hasta: Date): Promise<GoogleEventOcurrencia[]> {
+    try {
+      const accessToken = await this.getValidAccessToken(userId);
+      if (!accessToken) return [];
+      return await listGoogleEvents(accessToken, {
+        timeMin: desde.toISOString(),
+        timeMax: hasta.toISOString(),
+      });
+    } catch (err) {
+      this.logger.warn(`No se pudieron listar eventos de Google Calendar: ${err}`);
+      return [];
     }
   }
 

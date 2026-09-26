@@ -10,6 +10,7 @@ import {
   createGoogleEvent,
   deleteGoogleEvent,
   exchangeCodeForTokens,
+  GoogleOauthError,
   listGoogleEvents,
   refreshAccessToken,
   revokeGoogleToken,
@@ -23,6 +24,14 @@ interface OauthState {
   sub: string;
 }
 
+interface AccessTokenCacheado {
+  token: string;
+  expiraEn: number;
+}
+
+/** Margen para no apurar el access token justo en el filo de su caducidad. */
+const MARGEN_CADUCIDAD_MS = 60_000;
+
 type TareaParaSync = Pick<
   typeof schema.tareasAgenda.$inferSelect,
   "id" | "titulo" | "descripcion" | "fecha" | "completada" | "googleEventId"
@@ -31,6 +40,13 @@ type TareaParaSync = Pick<
 @Injectable()
 export class GoogleCalendarService {
   private readonly logger = new Logger(GoogleCalendarService.name);
+
+  /**
+   * Access tokens vivos por usuario. Sin esto se pedía uno nuevo a Google en
+   * cada llamada — cada pintado del calendario, cada alta de tarea — lo que
+   * es lento y gasta cuota de refresh para nada.
+   */
+  private readonly accessTokens = new Map<string, AccessTokenCacheado>();
 
   constructor(
     private readonly configService: ConfigService,
@@ -111,9 +127,18 @@ export class GoogleCalendarService {
         set: { refreshTokenCifrado: encryptedRefreshToken },
       });
 
+    // Credenciales nuevas: cualquier access token cacheado es del anterior.
+    this.accessTokens.delete(payload.sub);
+
     return payload.sub;
   }
 
+  /**
+   * "Conectado" significa que de verdad podemos hablar con Google en nombre
+   * del usuario, no solo que quede una fila guardada: comprobar únicamente
+   * la fila era lo que hacía que la UI dijese "conectado" mientras ninguna
+   * tarea llegaba al calendario.
+   */
   async getStatus(userId: string): Promise<{ connected: boolean }> {
     const db = getRequestDb();
     const [conexion] = await db
@@ -121,10 +146,20 @@ export class GoogleCalendarService {
       .from(schema.googleCalendarConexiones)
       .where(eq(schema.googleCalendarConexiones.usuarioId, userId))
       .limit(1);
-    return { connected: Boolean(conexion) };
+    if (!conexion) return { connected: false };
+
+    try {
+      return { connected: (await this.getValidAccessToken(userId)) !== null };
+    } catch (err) {
+      // Fallo pasajero hablando con Google: la credencial no está muerta,
+      // solo no hemos podido comprobarla ahora. No alarmamos al usuario.
+      this.logger.warn(`No se pudo verificar la conexión de Google del usuario ${userId}: ${err}`);
+      return { connected: true };
+    }
   }
 
   async disconnect(userId: string): Promise<void> {
+    this.accessTokens.delete(userId);
     const db = getRequestDb();
     const [conexion] = await db
       .select({ refreshTokenCifrado: schema.googleCalendarConexiones.refreshTokenCifrado })
@@ -133,11 +168,19 @@ export class GoogleCalendarService {
       .limit(1);
 
     if (conexion) {
-      const refreshToken = decryptToken(
-        conexion.refreshTokenCifrado,
-        this.configService.getOrThrow<string>("TOKEN_ENCRYPTION_KEY"),
-      );
-      await revokeGoogleToken(refreshToken);
+      // Revocar es cortesía hacia Google, no un requisito: si el token ya no
+      // se puede descifrar (clave rotada) desconectar debe funcionar
+      // igualmente — si no, el usuario se queda atrapado con una conexión
+      // rota que tampoco puede quitar.
+      try {
+        const refreshToken = decryptToken(
+          conexion.refreshTokenCifrado,
+          this.configService.getOrThrow<string>("TOKEN_ENCRYPTION_KEY"),
+        );
+        await revokeGoogleToken(refreshToken);
+      } catch (err) {
+        this.logger.warn(`No se pudo revocar el token de Google del usuario ${userId}: ${err}`);
+      }
     }
 
     await db
@@ -145,7 +188,34 @@ export class GoogleCalendarService {
       .where(eq(schema.googleCalendarConexiones.usuarioId, userId));
   }
 
+  /**
+   * Borra una conexión cuyas credenciales ya no sirven. Guardarla sería peor
+   * que no tenerla: `getStatus` diría "conectado" y el usuario no entendería
+   * por qué no se sincroniza nada. Sin fila, la UI le ofrece reconectar, que
+   * es justo lo que hay que hacer.
+   */
+  private async invalidarConexion(userId: string, motivo: string): Promise<void> {
+    this.logger.error(
+      `Conexión de Google Calendar inservible para el usuario ${userId} (${motivo}). Se elimina para que pueda reconectar.`,
+    );
+    this.accessTokens.delete(userId);
+    const db = getRequestDb();
+    await db
+      .delete(schema.googleCalendarConexiones)
+      .where(eq(schema.googleCalendarConexiones.usuarioId, userId));
+  }
+
+  /**
+   * Devuelve `null` cuando no hay conexión utilizable (nunca la hubo, o
+   * acaba de invalidarse). Los fallos pasajeros se propagan como excepción:
+   * el llamante decide, pero la conexión se conserva.
+   */
   private async getValidAccessToken(userId: string): Promise<string | null> {
+    const cacheado = this.accessTokens.get(userId);
+    if (cacheado && cacheado.expiraEn > Date.now() + MARGEN_CADUCIDAD_MS) {
+      return cacheado.token;
+    }
+
     const db = getRequestDb();
     const [conexion] = await db
       .select({ refreshTokenCifrado: schema.googleCalendarConexiones.refreshTokenCifrado })
@@ -154,14 +224,40 @@ export class GoogleCalendarService {
       .limit(1);
     if (!conexion) return null;
 
-    const refreshToken = decryptToken(
-      conexion.refreshTokenCifrado,
-      this.configService.getOrThrow<string>("TOKEN_ENCRYPTION_KEY"),
-    );
-    const tokens = await refreshAccessToken({
-      refreshToken,
-      clientId: this.configService.getOrThrow<string>("GOOGLE_CLIENT_ID"),
-      clientSecret: this.configService.getOrThrow<string>("GOOGLE_CLIENT_SECRET"),
+    let refreshToken: string;
+    try {
+      refreshToken = decryptToken(
+        conexion.refreshTokenCifrado,
+        this.configService.getOrThrow<string>("TOKEN_ENCRYPTION_KEY"),
+      );
+    } catch {
+      // El token se cifró con otra TOKEN_ENCRYPTION_KEY (rotada, o la de
+      // otro entorno). Es irrecuperable: la clave vieja ya no está.
+      await this.invalidarConexion(
+        userId,
+        "el refresh token guardado no se puede descifrar con la TOKEN_ENCRYPTION_KEY actual",
+      );
+      return null;
+    }
+
+    let tokens;
+    try {
+      tokens = await refreshAccessToken({
+        refreshToken,
+        clientId: this.configService.getOrThrow<string>("GOOGLE_CLIENT_ID"),
+        clientSecret: this.configService.getOrThrow<string>("GOOGLE_CLIENT_SECRET"),
+      });
+    } catch (err) {
+      if (err instanceof GoogleOauthError && err.esCredencialMuerta) {
+        await this.invalidarConexion(userId, `Google rechazó el refresh token (${err.codigo})`);
+        return null;
+      }
+      throw err;
+    }
+
+    this.accessTokens.set(userId, {
+      token: tokens.access_token,
+      expiraEn: Date.now() + tokens.expires_in * 1000,
     });
     return tokens.access_token;
   }

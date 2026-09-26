@@ -79,6 +79,35 @@ export function buildGoogleAuthUrl(params: {
   return `${AUTH_BASE}?${qs.toString()}`;
 }
 
+/**
+ * Error de OAuth con el código que devuelve Google, para poder separar lo
+ * irrecuperable (el usuario tiene que volver a autorizar) de lo pasajero
+ * (corte de red, 5xx) — que no debe costarle la conexión.
+ */
+export class GoogleOauthError extends Error {
+  constructor(
+    readonly codigo: string,
+    readonly status: number,
+    mensaje: string,
+  ) {
+    super(mensaje);
+    this.name = "GoogleOauthError";
+  }
+
+  /**
+   * `invalid_grant`: el refresh token ya no sirve — revocado por el usuario,
+   * caducado (las apps en modo "Testing" los caducan a los 7 días) o emitido
+   * por otras credenciales. La única salida es reconectar.
+   *
+   * Ojo: `invalid_client` NO entra aquí a propósito. Significa que el
+   * CLIENT_ID/SECRET del servidor están mal, y darlo por credencial muerta
+   * borraría la conexión de todos los usuarios por un error de configuración.
+   */
+  get esCredencialMuerta(): boolean {
+    return this.codigo === "invalid_grant";
+  }
+}
+
 async function postForm<T>(url: string, body: Record<string, string>): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
@@ -87,7 +116,17 @@ async function postForm<T>(url: string, body: Record<string, string>): Promise<T
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Google OAuth error (${res.status}): ${text}`);
+    let codigo = "";
+    try {
+      codigo = (JSON.parse(text) as { error?: string }).error ?? "";
+    } catch {
+      // Cuerpo no-JSON (un 502 del proxy de Google, por ejemplo): sin código.
+    }
+    throw new GoogleOauthError(
+      codigo,
+      res.status,
+      `Google OAuth error (${res.status}): ${text}`,
+    );
   }
   return res.json() as Promise<T>;
 }

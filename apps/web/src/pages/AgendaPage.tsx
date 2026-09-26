@@ -33,11 +33,13 @@ export function AgendaPage() {
   const [fecha, setFecha] = useState("");
 
   const googleResultado = searchParams.get("google");
+  const googleMotivo = searchParams.get("motivo");
   useEffect(() => {
     if (!googleResultado) return;
     queryClient.invalidateQueries({ queryKey: ["agenda", "google-status"] });
     const next = new URLSearchParams(searchParams);
     next.delete("google");
+    next.delete("motivo");
     setSearchParams(next, { replace: true });
     // Solo al aterrizar desde el callback de Google — no depende de nada
     // que cambie en cada render.
@@ -111,9 +113,12 @@ export function AgendaPage() {
           </p>
         )}
         {googleResultado === "error" && (
-          <p className="mt-4 rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-400">
-            No se pudo conectar con Google Calendar, inténtalo de nuevo.
-          </p>
+          <div className="mt-4 rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-400">
+            <p>No se pudo conectar con Google Calendar, inténtalo de nuevo.</p>
+            {googleMotivo && (
+              <p className="mt-1 text-xs text-red-400/80">Motivo: {googleMotivo}</p>
+            )}
+          </div>
         )}
 
         <div className="mt-6 flex items-center justify-between rounded-lg border border-ink-divider bg-ink-surface p-5">

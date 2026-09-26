@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../auth/AuthContext";
 import { OponowLogo } from "../components/OponowLogo";
 import { buttonClass } from "../components/button";
+import { ResumenWidget } from "../components/ResumenWidget";
+import { MiniCalendar } from "../components/MiniCalendar";
 import { listMySubscriptions } from "../lib/billing-client";
 
 const PLAN_LABEL: Record<string, string> = {
@@ -38,58 +40,70 @@ export function DashboardPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-6 py-10">
-        <div className="rounded-lg border border-ink-divider bg-ink-surface p-6">
-          <p className="text-ink-text">
-            Sesión activa · plan{" "}
-            <span className="rounded-md bg-accent-800 px-2 py-0.5 text-xs font-medium text-accent-100">
-              {user ? (PLAN_LABEL[user.plan] ?? user.plan) : "…"}
-            </span>
-          </p>
-          {miOposicion ? (
-            <Link
-              to={`/oposiciones/${miOposicion.oposicionSlug}/temario`}
-              className={buttonClass("primary", "mt-4 w-full")}
-            >
-              Ir al temario de {miOposicion.oposicionNombre}
-            </Link>
-          ) : (
-            <Link to="/oposiciones" className={buttonClass("primary", "mt-4 w-full")}>
-              Ver oposiciones
-            </Link>
-          )}
-        </div>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Link
-            to="/fallos"
-            className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
-          >
-            <h2 className="text-sm font-medium text-ink-text">Seguimiento de fallos</h2>
-            <p className="mt-1 text-xs text-neutral-500">
-              Repasa las preguntas que has fallado, filtradas por fecha.
-            </p>
-          </Link>
-          <Link
-            to="/agenda"
-            className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
-          >
-            <h2 className="text-sm font-medium text-ink-text">Agenda de estudio</h2>
-            <p className="mt-1 text-xs text-neutral-500">
-              Crea tareas y sincronízalas con Google Calendar o Apple Calendar.
-            </p>
-          </Link>
-          {user?.isAdmin && (
-            <Link
-              to="/admin"
-              className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
-            >
-              <h2 className="text-sm font-medium text-ink-text">Panel de administración</h2>
-              <p className="mt-1 text-xs text-neutral-500">
-                Ver y gestionar los usuarios registrados.
+      <main className="mx-auto max-w-6xl px-6 py-10">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr_320px] lg:items-start">
+          <div className="lg:order-2">
+            <div className="rounded-lg border border-ink-divider bg-ink-surface p-6">
+              <p className="text-ink-text">
+                Sesión activa · plan{" "}
+                <span className="rounded-md bg-accent-800 px-2 py-0.5 text-xs font-medium text-accent-100">
+                  {user ? (PLAN_LABEL[user.plan] ?? user.plan) : "…"}
+                </span>
               </p>
-            </Link>
-          )}
+              {miOposicion ? (
+                <Link
+                  to={`/oposiciones/${miOposicion.oposicionSlug}/temario`}
+                  className={buttonClass("primary", "mt-4 w-full")}
+                >
+                  Ir al temario de {miOposicion.oposicionNombre}
+                </Link>
+              ) : (
+                <Link to="/oposiciones" className={buttonClass("primary", "mt-4 w-full")}>
+                  Ver oposiciones
+                </Link>
+              )}
+            </div>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Link
+                to="/fallos"
+                className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+              >
+                <h2 className="text-sm font-medium text-ink-text">Seguimiento de fallos</h2>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Repasa las preguntas que has fallado, filtradas por fecha.
+                </p>
+              </Link>
+              <Link
+                to="/agenda"
+                className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+              >
+                <h2 className="text-sm font-medium text-ink-text">Agenda de estudio</h2>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Crea tareas y sincronízalas con Google Calendar o Apple Calendar.
+                </p>
+              </Link>
+              {user?.isAdmin && (
+                <Link
+                  to="/admin"
+                  className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+                >
+                  <h2 className="text-sm font-medium text-ink-text">Panel de administración</h2>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Ver y gestionar los usuarios registrados.
+                  </p>
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div className="lg:order-1">
+            <ResumenWidget />
+          </div>
+
+          <div className="lg:order-3">
+            <MiniCalendar />
+          </div>
         </div>
       </main>
     </div>

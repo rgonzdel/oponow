@@ -2,6 +2,7 @@ import type {
   FallosGroupBy,
   FallosResumen,
   IntentoIniciado,
+  ResumenDashboard,
   ResumenIntento,
   RespuestaResultado,
 } from "@oponow/shared-types";
@@ -13,6 +14,7 @@ export type {
   FallosResumen,
   IntentoIniciado,
   PreguntaTest,
+  ResumenDashboard,
   ResumenIntento,
   RespuestaResultado,
 } from "@oponow/shared-types";
@@ -51,4 +53,9 @@ export function getFallos(params: {
   if (params.groupBy) qs.set("groupBy", params.groupBy);
   const suffix = qs.toString() ? `?${qs.toString()}` : "";
   return apiFetch<FallosResumen>(`/quiz/fallos${suffix}`);
+}
+
+export function getResumen(dias?: 7 | 14 | 30) {
+  const suffix = dias ? `?dias=${dias}` : "";
+  return apiFetch<ResumenDashboard>(`/quiz/resumen${suffix}`);
 }

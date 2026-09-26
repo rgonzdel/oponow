@@ -23,6 +23,32 @@ export interface GoogleEventInput {
   oponowTareaId: string;
 }
 
+export interface GoogleEventOcurrencia {
+  id: string;
+  titulo: string;
+  inicio: string;
+  todoElDia: boolean;
+  oponowTareaId: string | null;
+}
+
+interface GoogleApiEventRaw {
+  id: string;
+  summary?: string;
+  start?: { dateTime?: string; date?: string };
+  extendedProperties?: { private?: Record<string, string> };
+}
+
+function toOcurrencia(raw: GoogleApiEventRaw): GoogleEventOcurrencia {
+  const inicio = raw.start?.dateTime ?? raw.start?.date ?? "";
+  return {
+    id: raw.id,
+    titulo: raw.summary ?? "(sin título)",
+    inicio,
+    todoElDia: !raw.start?.dateTime,
+    oponowTareaId: raw.extendedProperties?.private?.oponowTareaId ?? null,
+  };
+}
+
 function toGoogleEventBody(event: GoogleEventInput) {
   return {
     summary: event.completada ? `✓ ${event.titulo}` : event.titulo,
@@ -133,6 +159,25 @@ export async function updateGoogleEvent(
     body: JSON.stringify(toGoogleEventBody(event)),
   });
   if (!res.ok) throw new Error(`Google Calendar update error (${res.status})`);
+}
+
+export async function listGoogleEvents(
+  accessToken: string,
+  params: { timeMin: string; timeMax: string },
+): Promise<GoogleEventOcurrencia[]> {
+  const qs = new URLSearchParams({
+    timeMin: params.timeMin,
+    timeMax: params.timeMax,
+    singleEvents: "true",
+    orderBy: "startTime",
+    maxResults: "250",
+  });
+  const res = await fetch(`${CALENDAR_EVENTS_URL}?${qs.toString()}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) throw new Error(`Google Calendar list error (${res.status})`);
+  const body = (await res.json()) as { items?: GoogleApiEventRaw[] };
+  return (body.items ?? []).map(toOcurrencia);
 }
 
 export async function deleteGoogleEvent(accessToken: string, eventId: string): Promise<void> {

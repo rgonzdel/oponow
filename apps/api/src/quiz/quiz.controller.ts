@@ -3,6 +3,7 @@ import { Throttle } from "@nestjs/throttler";
 import { QuizService } from "./quiz.service";
 import { ResponderDto } from "./dto/responder.dto";
 import { FallosQueryDto } from "./dto/fallos-query.dto";
+import { ResumenQueryDto } from "./dto/resumen-query.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import type { AuthenticatedUser } from "../auth/strategies/jwt.strategy";
@@ -41,5 +42,13 @@ export class QuizController {
     @Query() query: FallosQueryDto,
   ) {
     return this.quizService.getFallos(user.id, query);
+  }
+
+  @Get("resumen")
+  resumen(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ResumenQueryDto,
+  ) {
+    return this.quizService.getResumen(user.id, query.dias);
   }
 }

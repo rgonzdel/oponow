@@ -61,3 +61,18 @@ export interface FallosResumen {
   fallos: FalloDetalle[];
   porPeriodo: { periodo: string; total: number }[];
 }
+
+export interface ResumenDashboard {
+  streak: number;
+  testsRealizados: number;
+  fallos: number | null;
+  dias: 7 | 14 | 30;
+}
+
+export interface GoogleEventOcurrencia {
+  id: string;
+  titulo: string;
+  inicio: string;
+  todoElDia: boolean;
+  oponowTareaId: string | null;
+}

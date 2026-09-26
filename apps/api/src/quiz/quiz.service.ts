@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 import { schema } from "@oponow/db";
 import { getRequestDb } from "../database/request-context";
 import type { ResponderDto } from "./dto/responder.dto";
@@ -50,17 +50,48 @@ export interface FallosResumen {
   porPeriodo: { periodo: string; total: number }[];
 }
 
+export interface ResumenDashboard {
+  streak: number;
+  testsRealizados: number;
+  fallos: number | null;
+  dias: 7 | 14 | 30;
+}
+
 function inicioDeHoy(): Date {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
   return hoy;
 }
 
+function claveDeDia(fecha: Date): string {
+  return fecha.toISOString().slice(0, 10);
+}
+
 function claveDePeriodo(fecha: Date, groupBy: FallosGroupBy): string {
   const iso = fecha.toISOString();
   if (groupBy === "year") return iso.slice(0, 4);
   if (groupBy === "month") return iso.slice(0, 7);
-  return iso.slice(0, 10);
+  return claveDeDia(fecha);
+}
+
+/**
+ * Racha de días consecutivos con al menos un intento completado, contando
+ * hacia atrás desde hoy. Si hoy todavía no tiene ningún intento pero ayer sí,
+ * la racha sigue "viva" (no se corta hasta que se salta un día entero).
+ */
+function calcularRacha(diasConIntento: Set<string>): number {
+  const cursor = inicioDeHoy();
+  if (!diasConIntento.has(claveDeDia(cursor))) {
+    cursor.setDate(cursor.getDate() - 1);
+    if (!diasConIntento.has(claveDeDia(cursor))) return 0;
+  }
+
+  let racha = 0;
+  while (diasConIntento.has(claveDeDia(cursor))) {
+    racha += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return racha;
 }
 
 @Injectable()
@@ -284,5 +315,62 @@ export class QuizService {
       .sort((a, b) => a.periodo.localeCompare(b.periodo));
 
     return { fallos: fallos.reverse(), porPeriodo };
+  }
+
+  /**
+   * Racha y tests son visibles para todos los planes (el test diario
+   * gratuito también cuenta) — solo el conteo de fallos se reserva a
+   * usuarios con una suscripción activa, igual que en getFallos, pero aquí
+   * se devuelve `null` en vez de un 403 para no tumbar el resto del widget.
+   */
+  async getResumen(userId: string, dias: 7 | 14 | 30 = 7): Promise<ResumenDashboard> {
+    const db = getRequestDb();
+
+    const [user] = await db
+      .select({ plan: schema.usuarios.plan })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, userId))
+      .limit(1);
+
+    const desde = new Date();
+    desde.setHours(0, 0, 0, 0);
+    desde.setDate(desde.getDate() - (dias - 1));
+
+    const intentosCompletados = await db
+      .select({ fecha: schema.intentosTest.fecha })
+      .from(schema.intentosTest)
+      .where(
+        and(
+          eq(schema.intentosTest.usuarioId, userId),
+          eq(schema.intentosTest.estado, "completado"),
+        ),
+      )
+      .orderBy(desc(schema.intentosTest.fecha))
+      .limit(400);
+
+    const diasConIntento = new Set(intentosCompletados.map((i) => claveDeDia(i.fecha)));
+    const streak = calcularRacha(diasConIntento);
+    const testsRealizados = intentosCompletados.filter((i) => i.fecha >= desde).length;
+
+    let fallos: number | null = null;
+    if (user && user.plan !== "free") {
+      const filasFallos = await db
+        .select({ id: schema.respuestasUsuario.id })
+        .from(schema.respuestasUsuario)
+        .innerJoin(
+          schema.intentosTest,
+          eq(schema.intentosTest.id, schema.respuestasUsuario.intentoId),
+        )
+        .where(
+          and(
+            eq(schema.intentosTest.usuarioId, userId),
+            eq(schema.respuestasUsuario.esCorrecta, false),
+            gte(schema.respuestasUsuario.fecha, desde),
+          ),
+        );
+      fallos = filasFallos.length;
+    }
+
+    return { streak, testsRealizados, fallos, dias };
   }
 }

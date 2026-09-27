@@ -175,22 +175,6 @@ export const TAI_TEMA3_PREGUNTAS = [
   },
   {
     enunciado:
-      "Según el artículo 58 de la Constitución, la Reina consorte o el consorte de la Reina:",
-    opciones: [
-      "Pueden asumir cualquier función constitucional del Rey por delegación expresa",
-      "No pueden asumir funciones constitucionales, salvo lo dispuesto para la Regencia",
-      "Ejercen automáticamente la Regencia si el Rey es menor de edad",
-      "Forman parte del Consejo de Estado con voto",
-    ],
-    respuestaCorrecta: 1,
-    justificacionIa:
-      "El artículo 58 CE dispone, sin más matices, que «la Reina consorte o el consorte de la Reina no podrán asumir funciones constitucionales, salvo lo dispuesto para la Regencia». La Regencia, según el artículo 59 CE, corresponde en su caso al padre o la madre del Rey, no automáticamente al consorte.",
-    mnemotecnia:
-      "El consorte no pinta nada constitucionalmente, salvo la excepción de la Regencia (art. 58).",
-    dificultad: 2,
-  },
-  {
-    enunciado:
       "De acuerdo con el artículo 59 de la Constitución, si el Rey se inhabilita para el ejercicio de su autoridad, entra a ejercer la Regencia:",
     opciones: [
       "El Presidente del Gobierno",
@@ -287,22 +271,6 @@ export const TAI_TEMA3_PREGUNTAS = [
   },
   {
     enunciado:
-      "Conforme al artículo 64 de la Constitución, de los actos del Rey refrendados por otra persona, la responsabilidad corresponde a:",
-    opciones: [
-      "El propio Rey, siempre de forma solidaria con quien refrenda",
-      "Las personas que autorizan el refrendo",
-      "Las Cortes Generales en su conjunto",
-      "El Tribunal Constitucional",
-    ],
-    respuestaCorrecta: 1,
-    justificacionIa:
-      "El bloque señala que «de ese refrendo son responsables las personas que lo autorizan — el propio Rey, según el artículo 56.3, es inviolable y no está sujeto a responsabilidad». La responsabilidad se traslada, por tanto, a quien refrenda, nunca al Rey.",
-    mnemotecnia:
-      "El Rey es inviolable; quien carga con la responsabilidad es quien REFRENDA (art. 64, con el art. 56.3).",
-    dificultad: 2,
-  },
-  {
-    enunciado:
       "Según el artículo 65 de la Constitución, la cantidad global que el Rey recibe de los Presupuestos Generales del Estado para el sostenimiento de su Familia y Casa:",
     opciones: [
       "La fija anualmente el Consejo de Ministros, partida por partida",
@@ -338,22 +306,6 @@ export const TAI_TEMA4_PREGUNTAS = [
   },
   {
     enunciado:
-      "De acuerdo con el artículo 67 de la Constitución, los miembros de las Cortes Generales:",
-    opciones: [
-      "Pueden ser simultáneamente Diputados y Senadores si así lo autoriza su partido",
-      "No están ligados por mandato imperativo",
-      "Están ligados por mandato imperativo respecto de su circunscripción",
-      "Solo pueden votar según las instrucciones vinculantes de su grupo parlamentario",
-    ],
-    respuestaCorrecta: 1,
-    justificacionIa:
-      "El artículo 67 CE establece que «nadie podrá ser miembro de las dos Cámaras simultáneamente» y que «los miembros de las Cortes Generales no estarán ligados por mandato imperativo».",
-    mnemotecnia:
-      "En las Cortes no hay mandato imperativo ni doble militancia entre Cámaras (art. 67).",
-    dificultad: 1,
-  },
-  {
-    enunciado:
       "Según el artículo 68 de la Constitución, el Congreso de los Diputados se compone de un número de Diputados comprendido entre:",
     opciones: ["200 y 300", "300 y 400", "350 fijos, sin margen", "400 y 500"],
     respuestaCorrecta: 1,
@@ -372,22 +324,6 @@ export const TAI_TEMA4_PREGUNTAS = [
       "El artículo 69 CE, al definir el Senado como Cámara de representación territorial, establece que «en cada provincia se elegirán cuatro Senadores», con un mandato de 4 años, sin perjuicio de los Senadores adicionales que designan las Comunidades Autónomas.",
     mnemotecnia:
       "El Senado se reparte de 4 en 4 por provincia (art. 69).",
-    dificultad: 2,
-  },
-  {
-    enunciado:
-      "Según el artículo 69 de la Constitución, además de los Senadores por provincia, las Comunidades Autónomas designan:",
-    opciones: [
-      "Un Senador y uno más por cada millón de habitantes de su territorio",
-      "Dos Senadores fijos, sin relación con la población",
-      "Un Senador por cada Diputación provincial",
-      "Ningún Senador adicional, salvo Ceuta y Melilla",
-    ],
-    respuestaCorrecta: 0,
-    justificacionIa:
-      "El artículo 69 CE añade que «las Comunidades Autónomas designarán además un Senador y otro más por cada millón de habitantes de su territorio». Es un criterio poblacional, no fijo ni provincial.",
-    mnemotecnia:
-      "CCAA: 1 Senador fijo + 1 más por cada millón de habitantes (art. 69).",
     dificultad: 2,
   },
   {

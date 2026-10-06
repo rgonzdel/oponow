@@ -17,9 +17,10 @@ export interface LegalPagina {
   secciones: LegalSeccion[];
 }
 
-// Datos del titular: los marcadores [NOMBRE], [NIF] y [DIRECCIÓN] hay que
-// sustituirlos por los reales antes de dar los textos por definitivos.
-const TITULAR = "[NOMBRE], con NIF [NIF] y domicilio en [DIRECCIÓN]";
+// Datos del titular (persona física), exigidos por el art. 10 LSSI-CE y el
+// art. 13 RGPD. Se reutilizan en privacidad, términos y aviso legal.
+const TITULAR =
+  "Rafael González de la Torre, con NIF 54900651L y domicilio en Calle Toledo, 5, 45222 Borox (Toledo)";
 const CONTACTO = "info@oponow.com";
 const ACTUALIZADO = "7 de octubre de 2026";
 const POLITICA_API_GOOGLE =

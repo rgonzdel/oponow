@@ -23,6 +23,7 @@ import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { FacebookLoginDto, GoogleLoginDto } from "./dto/social.dto";
 import { MfaReenviarDto, MfaVerificarDto } from "./dto/mfa.dto";
+import { diagnosticoSmtp } from "./diagnostico-smtp";
 import { RefreshDto } from "./dto/refresh.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { CurrentUser } from "./decorators/current-user.decorator";
@@ -96,6 +97,13 @@ export class AuthController {
     @Headers("user-agent") userAgent?: string,
   ): Promise<void> {
     await this.authService.reenviarMfa(dto.desafioId, userAgent);
+  }
+
+  // TEMPORAL: diagnóstico de puertos SMTP desde Render (ver diagnostico-smtp.ts).
+  @Get("diagnostico-smtp")
+  @Throttle({ default: { limit: 3, ttl: 60_000 } })
+  diagnostico() {
+    return diagnosticoSmtp();
   }
 
   /** Público: qué botones de acceso debe mostrar la web. */

@@ -38,6 +38,9 @@ interface AuthState {
   /** Login con Google (/auth/google), Facebook (/auth/facebook) o con el
    * código MFA del correo (/auth/mfa/verificar). */
   loginCon: (path: string, body: Record<string, string>) => Promise<void>;
+  /** Inicia la sesión con un access token ya obtenido (p. ej. tras verificar
+   * el código MFA y terminar su animación de éxito). */
+  entrarConToken: (accessToken: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   /** El `plan` viaja dentro del access token, así que un cambio de plan en
@@ -107,6 +110,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadUser();
   }
 
+  async function entrarConToken(accessToken: string) {
+    setAccessToken(accessToken);
+    await loadUser();
+  }
+
   async function register(email: string, password: string) {
     const tokens = await apiFetch<AuthTokensResponse>("/auth/register", {
       method: "POST",
@@ -126,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, status, login, loginCon, register, logout, refreshSession }}
+      value={{ user, status, login, loginCon, entrarConToken, register, logout, refreshSession }}
     >
       {children}
     </AuthContext.Provider>

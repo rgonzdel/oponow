@@ -6,6 +6,11 @@ import { buttonClass } from "./button";
 
 const REENVIO_S = 30;
 const LONGITUD = 6;
+// Tiempo para que se vea la animación de éxito (sobre → check) antes de
+// iniciar la sesión, que redirige al panel.
+const ANIMACION_OK_MS = 1600;
+
+type Estado = "espera" | "ok" | "error";
 
 /** Segundo paso del login en un navegador nuevo: el código enviado al correo. */
 export function CodigoMfa({
@@ -17,10 +22,11 @@ export function CodigoMfa({
   onSuccess: () => void;
   onVolver: () => void;
 }) {
-  const { loginCon } = useAuth();
+  const { entrarConToken } = useAuth();
   const [codigo, setCodigo] = useState("");
   const [espera, setEspera] = useState(REENVIO_S);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [estado, setEstado] = useState<Estado>("espera");
   const input = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -33,11 +39,23 @@ export function CodigoMfa({
     return () => clearTimeout(t);
   }, [espera]);
 
+  // Se verifica el código sin iniciar todavía la sesión: primero se muestra
+  // la animación de éxito y después se entra.
   const verificar = useMutation({
     mutationFn: (valor: string) =>
-      loginCon("/auth/mfa/verificar", { desafioId: desafio.desafioId, codigo: valor }),
-    onSuccess,
+      apiFetch<{ accessToken: string }>("/auth/mfa/verificar", {
+        method: "POST",
+        skipAuth: true,
+        body: JSON.stringify({ desafioId: desafio.desafioId, codigo: valor }),
+      }),
+    onSuccess: ({ accessToken }) => {
+      setEstado("ok");
+      setTimeout(() => {
+        entrarConToken(accessToken).then(onSuccess, () => setAviso("No se ha podido iniciar la sesión"));
+      }, ANIMACION_OK_MS);
+    },
     onError: () => {
+      setEstado("error");
       setCodigo("");
       input.current?.focus();
     },
@@ -53,6 +71,7 @@ export function CodigoMfa({
     onSuccess: () => {
       setEspera(REENVIO_S);
       setCodigo("");
+      setEstado("espera");
       verificar.reset();
       setAviso("Te hemos enviado un código nuevo.");
       input.current?.focus();
@@ -60,34 +79,38 @@ export function CodigoMfa({
   });
 
   function cambiar(valor: string) {
+    if (estado === "ok") return;
     const limpio = valor.replace(/\D/g, "").slice(0, LONGITUD);
     setCodigo(limpio);
     setAviso(null);
+    // Tras un fallo, la X se queda hasta que se empieza a escribir otro código.
+    if (estado === "error" && limpio.length > 0) setEstado("espera");
     // Al completar los 6 dígitos (al escribir o al pegar) se envía solo.
     if (limpio.length === LONGITUD && !verificar.isPending) verificar.mutate(limpio);
   }
 
-  const error = verificar.error ?? reenviar.error;
+  const error = estado === "error" ? verificar.error : reenviar.error;
 
   return (
     <form
       className="auth-pop space-y-4"
       onSubmit={(e) => {
         e.preventDefault();
-        if (codigo.length === LONGITUD) verificar.mutate(codigo);
+        if (codigo.length === LONGITUD && estado !== "ok") verificar.mutate(codigo);
       }}
     >
       <div className="flex justify-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
-          <svg aria-hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} className="h-6 w-6">
-            <rect x="3" y="5" width="18" height="14" rx="2.5" />
-            <path d="m4 7 8 6 8-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
+        <IconoEstado estado={estado} />
       </div>
-      <p className="text-center text-sm text-neutral-300">
-        Te hemos enviado un código de {LONGITUD} dígitos a
-        <span className="mt-0.5 block font-medium text-ink-text">{desafio.email}</span>
+      <p className="text-center text-sm text-neutral-300" aria-live="polite">
+        {estado === "ok" ? (
+          <span className="font-medium text-green-400">Código correcto. Entrando…</span>
+        ) : (
+          <>
+            Te hemos enviado un código de {LONGITUD} dígitos a
+            <span className="mt-0.5 block font-medium text-ink-text">{desafio.email}</span>
+          </>
+        )}
       </p>
 
       <label className="block">
@@ -97,11 +120,13 @@ export function CodigoMfa({
           inputMode="numeric"
           autoComplete="one-time-code"
           maxLength={LONGITUD}
-          value={codigo}
+          value={estado === "ok" ? verificar.variables ?? codigo : codigo}
           onChange={(e) => cambiar(e.target.value)}
+          readOnly={estado === "ok"}
           placeholder="••••••"
-          aria-invalid={!!verificar.error}
-          className="w-full rounded-md border border-ink-divider bg-ink px-3 py-3 text-center font-mono text-2xl tracking-[0.6em] text-ink-text placeholder-neutral-700 outline-none transition-[border-color,box-shadow] duration-200 focus:border-accent focus:shadow-[0_0_0_3px_rgba(145,132,217,0.18)]"
+          aria-invalid={estado === "error"}
+          data-estado={estado}
+          className="codigo-mfa__input w-full rounded-md border border-ink-divider bg-ink px-3 py-3 text-center font-mono text-2xl tracking-[0.6em] text-ink-text placeholder-neutral-700 outline-none transition-[border-color,box-shadow,color] duration-300 focus:border-accent focus:shadow-[0_0_0_3px_rgba(145,132,217,0.18)]"
         />
       </label>
 
@@ -112,31 +137,58 @@ export function CodigoMfa({
       )}
       {aviso && !error && <p className="text-center text-sm text-accent-300">{aviso}</p>}
 
-      <button
-        type="submit"
-        disabled={codigo.length < LONGITUD || verificar.isPending}
-        className={buttonClass("primary", "w-full")}
-      >
-        {verificar.isPending ? "Comprobando…" : "Verificar y entrar"}
-      </button>
+      {estado !== "ok" && (
+        <>
+          <button
+            type="submit"
+            disabled={codigo.length < LONGITUD || verificar.isPending}
+            className={buttonClass("primary", "w-full")}
+          >
+            {verificar.isPending ? "Comprobando…" : "Verificar y entrar"}
+          </button>
 
-      <div className="flex justify-between text-xs">
-        <button type="button" onClick={onVolver} className="text-neutral-400 hover:text-ink-text">
-          ← Volver
-        </button>
-        <button
-          type="button"
-          disabled={espera > 0 || reenviar.isPending}
-          onClick={() => reenviar.mutate()}
-          className="text-accent hover:underline disabled:text-neutral-600 disabled:no-underline"
-        >
-          {reenviar.isPending ? "Enviando…" : espera > 0 ? `Reenviar en ${espera} s` : "Reenviar código"}
-        </button>
-      </div>
+          <div className="flex justify-between text-xs">
+            <button type="button" onClick={onVolver} className="text-neutral-400 hover:text-ink-text">
+              ← Volver
+            </button>
+            <button
+              type="button"
+              disabled={espera > 0 || reenviar.isPending}
+              onClick={() => reenviar.mutate()}
+              className="text-accent hover:underline disabled:text-neutral-600 disabled:no-underline"
+            >
+              {reenviar.isPending ? "Enviando…" : espera > 0 ? `Reenviar en ${espera} s` : "Reenviar código"}
+            </button>
+          </div>
 
-      <p className="text-center text-xs text-neutral-500">
-        Mira también en la carpeta de spam. No te lo volveremos a pedir en este navegador durante 30 días.
-      </p>
+          <p className="text-center text-xs text-neutral-500">
+            Mira también en la carpeta de spam. No te lo volveremos a pedir en este navegador durante 30 días.
+          </p>
+        </>
+      )}
     </form>
+  );
+}
+
+/**
+ * Sobre que se transforma en check (verde) o en X (rojo). No hay fundidos:
+ * los trazos del sobre se "desdibujan" mientras se dibujan los del nuevo
+ * icono (stroke-dashoffset), y el resultado se queda fijo. Estilos en
+ * index.css (.icono-mfa).
+ */
+function IconoEstado({ estado }: { estado: Estado }) {
+  return (
+    <span className="icono-mfa" data-estado={estado} role="img" aria-label={estado === "ok" ? "Código correcto" : estado === "error" ? "Código incorrecto" : "Correo enviado"}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+        {/* Sobre */}
+        <rect className="icono-mfa__sobre" x="3" y="5" width="18" height="14" rx="2.5" pathLength={1} />
+        <path className="icono-mfa__sobre icono-mfa__sobre--solapa" d="m4 7 8 6 8-6" pathLength={1} />
+        {/* Check */}
+        <path className="icono-mfa__check" d="M5.5 12.5 10 17l8.5-9.5" strokeWidth={2.2} pathLength={1} />
+        {/* X */}
+        <path className="icono-mfa__x icono-mfa__x--1" d="M7 7l10 10" strokeWidth={2.2} pathLength={1} />
+        <path className="icono-mfa__x icono-mfa__x--2" d="M17 7 7 17" strokeWidth={2.2} pathLength={1} />
+      </svg>
+    </span>
   );
 }

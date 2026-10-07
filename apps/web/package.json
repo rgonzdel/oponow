@@ -11,15 +11,16 @@
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
-    "@oponow/shared-types": "workspace:*",
     "@hookform/resolvers": "^3.9.1",
+    "@oponow/shared-types": "workspace:*",
     "@tanstack/react-query": "^5.62.7",
+    "nodemailer": "^6.9.16",
+    "pdfjs-dist": "5.4.296",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.0",
     "react-pdf": "^10.4.1",
     "react-router-dom": "^6.28.0",
-    "pdfjs-dist": "5.4.296",
     "zod": "^3.24.1"
   },
   "devDependencies": {

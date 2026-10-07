@@ -202,6 +202,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.62.7
         version: 5.101.4(react@18.3.1)
+      nodemailer:
+        specifier: ^6.9.16
+        version: 6.10.1
       pdfjs-dist:
         specifier: 5.4.296
         version: 5.4.296
@@ -7492,7 +7495,9 @@ snapshots:
       metro-runtime: 0.84.4
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 

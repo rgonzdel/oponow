@@ -24,6 +24,10 @@ export class CorreoService {
   private readonly transporte: Transporter | null;
   private readonly remitente: string;
   private readonly responderA: string | undefined;
+  // Reenvío por HTTPS (apps/web/api/enviar-correo.js en Vercel): Render, en
+  // el plan gratuito, bloquea el SMTP saliente. Si está configurado, se usa
+  // en lugar de la conexión SMTP directa.
+  private readonly reenvio: { url: string; clave: string } | null;
   // GIF animados en línea (cid). nest-cli.json los copia a dist/ junto a
   // este fichero. Los genera la animación HTML descrita en cada plantilla.
   private readonly imagenes = cargarImagenes([
@@ -41,6 +45,9 @@ export class CorreoService {
     // Las respuestas llegan al buzón real: el correo invita a responder si
     // el intento de acceso no lo hizo el usuario.
     this.responderA = user;
+    const urlReenvio = config.get<string>("CORREO_RELAY_URL");
+    const claveReenvio = config.get<string>("CORREO_RELAY_SECRET");
+    this.reenvio = urlReenvio && claveReenvio ? { url: urlReenvio, clave: claveReenvio } : null;
     this.transporte =
       host && user && pass
         ? createTransport({
@@ -60,10 +67,35 @@ export class CorreoService {
   }
 
   get configurado(): boolean {
-    return this.transporte !== null;
+    return this.reenvio !== null || this.transporte !== null;
   }
 
   async enviarCodigoAcceso(datos: DatosCodigoAcceso): Promise<void> {
+    const mensaje = {
+      to: datos.email,
+      replyTo: this.responderA,
+      subject: asuntoCodigoAcceso(datos.codigo),
+      text: textoCodigoAcceso(datos),
+      html: htmlCodigoAcceso(datos),
+    };
+    if (this.reenvio) {
+      const res = await fetch(this.reenvio.url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.reenvio.clave}` },
+        body: JSON.stringify({
+          ...mensaje,
+          attachments: this.imagenes.map(({ archivo, cid, contenido }) => ({
+            filename: archivo,
+            content: contenido.toString("base64"),
+            contentType: "image/gif",
+            cid,
+          })),
+        }),
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) throw new Error(`Reenvío de correo respondió ${res.status}: ${await res.text().catch(() => "")}`);
+      return;
+    }
     if (!this.transporte) {
       // Solo para desarrollo local: sin SMTP, el código se ve en el log.
       this.logger.warn(`SMTP sin configurar. Código de acceso para ${datos.email}: ${datos.codigo}`);
@@ -71,11 +103,7 @@ export class CorreoService {
     }
     await this.transporte.sendMail({
       from: this.remitente,
-      replyTo: this.responderA,
-      to: datos.email,
-      subject: asuntoCodigoAcceso(datos.codigo),
-      text: textoCodigoAcceso(datos),
-      html: htmlCodigoAcceso(datos),
+      ...mensaje,
       // Imágenes en línea (cid): se muestran aunque el cliente bloquee
       // imágenes externas y no aparecen como adjuntos.
       attachments: this.imagenes.map(({ archivo, cid, contenido }) => ({

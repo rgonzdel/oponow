@@ -54,7 +54,7 @@ export function CheckoutPage() {
 
   const mutation = useMutation({
     mutationFn: (values: CheckoutFormValues) =>
-      subscribeWithTrial({ oposicionSlug: slug, ...values }),
+      subscribeWithTrial({ oposicionSlug: slug, ciclo, ...values }),
     onSuccess: async () => {
       await refreshSession();
       navigate("/dashboard", { replace: true });

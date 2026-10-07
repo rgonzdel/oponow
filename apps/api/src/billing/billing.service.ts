@@ -12,6 +12,13 @@ import { PAYMENT_GATEWAY, type PaymentGateway } from "./gateway/payment-gateway"
 import type { SubscribeDto } from "./dto/subscribe.dto";
 
 const TRIAL_DAYS = 7;
+// Mismos precios que packages/shared-types/src/pricing.ts (PLAN_PRECIO), en
+// céntimos. Si cambian allí, cambiarlos aquí.
+const PRECIO_CENTIMOS = { mensual: 499, anual: 3999 } as const;
+
+export type MetodoPago =
+  | { tipo: "tarjeta"; marca: string | null; ultimos4: string | null; caducidad: string | null }
+  | { tipo: "bizum"; telefonoUltimos: string | null };
 
 export interface SubscriptionStatus {
   oposicionSlug: string;
@@ -19,6 +26,11 @@ export interface SubscriptionStatus {
   subscribed: boolean;
   estado: string | null;
   trialEndsAt: Date | null;
+  ciclo?: "mensual" | "anual";
+  /** Importe de cada cobro, en céntimos. */
+  importeCentimos?: number | null;
+  proximoPago?: Date | null;
+  metodoPago?: MetodoPago | null;
 }
 
 @Injectable()
@@ -36,6 +48,14 @@ export class BillingService {
         oposicionNombre: schema.oposiciones.nombre,
         estado: schema.suscripcionesOposicion.estado,
         trialEndsAt: schema.suscripcionesOposicion.trialEndsAt,
+        ciclo: schema.suscripcionesOposicion.ciclo,
+        importeCentimos: schema.suscripcionesOposicion.importeCentimos,
+        proximoCobro: schema.suscripcionesOposicion.proximoCobro,
+        metodoPago: schema.suscripcionesOposicion.metodoPago,
+        tarjetaMarca: schema.suscripcionesOposicion.tarjetaMarca,
+        tarjetaUltimos4: schema.suscripcionesOposicion.tarjetaUltimos4,
+        tarjetaCaducidad: schema.suscripcionesOposicion.tarjetaCaducidad,
+        bizumTelefonoUltimos: schema.suscripcionesOposicion.bizumTelefonoUltimos,
       })
       .from(schema.suscripcionesOposicion)
       .innerJoin(
@@ -49,7 +69,23 @@ export class BillingService {
         ),
       );
 
-    return rows.map((row) => ({ ...row, subscribed: true }));
+    return rows.map((r) => ({
+      oposicionSlug: r.oposicionSlug,
+      oposicionNombre: r.oposicionNombre,
+      subscribed: true,
+      estado: r.estado,
+      trialEndsAt: r.trialEndsAt,
+      ciclo: r.ciclo,
+      // Suscripciones anteriores a guardar estos datos: se deducen.
+      importeCentimos: r.importeCentimos ?? PRECIO_CENTIMOS[r.ciclo],
+      proximoPago: r.proximoCobro ?? (r.estado === "trialing" ? r.trialEndsAt : null),
+      metodoPago:
+        r.metodoPago === "bizum"
+          ? { tipo: "bizum", telefonoUltimos: r.bizumTelefonoUltimos }
+          : r.metodoPago === "tarjeta"
+            ? { tipo: "tarjeta", marca: r.tarjetaMarca, ultimos4: r.tarjetaUltimos4, caducidad: r.tarjetaCaducidad }
+            : null,
+    }));
   }
 
   async getStatus(
@@ -116,17 +152,32 @@ export class BillingService {
     // La pasarela (hoy MockPaymentGateway, mañana Stripe) valida y "cobra"
     // la tarjeta antes de que activemos nada — así el orden de operaciones
     // ya es el correcto para cuando esto hable con Stripe de verdad.
-    const { externalSubscriptionId, trialEndsAt } =
+    const ciclo = dto.ciclo ?? "mensual";
+    const importeCentimos = PRECIO_CENTIMOS[ciclo];
+    const { externalSubscriptionId, trialEndsAt, proximoCobro, metodo } =
       await this.gateway.chargeAndSubscribe({
         customerId: userId,
         customerEmail: user.email,
-        planLabel: `Oponow LITE — ${oposicion.nombre}`,
+        planLabel: `Oponow ${ciclo === "anual" ? "anual" : "mensual"} — ${oposicion.nombre}`,
         trialDays: TRIAL_DAYS,
+        importeCentimos,
+        ciclo,
         cardNumber: dto.cardNumber,
         cardExpiry: dto.cardExpiry,
         cardCvc: dto.cardCvc,
         cardName: dto.cardName,
       });
+
+    const facturacion = {
+      ciclo,
+      importeCentimos,
+      proximoCobro,
+      metodoPago: metodo.tipo,
+      tarjetaMarca: metodo.tipo === "tarjeta" ? metodo.marca : null,
+      tarjetaUltimos4: metodo.tipo === "tarjeta" ? metodo.ultimos4 : null,
+      tarjetaCaducidad: metodo.tipo === "tarjeta" ? metodo.caducidad : null,
+      bizumTelefonoUltimos: metodo.tipo === "bizum" ? metodo.telefonoUltimos : null,
+    };
 
     if (existing) {
       await db
@@ -138,6 +189,7 @@ export class BillingService {
           fechaInicio: new Date(),
           fechaFin: null,
           stripeSubscriptionId: externalSubscriptionId,
+          ...facturacion,
         })
         .where(eq(schema.suscripcionesOposicion.id, existing.id));
     } else {
@@ -148,6 +200,7 @@ export class BillingService {
         estado: "trialing",
         trialEndsAt,
         stripeSubscriptionId: externalSubscriptionId,
+        ...facturacion,
       });
     }
 
@@ -192,7 +245,7 @@ export class BillingService {
     if (sub.externa) await this.gateway.cancelSubscription(sub.externa);
     await db
       .update(schema.suscripcionesOposicion)
-      .set({ activa: false, estado: "canceled", fechaFin: new Date() })
+      .set({ activa: false, estado: "canceled", fechaFin: new Date(), proximoCobro: null })
       .where(eq(schema.suscripcionesOposicion.id, sub.id));
 
     const quedan = await this.listActive(userId);

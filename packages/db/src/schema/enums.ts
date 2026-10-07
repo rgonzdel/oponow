@@ -18,3 +18,7 @@ export const suscripcionEstadoEnum = pgEnum("suscripcion_estado", [
   "past_due",
   "canceled",
 ]);
+
+export const cicloFacturacionEnum = pgEnum("ciclo_facturacion", ["mensual", "anual"]);
+
+export const metodoPagoEnum = pgEnum("metodo_pago", ["tarjeta", "bizum"]);

@@ -9,7 +9,13 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { planTipoEnum, proveedorIdentidadEnum, suscripcionEstadoEnum } from "./enums";
+import {
+  cicloFacturacionEnum,
+  metodoPagoEnum,
+  planTipoEnum,
+  proveedorIdentidadEnum,
+  suscripcionEstadoEnum,
+} from "./enums";
 import { bloquesContenido, oposiciones } from "./content";
 
 export const usuarios = pgTable("usuarios", {
@@ -154,6 +160,18 @@ export const suscripcionesOposicion = pgTable("suscripciones_oposicion", {
   // al conectar Stripe de verdad pasará a ser el id real de Stripe, sin
   // tocar el resto del modelo.
   stripeSubscriptionId: text("stripe_subscription_id"),
+  // Facturación: lo que se muestra en "Mi cuenta" (próximo pago, importe y
+  // método). De la tarjeta solo se guarda lo que la propia pasarela expone
+  // (marca, 4 últimos dígitos y caducidad): nunca el número ni el CVC.
+  ciclo: cicloFacturacionEnum("ciclo").notNull().default("mensual"),
+  importeCentimos: integer("importe_centimos"),
+  proximoCobro: timestamp("proximo_cobro", { withTimezone: true }),
+  metodoPago: metodoPagoEnum("metodo_pago"),
+  tarjetaMarca: text("tarjeta_marca"),
+  tarjetaUltimos4: text("tarjeta_ultimos4"),
+  tarjetaCaducidad: text("tarjeta_caducidad"),
+  /** Bizum: solo los últimos dígitos del móvil, para reconocerlo. */
+  bizumTelefonoUltimos: text("bizum_telefono_ultimos"),
 }, (t) => [
   uniqueIndex("suscripciones_usuario_oposicion_idx").on(
     t.usuarioId,

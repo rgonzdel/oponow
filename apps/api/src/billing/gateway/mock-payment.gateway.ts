@@ -55,6 +55,17 @@ export class MockPaymentGateway implements PaymentGateway {
     return {
       externalSubscriptionId: `mock_sub_${randomUUID()}`,
       trialEndsAt,
+      proximoCobro: trialEndsAt,
+      metodo: { tipo: "tarjeta", marca: marcaTarjeta(digits), ultimos4: digits.slice(-4), caducidad: input.cardExpiry },
     };
   }
+}
+
+/** Marca por el prefijo (BIN), como la que devolvería la pasarela real. */
+function marcaTarjeta(digitos: string): string {
+  if (/^4/.test(digitos)) return "Visa";
+  if (/^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/.test(digitos)) return "Mastercard";
+  if (/^3[47]/.test(digitos)) return "American Express";
+  if (/^(6011|65|64[4-9])/.test(digitos)) return "Discover";
+  return "Tarjeta";
 }

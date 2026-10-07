@@ -8,10 +8,19 @@ export interface SubscriptionStatus {
   subscribed: boolean;
   estado: SuscripcionEstado | null;
   trialEndsAt: string | null;
+  ciclo?: "mensual" | "anual";
+  /** Importe de cada cobro, en céntimos. */
+  importeCentimos?: number | null;
+  proximoPago?: string | null;
+  metodoPago?:
+    | { tipo: "tarjeta"; marca: string | null; ultimos4: string | null; caducidad: string | null }
+    | { tipo: "bizum"; telefonoUltimos: string | null }
+    | null;
 }
 
 export interface SubscribePayload {
   oposicionSlug: string;
+  ciclo: "mensual" | "anual";
   cardNumber: string;
   cardExpiry: string;
   cardCvc: string;

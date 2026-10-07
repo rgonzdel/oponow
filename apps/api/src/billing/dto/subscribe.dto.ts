@@ -1,8 +1,12 @@
-import { IsString, Length, Matches } from "class-validator";
+import { IsIn, IsOptional, IsString, Length, Matches } from "class-validator";
 
 export class SubscribeDto {
   @IsString()
   oposicionSlug!: string;
+
+  @IsOptional()
+  @IsIn(["mensual", "anual"])
+  ciclo?: "mensual" | "anual";
 
   @IsString()
   @Length(13, 23) // hasta 19 dígitos + espacios de formato

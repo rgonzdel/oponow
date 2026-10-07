@@ -7,7 +7,7 @@ import { LoadingScreen } from "../components/LoadingScreen";
 import { FormField, TextInput } from "../components/FormField";
 import { buttonClass } from "../components/button";
 import { ApiError } from "../lib/api-client";
-import { cancelSubscription, listMySubscriptions } from "../lib/billing-client";
+import { cancelSubscription, listMySubscriptions, type SubscriptionStatus } from "../lib/billing-client";
 import {
   borrarCuenta,
   cambiarContrasena,
@@ -25,6 +25,7 @@ const ESTADO_SUSCRIPCION: Record<string, string> = {
   canceled: "Cancelada",
 };
 const PROVEEDOR: Record<string, string> = { google: "Google", facebook: "Facebook" };
+const EUROS = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" });
 const FECHA = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric" });
 
 const mensajeError = (e: unknown, porDefecto: string) => (e instanceof ApiError ? e.message : porDefecto);
@@ -218,7 +219,7 @@ function SeccionSuscripcion({
   cargando,
 }: {
   plan: string;
-  suscripciones: { oposicionSlug: string; oposicionNombre: string; estado: string | null; trialEndsAt: string | null }[];
+  suscripciones: SubscriptionStatus[];
   cargando: boolean;
 }) {
   const queryClient = useQueryClient();
@@ -258,9 +259,27 @@ function SeccionSuscripcion({
                 <span className="text-sm text-ink-text">{s.oposicionNombre}</span>
                 <Chip tono={s.estado === "past_due" ? "aviso" : "ok"}>{ESTADO_SUSCRIPCION[s.estado ?? ""] ?? "Activa"}</Chip>
               </div>
-              {s.estado === "trialing" && s.trialEndsAt && (
-                <p className="mt-1 text-xs text-neutral-500">La prueba gratuita termina el {FECHA.format(new Date(s.trialEndsAt))}.</p>
-              )}
+              <dl className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+                <Dato titulo="Próximo pago">
+                  {s.proximoPago ? FECHA.format(new Date(s.proximoPago)) : "—"}
+                  {s.estado === "trialing" && s.proximoPago && (
+                    <span className="block text-xs text-neutral-500">al terminar la prueba gratuita</span>
+                  )}
+                </Dato>
+                <Dato titulo="Importe">
+                  {s.importeCentimos != null ? (
+                    <>
+                      {EUROS.format(s.importeCentimos / 100)}
+                      <span className="text-neutral-500"> {s.ciclo === "anual" ? "al año" : "al mes"}</span>
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </Dato>
+                <Dato titulo="Método de pago">
+                  <MetodoPago metodo={s.metodoPago ?? null} />
+                </Dato>
+              </dl>
               {confirmando === s.oposicionSlug ? (
                 <div className="mt-3 rounded-md border border-red-400/40 bg-red-500/10 p-3">
                   <p className="text-sm text-ink-text">
@@ -377,6 +396,36 @@ function SeccionBorrar({ tieneContrasena }: { tieneContrasena: boolean }) {
         </form>
       )}
     </section>
+  );
+}
+
+/** "Visa •••• 4242 · caduca 12/30" o "Bizum · móvil •••• 34". */
+function MetodoPago({ metodo }: { metodo: SubscriptionStatus["metodoPago"] }) {
+  if (!metodo) return <span className="text-neutral-500">Sin datos</span>;
+  if (metodo.tipo === "bizum") {
+    return (
+      <span className="flex flex-wrap items-center gap-2">
+        <Marca>Bizum</Marca>
+        {metodo.telefonoUltimos && <span className="tabular-nums">móvil •••• {metodo.telefonoUltimos}</span>}
+      </span>
+    );
+  }
+  return (
+    <span className="block">
+      <span className="flex flex-wrap items-center gap-2">
+        <Marca>{metodo.marca ?? "Tarjeta"}</Marca>
+        <span className="tabular-nums">•••• {metodo.ultimos4 ?? "····"}</span>
+      </span>
+      {metodo.caducidad && <span className="mt-0.5 block text-xs text-neutral-500">Caduca {metodo.caducidad}</span>}
+    </span>
+  );
+}
+
+function Marca({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-block rounded border border-ink-divider bg-ink px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-neutral-300">
+      {children}
+    </span>
   );
 }
 

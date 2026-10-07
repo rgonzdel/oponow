@@ -140,6 +140,8 @@ export class QuizService {
     userId: string,
     plan: string,
     temaId: string,
+    /** Administración y editores revisan contenido: sin límite diario. */
+    sinLimite = false,
   ): Promise<IntentoIniciado> {
     const db = getRequestDb();
 
@@ -150,7 +152,7 @@ export class QuizService {
       .limit(1);
     if (!tema) throw new NotFoundException("Tema no encontrado");
 
-    const esDiario = plan === "free";
+    const esDiario = plan === "free" && !sinLimite;
 
     const preguntas = await db
       .select({

@@ -71,6 +71,13 @@
       "when": 1791405669823,
       "tag": "0009_datos_de_pago",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791416256108,
+      "tag": "0010_roles",
+      "breakpoints": true
     }
   ]
 }

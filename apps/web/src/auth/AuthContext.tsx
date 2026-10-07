@@ -6,11 +6,15 @@ import {
   type ReactNode,
 } from "react";
 import { apiFetch, refrescarTokens, setAccessToken } from "../lib/api-client";
+import type { Permiso, Rol } from "../lib/admin-client";
 
 export interface AuthUser {
   id: string;
   plan: string;
   isAdmin: boolean;
+  /** Rol en Oponow y sus permisos en el panel (ver apps/api/src/auth/roles.ts). */
+  rol: Rol;
+  permisos: Permiso[];
 }
 
 interface AuthTokensResponse {

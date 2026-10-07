@@ -13,7 +13,7 @@
 --     el código, y contar los intentos fallidos.
 --   - restablecer la contraseña: localizar el enlace por el hash de su token
 --     antes de saber de qué usuario es.
-GRANT SELECT (id, email, password_hash, plan, plan_expira, email_verified, es_admin)
+GRANT SELECT (id, email, password_hash, plan, plan_expira, email_verified, es_admin, rol)
   ON usuarios TO auth_service;
 
 GRANT SELECT (id, usuario_id, codigo_hash, intentos, reenvios, expira_en, enviado_en, usado_en)

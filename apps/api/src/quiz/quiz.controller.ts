@@ -19,7 +19,7 @@ export class QuizController {
     @CurrentUser() user: AuthenticatedUser,
     @Param("temaId") temaId: string,
   ) {
-    return this.quizService.iniciarIntento(user.id, user.plan, temaId);
+    return this.quizService.iniciarIntento(user.id, user.plan, temaId, user.permisos.includes("ver_contenido"));
   }
 
   @Post("intentos/:intentoId/respuestas")

@@ -155,6 +155,20 @@ CREATE POLICY usuarios_admin_update ON usuarios
   USING (current_setting('app.is_admin', true) = 'true')
   WITH CHECK (current_setting('app.is_admin', true) = 'true');
 
+DROP POLICY IF EXISTS usuarios_equipo_read ON usuarios;
+CREATE POLICY usuarios_equipo_read ON usuarios
+  FOR SELECT USING (current_setting('app.current_role', true) IN ('admin', 'soporte', 'lectura'));
+
+DROP POLICY IF EXISTS usuarios_equipo_update ON usuarios;
+CREATE POLICY usuarios_equipo_update ON usuarios
+  FOR UPDATE
+  USING (current_setting('app.current_role', true) IN ('admin', 'soporte'))
+  WITH CHECK (current_setting('app.current_role', true) IN ('admin', 'soporte'));
+
+DROP POLICY IF EXISTS suscripciones_oposicion_equipo_read ON suscripciones_oposicion;
+CREATE POLICY suscripciones_oposicion_equipo_read ON suscripciones_oposicion
+  FOR SELECT USING (current_setting('app.current_role', true) IN ('admin', 'soporte', 'lectura'));
+
 DROP POLICY IF EXISTS suscripciones_oposicion_admin_read ON suscripciones_oposicion;
 CREATE POLICY suscripciones_oposicion_admin_read ON suscripciones_oposicion
   FOR SELECT USING (current_setting('app.is_admin', true) = 'true');
@@ -187,6 +201,7 @@ CREATE POLICY temas_visibles ON temas
   FOR SELECT USING (
     es_gratuito
     OR current_setting('app.current_plan', true) = 'vip'
+    OR current_setting('app.current_role', true) IN ('admin', 'editor')
     OR EXISTS (
       SELECT 1 FROM suscripciones_oposicion so
       WHERE so.oposicion_id = temas.oposicion_id
@@ -205,6 +220,7 @@ CREATE POLICY bloques_contenido_visibles ON bloques_contenido
         AND (
           t.es_gratuito
           OR current_setting('app.current_plan', true) = 'vip'
+          OR current_setting('app.current_role', true) IN ('admin', 'editor')
           OR EXISTS (
             SELECT 1 FROM suscripciones_oposicion so
             WHERE so.oposicion_id = t.oposicion_id
@@ -225,6 +241,7 @@ CREATE POLICY preguntas_visibles ON preguntas
         AND (
           t.es_gratuito
           OR current_setting('app.current_plan', true) = 'vip'
+          OR current_setting('app.current_role', true) IN ('admin', 'editor')
           OR EXISTS (
             SELECT 1 FROM suscripciones_oposicion so
             WHERE so.oposicion_id = t.oposicion_id
@@ -248,6 +265,7 @@ CREATE POLICY flashcards_temas_visibles ON flashcards_temas
         AND (
           t.es_gratuito
           OR current_setting('app.current_plan', true) = 'vip'
+          OR current_setting('app.current_role', true) IN ('admin', 'editor')
           OR EXISTS (
             SELECT 1 FROM suscripciones_oposicion so
             WHERE so.oposicion_id = t.oposicion_id
@@ -271,6 +289,7 @@ CREATE POLICY flashcards_visibles ON flashcards
             AND (
               t.es_gratuito
               OR current_setting('app.current_plan', true) = 'vip'
+              OR current_setting('app.current_role', true) IN ('admin', 'editor')
               OR EXISTS (
                 SELECT 1 FROM suscripciones_oposicion so
                 WHERE so.oposicion_id = t.oposicion_id

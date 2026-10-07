@@ -5,6 +5,7 @@ import type { NextFunction, Request, Response } from "express";
 import { createDb, type Sql } from "@oponow/db";
 import { APP_DATABASE_POOL } from "./database.module";
 import { rlsContextStorage } from "./request-context";
+import { esRol } from "../auth/roles";
 
 /**
  * UUID que nunca coincidirá con un usuario real (los ids se generan con
@@ -19,6 +20,7 @@ interface AccessTokenPayload {
   sub: string;
   plan: string;
   isAdmin?: boolean;
+  rol?: string;
 }
 
 /**
@@ -41,6 +43,7 @@ export class RlsContextMiddleware implements NestMiddleware {
     let userId: string | null = null;
     let plan: string | null = null;
     let isAdmin = false;
+    let rol = "";
 
     const authHeader = req.headers.authorization;
     if (authHeader?.startsWith("Bearer ")) {
@@ -52,6 +55,8 @@ export class RlsContextMiddleware implements NestMiddleware {
         userId = payload.sub;
         plan = payload.plan;
         isAdmin = payload.isAdmin ?? false;
+        rol = esRol(payload.rol) ? payload.rol : isAdmin ? "admin" : "opositor";
+        isAdmin = rol === "admin";
       } catch {
         // Token ausente/inválido/expirado: seguimos como anónimos. Las
         // rutas protegidas con JwtAuthGuard devolverán 401 por su cuenta.
@@ -64,7 +69,8 @@ export class RlsContextMiddleware implements NestMiddleware {
       await reserved`SELECT
         set_config('app.current_user_id', ${userId ?? ANONYMOUS_USER_ID}, false),
         set_config('app.current_plan', ${plan ?? ""}, false),
-        set_config('app.is_admin', ${String(isAdmin)}, false)`;
+        set_config('app.is_admin', ${String(isAdmin)}, false),
+        set_config('app.current_role', ${rol}, false)`;
     } catch (err) {
       reserved.release();
       next(err as Error);

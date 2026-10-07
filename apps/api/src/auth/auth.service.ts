@@ -936,13 +936,23 @@ export class AuthService {
     db: Database,
     userId: string,
     plan: string,
-    isAdmin: boolean,
+    _esAdminColumna: boolean, // el rol (leído abajo) es la fuente de verdad
     userAgent?: string,
   ): Promise<AuthTokens> {
+    // El rol se lee aquí (la conexión ya tiene la identidad del usuario):
+    // así todos los inicios de sesión y refrescos lo llevan sin cambiar
+    // cada llamada.
+    const [fila] = await db
+      .select({ rol: schema.usuarios.rol })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, userId))
+      .limit(1);
+    const rol = fila?.rol ?? "opositor";
     const accessToken = await this.jwtService.signAsync({
       sub: userId,
       plan,
-      isAdmin,
+      isAdmin: rol === "admin",
+      rol,
     });
 
     const refreshToken = generateRefreshToken();

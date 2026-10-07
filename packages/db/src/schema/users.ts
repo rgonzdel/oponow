@@ -14,6 +14,7 @@ import {
   metodoPagoEnum,
   planTipoEnum,
   proveedorIdentidadEnum,
+  rolUsuarioEnum,
   suscripcionEstadoEnum,
 } from "./enums";
 import { bloquesContenido, oposiciones } from "./content";
@@ -34,6 +35,9 @@ export const usuarios = pgTable("usuarios", {
   // y se expone como GUC de sesión app.is_admin (ver rls-context.middleware)
   // para las políticas *_admin_read/*_admin_update de policies.sql.
   esAdmin: boolean("es_admin").notNull().default(false),
+  // Rol del equipo (o "opositor"). es_admin se mantiene sincronizado
+  // (= rol "admin") porque lo usan las políticas RLS y el JWT existentes.
+  rol: rolUsuarioEnum("rol").notNull().default("opositor"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

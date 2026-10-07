@@ -4,6 +4,9 @@
       "source": "/legal/:slug(aviso-legal|privacidad|cookies|terminos)",
       "destination": "/legal/:slug.html"
     },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
   ]
 }

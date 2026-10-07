@@ -173,7 +173,15 @@ export class AuthService {
     if (!this.mfaActivo() || (await this.dispositivoDeConfianza(db, user.id, tokenDispositivo))) {
       return this.issueTokens(db, user.id, user.plan, user.esAdmin, userAgent);
     }
-    return this.crearDesafioMfa(db, user.id, user.email ?? dto.email, userAgent);
+    try {
+      return await this.crearDesafioMfa(db, user.id, user.email ?? dto.email, userAgent);
+    } catch (e) {
+      // Si el código no se puede enviar (SMTP caído o bloqueado), es mejor
+      // dejar entrar con la contraseña correcta que dejar a nadie fuera.
+      // El fallo ya queda registrado en enviarCodigo.
+      this.logger.warn(`MFA omitido para ${user.id}: ${e instanceof Error ? e.message : String(e)}`);
+      return this.issueTokens(db, user.id, user.plan, user.esAdmin, userAgent);
+    }
   }
 
   /** Comprueba el código del correo. Si es correcto, inicia sesión y marca

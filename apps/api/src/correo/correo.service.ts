@@ -49,6 +49,12 @@ export class CorreoService {
             // 465 = TLS directo; 587 = STARTTLS.
             secure: port === 465,
             auth: { user, pass },
+            // Sin límites, si el servidor SMTP no responde (p. ej. el
+            // proveedor de hosting bloquea el puerto de salida) nodemailer
+            // espera minutos y el inicio de sesión se queda colgado.
+            connectionTimeout: 8_000,
+            greetingTimeout: 8_000,
+            socketTimeout: 10_000,
           })
         : null;
   }

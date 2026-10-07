@@ -56,12 +56,14 @@ async function rawFetch(path: string, options: ApiFetchOptions): Promise<Respons
   });
 }
 
-// Varias requests pueden recibir un 401 a la vez si el access token caducó
-// mientras el usuario tenía varias peticiones en vuelo; nos aseguramos de
-// lanzar una única llamada a /auth/refresh y que todas esperen la misma.
-let refreshPromise: Promise<boolean> | null = null;
+// El refresh token rota en cada uso: dos llamadas simultáneas con la misma
+// cookie harían que la segunda llegue con un token ya revocado y cierre la
+// sesión. Toda la app (este cliente al recibir un 401 y AuthContext al
+// arrancar o tras un pago) comparte una única llamada a /auth/refresh.
+let refreshPromise: Promise<{ accessToken: string } | null> | null = null;
 
-async function tryRefresh(): Promise<boolean> {
+/** Pide un access token nuevo con la cookie de refresh. null si no hay sesión. */
+export function refrescarTokens(): Promise<{ accessToken: string } | null> {
   if (!refreshPromise) {
     refreshPromise = (async () => {
       try {
@@ -69,18 +71,22 @@ async function tryRefresh(): Promise<boolean> {
           method: "POST",
           skipAuth: true,
         });
-        if (!res.ok) return false;
+        if (!res.ok) return null;
         const data = (await res.json()) as { accessToken: string };
         setAccessToken(data.accessToken);
-        return true;
+        return data;
       } catch {
-        return false;
+        return null;
       } finally {
         refreshPromise = null;
       }
     })();
   }
   return refreshPromise;
+}
+
+async function tryRefresh(): Promise<boolean> {
+  return (await refrescarTokens()) !== null;
 }
 
 export async function apiFetch<T>(

@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { apiFetch, setAccessToken } from "../lib/api-client";
+import { apiFetch, refrescarTokens, setAccessToken } from "../lib/api-client";
 
 export interface AuthUser {
   id: string;
@@ -52,6 +52,14 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+// Una sola llamada a /auth/refresh compartida por toda la app (ver
+// refrescarTokens en api-client.ts).
+async function refrescoCompartido(): Promise<{ accessToken: string }> {
+  const tokens = await refrescarTokens();
+  if (!tokens) throw new Error("Sin sesión");
+  return tokens;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [status, setStatus] = useState<AuthStatus>("loading");
@@ -63,10 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function refreshSession() {
-    const tokens = await apiFetch<AuthTokensResponse>("/auth/refresh", {
-      method: "POST",
-      skipAuth: true,
-    });
+    const tokens = await refrescoCompartido();
     setAccessToken(tokens.accessToken);
     await loadUser();
   }

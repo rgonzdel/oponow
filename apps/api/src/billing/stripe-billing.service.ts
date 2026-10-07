@@ -46,9 +46,10 @@ export class StripeBillingService {
   private readonly stripe: Stripe | null;
   private readonly secretoWebhook: string | undefined;
   private readonly web: string;
-  // Managed Payments: Stripe como vendedor legal (gestiona e ingresa el IVA,
-  // con comisión adicional). Decisión de negocio: desactivado salvo que
-  // STRIPE_MANAGED_PAYMENTS=true (y entonces el producto necesita tax_code).
+  // Managed Payments: Stripe actúa como vendedor legal y gestiona e ingresa
+  // el IVA (con comisión adicional). Activado por decisión de negocio; se
+  // puede apagar con STRIPE_MANAGED_PAYMENTS=false. Requiere que el producto
+  // tenga tax_code (lo asigna scripts/stripe-configurar.mjs).
   private readonly managedPayments: boolean;
   private precios: Partial<Record<Ciclo, string>> = {};
 
@@ -57,7 +58,7 @@ export class StripeBillingService {
     this.stripe = clave ? new Stripe(clave) : null;
     this.secretoWebhook = config.get<string>("STRIPE_WEBHOOK_SECRET");
     this.web = config.get<string>("WEB_ORIGIN", "https://www.oponow.com").replace(/\/$/, "");
-    this.managedPayments = config.get<string>("STRIPE_MANAGED_PAYMENTS") === "true";
+    this.managedPayments = config.get<string>("STRIPE_MANAGED_PAYMENTS") !== "false";
   }
 
   get configurado(): boolean {

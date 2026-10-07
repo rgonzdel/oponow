@@ -16,6 +16,10 @@ if (!CLAVE) throw new Error("Falta STRIPE_SECRET_KEY en el .env");
 const WEB = process.env.WEB_PUBLICA ?? "https://www.oponow.com";
 
 // Mismos precios que packages/shared-types/src/pricing.ts (IVA incluido).
+// Código fiscal del producto (catálogo de Stripe): formación de autoestudio
+// por internet. Lo exige Managed Payments (Stripe como vendedor legal).
+const TAX_CODE = "txcd_20060058"; // Training Services - Self-study Web-based
+
 const PRECIOS = [
   { lookup: "oponow_mensual", importe: 499, intervalo: "month", nombre: "Mensual" },
   { lookup: "oponow_anual", importe: 3999, intervalo: "year", nombre: "Anual" },
@@ -55,11 +59,15 @@ if (!producto) {
 if (!producto) {
   producto = await stripe("POST", "/products", {
     name: "Oponow",
+    tax_code: TAX_CODE,
     description: "Temario completo, tests ilimitados y preguntas reales de examen de la oposición que elijas.",
     metadata: { app: "oponow" },
   });
   console.log("✓ producto creado:", producto.id);
-} else console.log("· producto ya existía:", producto.id);
+} else {
+  if (producto.tax_code !== TAX_CODE) await stripe("POST", `/products/${producto.id}`, { tax_code: TAX_CODE });
+  console.log("· producto ya existía:", producto.id, "(código fiscal", TAX_CODE + ")");
+}
 
 // Precios, identificados por lookup_key (la API los busca por esa clave).
 for (const p of PRECIOS) {

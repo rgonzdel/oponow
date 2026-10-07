@@ -28,4 +28,6 @@ export interface ChargeCardResult {
  */
 export interface PaymentGateway {
   chargeAndSubscribe(input: ChargeCardInput): Promise<ChargeCardResult>;
+  /** Da de baja la suscripción en la pasarela (deja de cobrarse). */
+  cancelSubscription(externalSubscriptionId: string): Promise<void>;
 }

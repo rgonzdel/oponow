@@ -20,6 +20,8 @@ import { AdminPage } from "./pages/AdminPage";
 import { RecuperarContrasenaPage } from "./pages/RecuperarContrasenaPage";
 import { FlashcardsOposicionesPage, FlashcardsPage } from "./pages/FlashcardsPage";
 import { FlashcardsSesionPage } from "./pages/FlashcardsSesionPage";
+import { CuentaPage } from "./pages/CuentaPage";
+import { ConfirmarEmailPage } from "./pages/ConfirmarEmailPage";
 import { RestablecerContrasenaPage } from "./pages/RestablecerContrasenaPage";
 
 export function App() {
@@ -128,6 +130,15 @@ export function App() {
               </RedirectIfAuthenticated>
             }
           />
+          <Route
+            path="/cuenta"
+            element={
+              <RequireAuth>
+                <CuentaPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="/confirmar-email" element={<ConfirmarEmailPage />} />
           <Route path="/recuperar-contrasena" element={<RecuperarContrasenaPage />} />
           <Route path="/restablecer-contrasena" element={<RestablecerContrasenaPage />} />
           <Route

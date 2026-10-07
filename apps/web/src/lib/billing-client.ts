@@ -34,3 +34,7 @@ export function subscribeWithTrial(payload: SubscribePayload) {
     body: JSON.stringify(payload),
   });
 }
+
+export function cancelSubscription(oposicionSlug: string) {
+  return apiFetch<SubscriptionStatus>(`/billing/subscriptions/${oposicionSlug}/cancelar`, { method: "POST" });
+}

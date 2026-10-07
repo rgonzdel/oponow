@@ -19,6 +19,9 @@ const DECLINED_TEST_CARD = "4000000000000002";
  */
 @Injectable()
 export class MockPaymentGateway implements PaymentGateway {
+  // Nada que cancelar fuera: la simulación no cobra.
+  async cancelSubscription(_externalSubscriptionId: string): Promise<void> {}
+
   async chargeAndSubscribe(
     input: ChargeCardInput,
   ): Promise<ChargeCardResult> {

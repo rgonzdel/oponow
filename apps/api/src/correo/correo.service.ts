@@ -18,6 +18,7 @@ import {
   textoRestablecerContrasena,
   type DatosRestablecerContrasena,
 } from "./plantilla-restablecer-contrasena";
+import { htmlAviso, textoAviso, type DatosAviso } from "./plantilla-aviso";
 
 interface Mensaje {
   to: string;
@@ -105,6 +106,14 @@ export class CorreoService {
         html: htmlRestablecerContrasena(datos),
       },
       `Enlace para restablecer la contraseña de ${datos.email}: ${datos.enlace}`,
+    );
+  }
+
+  /** Avisos de la cuenta (contraseña o email cambiados, cuenta eliminada…). */
+  async enviarAviso(datos: DatosAviso): Promise<void> {
+    await this.enviar(
+      { to: datos.email, subject: datos.asunto, text: textoAviso(datos), html: htmlAviso(datos) },
+      `${datos.asunto} → ${datos.email}${datos.boton ? `: ${datos.boton.enlace}` : ""}`,
     );
   }
 

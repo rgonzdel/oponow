@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Inject,
@@ -13,7 +14,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { createHmac, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
 import * as argon2 from "argon2";
-import { and, eq, gt, isNull, sql as dsql } from "drizzle-orm";
+import { and, count, eq, gt, isNull, ne, sql as dsql } from "drizzle-orm";
 import { createDb, schema, type Database, type Sql } from "@oponow/db";
 import { AUTH_DATABASE_POOL } from "../database/database.module";
 import { getRequestDb } from "../database/request-context";
@@ -27,6 +28,19 @@ import type { LoginDto } from "./dto/login.dto";
 import { canjearCodigoGoogle, verificarIdTokenGoogle } from "./proveedores/google-id-token";
 import { verificarTokenFacebook } from "./proveedores/facebook";
 import { CorreoService } from "../correo/correo.service";
+
+export interface DatosCuenta {
+  email: string | null;
+  emailVerificado: boolean;
+  plan: string;
+  planExpira: Date | null;
+  creadaEn: Date;
+  tieneContrasena: boolean;
+  /** Proveedores externos vinculados ("google", "facebook"). */
+  proveedores: string[];
+  sesionesActivas: number;
+  dispositivosConfianza: number;
+}
 
 export interface ProveedoresDisponibles {
   /** Client ID público de Google, o null si no está configurado. */
@@ -64,6 +78,9 @@ const RESTABLECER_MIN = 60;
 // por IP del controlador): evita usar el formulario para inundar un buzón.
 const RESTABLECER_ESPERA_S = 60;
 const ENLACE_INVALIDO = "El enlace no es válido o ha caducado. Pide uno nuevo.";
+const CAMBIO_EMAIL_INVALIDO = "El enlace no es válido o ha caducado. Vuelve a pedir el cambio desde Mi cuenta.";
+const CAMBIO_EMAIL_TTL = "1h";
+const CONTRASENA_INCORRECTA = "La contraseña actual no es correcta";
 
 const INVALID_CREDENTIALS = "Credenciales inválidas";
 const INVALID_REFRESH = "Refresh token inválido o expirado";
@@ -404,7 +421,7 @@ export class AuthService {
       tokenHash: hashRefreshToken(token),
       expiraEn: new Date(Date.now() + RESTABLECER_MIN * 60_000),
     });
-    const web = this.configService.get<string>("WEB_ORIGIN", "https://www.oponow.com").replace(/\/$/, "");
+    const web = this.webOrigen();
     void this.correo
       .enviarRestablecerContrasena({
         email: user.email,
@@ -497,6 +514,241 @@ export class AuthService {
       throw new BadRequestException(ENLACE_INVALIDO);
     }
     return enlace;
+  }
+
+  // ===== Mi cuenta (usuario ya autenticado: RLS con su identidad) =====
+
+  async datosCuenta(userId: string): Promise<DatosCuenta> {
+    const db = getRequestDb();
+    const [u] = await db
+      .select({
+        email: schema.usuarios.email,
+        emailVerificado: schema.usuarios.emailVerified,
+        plan: schema.usuarios.plan,
+        planExpira: schema.usuarios.planExpira,
+        creadaEn: schema.usuarios.createdAt,
+        passwordHash: schema.usuarios.passwordHash,
+      })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, userId))
+      .limit(1);
+    if (!u) throw new UnauthorizedException();
+    const proveedores = await db
+      .select({ proveedor: schema.identidadesExternas.proveedor })
+      .from(schema.identidadesExternas)
+      .where(eq(schema.identidadesExternas.usuarioId, userId));
+    const [sesiones] = await db
+      .select({ n: count() })
+      .from(schema.refreshTokens)
+      .where(
+        and(
+          eq(schema.refreshTokens.usuarioId, userId),
+          isNull(schema.refreshTokens.revokedAt),
+          gt(schema.refreshTokens.expiresAt, new Date()),
+        ),
+      );
+    const [dispositivos] = await db
+      .select({ n: count() })
+      .from(schema.dispositivosConfianza)
+      .where(and(eq(schema.dispositivosConfianza.usuarioId, userId), gt(schema.dispositivosConfianza.expiraEn, new Date())));
+    const { passwordHash, ...resto } = u;
+    return {
+      ...resto,
+      tieneContrasena: !!passwordHash,
+      proveedores: [...new Set(proveedores.map((p) => p.proveedor))],
+      sesionesActivas: sesiones?.n ?? 0,
+      dispositivosConfianza: dispositivos?.n ?? 0,
+    };
+  }
+
+  /** Cambia la contraseña sabiendo la actual. Cierra el resto de sesiones y
+   * devuelve una nueva para este navegador. */
+  async cambiarContrasena(userId: string, actual: string, nueva: string, userAgent?: string): Promise<AuthTokens> {
+    const db = getRequestDb();
+    const usuario = await this.usuarioConContrasena(db, userId, actual);
+    await db
+      .update(schema.usuarios)
+      .set({ passwordHash: await argon2.hash(nueva, ARGON2_OPTIONS) })
+      .where(eq(schema.usuarios.id, userId));
+    await this.revocarSesiones(db, userId);
+    if (usuario.email) {
+      this.avisar({
+        email: usuario.email,
+        asunto: "Tu contraseña de Oponow ha cambiado",
+        titulo: "Has cambiado tu contraseña",
+        parrafos: [
+          "La contraseña de tu cuenta de Oponow se acaba de cambiar desde «Mi cuenta». Se ha cerrado la sesión en el resto de dispositivos.",
+        ],
+        siNoHasSidoTu: "Alguien ha entrado en tu cuenta. Restablece la contraseña desde «¿Has olvidado tu contraseña?» en la página de inicio de sesión y responde a este correo para que te ayudemos.",
+        motivo: "Has recibido este correo porque se ha cambiado la contraseña de tu cuenta de Oponow.",
+      });
+    }
+    return this.iniciarSesion(userId, userAgent);
+  }
+
+  /** Cierra la sesión en todos los dispositivos y vuelve a abrir solo esta. */
+  async cerrarOtrasSesiones(userId: string, userAgent?: string): Promise<AuthTokens> {
+    const db = getRequestDb();
+    await this.revocarSesiones(db, userId);
+    await db.delete(schema.dispositivosConfianza).where(eq(schema.dispositivosConfianza.usuarioId, userId));
+    const tokens = await this.iniciarSesion(userId, userAgent);
+    return { ...tokens, tokenDispositivo: await this.confiarDispositivo(getRequestDb(), userId, userAgent) };
+  }
+
+  /**
+   * Pide cambiar el email: manda un enlace de confirmación a la dirección
+   * nueva. Si ya la usa otra cuenta no se envía nada, pero la respuesta es
+   * la misma (no revela qué direcciones están registradas).
+   */
+  async solicitarCambioEmail(userId: string, nuevoEmail: string, password: string): Promise<void> {
+    const db = getRequestDb();
+    const usuario = await this.usuarioConContrasena(db, userId, password);
+    const nuevo = nuevoEmail.trim().toLowerCase();
+    if (usuario.email?.toLowerCase() === nuevo) {
+      throw new ConflictException("Esa ya es la dirección de tu cuenta");
+    }
+    const [ocupado] = await this.authDb
+      .select({ id: schema.usuarios.id })
+      .from(schema.usuarios)
+      .where(dsql`lower(${schema.usuarios.email}) = ${nuevo}`)
+      .limit(1);
+    if (ocupado) return;
+
+    // Token firmado con un secreto propio (no el de los access tokens: no
+    // debe poder usarse como sesión). Incluye el email actual: si la cuenta
+    // cambia de email antes de usarlo, deja de valer (un solo uso).
+    const token = await this.jwtService.signAsync(
+      { sub: userId, nuevo, actual: usuario.email ?? "" },
+      { secret: this.secretoCambioEmail(), expiresIn: CAMBIO_EMAIL_TTL },
+    );
+    this.avisar({
+      email: nuevo,
+      asunto: "Confirma tu nuevo email de Oponow",
+      titulo: "Confirma tu nuevo email",
+      parrafos: [
+        "Has pedido usar esta dirección para tu cuenta de Oponow. Pulsa el botón para confirmarla: a partir de entonces entrarás con ella.",
+      ],
+      boton: { texto: "Confirmar este email", enlace: `${this.webOrigen()}/confirmar-email?token=${token}`, nota: "Caduca en 1 hora" },
+      siNoHasSidoTu: "Ignora este correo: no se cambiará nada.",
+      motivo: "Has recibido este correo porque alguien quiere usar esta dirección en una cuenta de Oponow.",
+    });
+  }
+
+  /** Abre el enlace del correo: aplica el cambio de email. Público (el
+   * enlace puede abrirse en otro navegador sin sesión). */
+  async confirmarCambioEmail(token: string): Promise<{ email: string }> {
+    let datos: { sub: string; nuevo: string; actual: string };
+    try {
+      datos = await this.jwtService.verifyAsync(token, { secret: this.secretoCambioEmail() });
+    } catch {
+      throw new BadRequestException(CAMBIO_EMAIL_INVALIDO);
+    }
+    const [u] = await this.authDb
+      .select({ email: schema.usuarios.email, plan: schema.usuarios.plan, esAdmin: schema.usuarios.esAdmin })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, datos.sub))
+      .limit(1);
+    if (!u || (u.email ?? "") !== datos.actual) throw new BadRequestException(CAMBIO_EMAIL_INVALIDO);
+    const [ocupado] = await this.authDb
+      .select({ id: schema.usuarios.id })
+      .from(schema.usuarios)
+      .where(and(dsql`lower(${schema.usuarios.email}) = ${datos.nuevo}`, ne(schema.usuarios.id, datos.sub)))
+      .limit(1);
+    if (ocupado) throw new ConflictException("Esa dirección ya la usa otra cuenta");
+
+    const db = getRequestDb();
+    await db.execute(dsql`SELECT
+      set_config('app.current_user_id', ${datos.sub}, false),
+      set_config('app.current_plan', ${u.plan}, false),
+      set_config('app.is_admin', ${String(u.esAdmin)}, false)`);
+    await db
+      .update(schema.usuarios)
+      .set({ email: datos.nuevo, emailVerified: true })
+      .where(eq(schema.usuarios.id, datos.sub));
+
+    if (datos.actual) {
+      this.avisar({
+        email: datos.actual,
+        asunto: "El email de tu cuenta de Oponow ha cambiado",
+        titulo: "Tu cuenta ya usa otro email",
+        parrafos: [
+          `El email de tu cuenta de Oponow ha cambiado a ${enmascararEmail(datos.nuevo)}. Desde ahora entrarás con esa dirección y los avisos llegarán allí.`,
+        ],
+        siNoHasSidoTu: "Responde a este correo cuanto antes para que recuperemos tu cuenta.",
+        motivo: "Has recibido este correo porque esta era la dirección de tu cuenta de Oponow.",
+      });
+    }
+    return { email: datos.nuevo };
+  }
+
+  /**
+   * Borra la cuenta y todos sus datos (todas las tablas cuelgan de usuarios
+   * con ON DELETE CASCADE). Con contraseña, se pide la contraseña; sin ella
+   * (solo Google), basta la confirmación escrita.
+   */
+  async borrarCuenta(userId: string, password: string | undefined): Promise<void> {
+    const db = getRequestDb();
+    const [u] = await db
+      .select({ email: schema.usuarios.email, passwordHash: schema.usuarios.passwordHash })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, userId))
+      .limit(1);
+    if (!u) throw new UnauthorizedException();
+    if (u.passwordHash && !(password && (await argon2.verify(u.passwordHash, password)))) {
+      throw new ForbiddenException(CONTRASENA_INCORRECTA);
+    }
+    await db.delete(schema.usuarios).where(eq(schema.usuarios.id, userId));
+    this.logger.log(`Cuenta eliminada por su titular: ${userId}`);
+    if (u.email) {
+      this.avisar({
+        email: u.email,
+        asunto: "Tu cuenta de Oponow se ha eliminado",
+        titulo: "Hemos eliminado tu cuenta",
+        parrafos: [
+          "Tal como pediste, hemos borrado tu cuenta de Oponow y todos sus datos: progreso, tests, flashcards, agenda y suscripciones.",
+          "Si algún día quieres volver, puedes crear una cuenta nueva cuando quieras. ¡Mucha suerte con la oposición!",
+        ],
+        siNoHasSidoTu: "Responde a este correo cuanto antes.",
+        motivo: "Has recibido este correo porque se ha eliminado tu cuenta de Oponow.",
+      });
+    }
+  }
+
+  private async usuarioConContrasena(db: Database, userId: string, password: string) {
+    const [u] = await db
+      .select({ email: schema.usuarios.email, passwordHash: schema.usuarios.passwordHash })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, userId))
+      .limit(1);
+    if (!u) throw new UnauthorizedException();
+    if (!u.passwordHash) {
+      throw new BadRequestException("Tu cuenta no tiene contraseña: créala primero con el enlace que te enviamos por correo.");
+    }
+    if (!(await argon2.verify(u.passwordHash, password))) throw new ForbiddenException(CONTRASENA_INCORRECTA);
+    return u;
+  }
+
+  /** Requiere app.current_user_id = userId (RLS). */
+  private async revocarSesiones(db: Database, userId: string) {
+    await db
+      .update(schema.refreshTokens)
+      .set({ revokedAt: new Date() })
+      .where(and(eq(schema.refreshTokens.usuarioId, userId), isNull(schema.refreshTokens.revokedAt)));
+  }
+
+  private secretoCambioEmail(): string {
+    return `${this.configService.getOrThrow<string>("JWT_ACCESS_SECRET")}:cambio-email`;
+  }
+
+  private webOrigen(): string {
+    return this.configService.get<string>("WEB_ORIGIN", "https://www.oponow.com").replace(/\/$/, "");
+  }
+
+  /** Avisos por correo en segundo plano: un fallo de envío no deshace la acción. */
+  private avisar(datos: Parameters<CorreoService["enviarAviso"]>[0]) {
+    void this.correo
+      .enviarAviso(datos)
+      .catch((e) => this.logger.error(`No se pudo enviar "${datos.asunto}": ${e instanceof Error ? e.message : String(e)}`));
   }
 
   async refresh(refreshToken: string, userAgent?: string): Promise<AuthTokens> {

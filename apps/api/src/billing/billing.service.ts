@@ -168,6 +168,45 @@ export class BillingService {
     };
   }
 
+  /**
+   * Cancela la suscripción de una oposición: deja de cobrarse y se pierde el
+   * acceso a sus temas de pago. Si era la última y el plan es Lite, vuelve a
+   * Free (VIP se gestiona aparte y no se toca).
+   */
+  async cancel(userId: string, oposicionSlug: string): Promise<SubscriptionStatus> {
+    const db = getRequestDb();
+    const oposicion = await this.findOposicionBySlug(oposicionSlug);
+    const [sub] = await db
+      .select({ id: schema.suscripcionesOposicion.id, externa: schema.suscripcionesOposicion.stripeSubscriptionId })
+      .from(schema.suscripcionesOposicion)
+      .where(
+        and(
+          eq(schema.suscripcionesOposicion.usuarioId, userId),
+          eq(schema.suscripcionesOposicion.oposicionId, oposicion.id),
+          eq(schema.suscripcionesOposicion.activa, true),
+        ),
+      )
+      .limit(1);
+    if (!sub) throw new NotFoundException("No tienes una suscripción activa a esta oposición");
+
+    if (sub.externa) await this.gateway.cancelSubscription(sub.externa);
+    await db
+      .update(schema.suscripcionesOposicion)
+      .set({ activa: false, estado: "canceled", fechaFin: new Date() })
+      .where(eq(schema.suscripcionesOposicion.id, sub.id));
+
+    const quedan = await this.listActive(userId);
+    const [user] = await db
+      .select({ plan: schema.usuarios.plan })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, userId))
+      .limit(1);
+    if (user?.plan === "lite" && quedan.length === 0) {
+      await db.update(schema.usuarios).set({ plan: "free" }).where(eq(schema.usuarios.id, userId));
+    }
+    return { oposicionSlug, oposicionNombre: oposicion.nombre, subscribed: false, estado: "canceled", trialEndsAt: null };
+  }
+
   private async findOposicionBySlug(slug: string) {
     const db = getRequestDb();
     const [oposicion] = await db

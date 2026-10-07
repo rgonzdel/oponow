@@ -24,6 +24,15 @@ export class BillingController {
     return this.billingService.getStatus(user.id, oposicionSlug);
   }
 
+  @Post("subscriptions/:oposicionSlug/cancelar")
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  cancel(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("oposicionSlug") oposicionSlug: string,
+  ): Promise<SubscriptionStatus> {
+    return this.billingService.cancel(user.id, oposicionSlug);
+  }
+
   @Post("subscriptions")
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   subscribe(

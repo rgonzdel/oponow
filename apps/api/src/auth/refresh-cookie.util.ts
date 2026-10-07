@@ -38,3 +38,7 @@ export function setDispositivoCookie(res: Response, token: string) {
     maxAge: DISPOSITIVO_MAX_AGE_MS,
   });
 }
+
+export function clearDispositivoCookie(res: Response) {
+  res.clearCookie(DISPOSITIVO_COOKIE_NAME, { path: REFRESH_COOKIE_PATH });
+}

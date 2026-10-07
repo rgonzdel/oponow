@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { SiteHeader } from "../components/SiteHeader";
 import { QuestionPreviewCard } from "../components/QuestionPreviewCard";
 import { OPOSICION_ICONS } from "../components/oposicion-icons";
@@ -67,6 +67,7 @@ export function LandingPage() {
         <span className="fondo-luces__orbe" />
       </div>
       <SiteHeader />
+      <AvisoCuentaEliminada />
 
       <main>
         {/* ---------- Hero ---------- */}
@@ -346,6 +347,22 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+/** Tras eliminar la cuenta desde Mi cuenta se llega aquí con ?cuenta=eliminada. */
+function AvisoCuentaEliminada() {
+  const [params, setParams] = useSearchParams();
+  if (params.get("cuenta") !== "eliminada") return null;
+  return (
+    <div className="mx-auto mt-4 max-w-5xl px-6">
+      <div className="flex items-start justify-between gap-4 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300" role="status">
+        <span>Tu cuenta y todos sus datos se han eliminado. Te hemos enviado un correo de confirmación.</span>
+        <button type="button" onClick={() => setParams({}, { replace: true })} className="flex-none text-green-300/80 hover:text-green-200" aria-label="Cerrar aviso">
+          ✕
+        </button>
+      </div>
     </div>
   );
 }

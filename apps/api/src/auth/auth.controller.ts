@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -16,6 +17,7 @@ import type { Request, Response } from "express";
 import {
   AuthService,
   type AuthTokens,
+  type DatosCuenta,
   type MfaRequerido,
   type ProveedoresDisponibles,
 } from "./auth.service";
@@ -25,12 +27,14 @@ import { FacebookLoginDto, GoogleLoginDto } from "./dto/social.dto";
 import { MfaReenviarDto, MfaVerificarDto } from "./dto/mfa.dto";
 import { RefreshDto } from "./dto/refresh.dto";
 import { ComprobarEnlaceDto, OlvidadaDto, RestablecerDto } from "./dto/contrasena.dto";
+import { BorrarCuentaDto, CambiarContrasenaDto, CambiarEmailDto, ConfirmarEmailDto } from "./dto/cuenta.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { CurrentUser } from "./decorators/current-user.decorator";
 import type { AuthenticatedUser } from "./strategies/jwt.strategy";
 import {
   DISPOSITIVO_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
+  clearDispositivoCookie,
   clearRefreshCookie,
   setDispositivoCookie,
   setRefreshCookie,
@@ -133,6 +137,72 @@ export class AuthController {
     const tokens = await this.authService.restablecerContrasena(dto.token, dto.password, userAgent);
     this.entregarSesion(res, tokens);
     return tokens;
+  }
+
+  // ===== Mi cuenta =====
+
+  @Get("cuenta")
+  @UseGuards(JwtAuthGuard)
+  cuenta(@CurrentUser() user: AuthenticatedUser): Promise<DatosCuenta> {
+    return this.authService.datosCuenta(user.id);
+  }
+
+  @Post("cuenta/contrasena")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @Throttle(AUTH_THROTTLE)
+  async cambiarContrasena(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CambiarContrasenaDto,
+    @Res({ passthrough: true }) res: Response,
+    @Headers("user-agent") userAgent?: string,
+  ): Promise<AuthTokens> {
+    const tokens = await this.authService.cambiarContrasena(user.id, dto.actual, dto.nueva, userAgent);
+    this.entregarSesion(res, tokens);
+    return tokens;
+  }
+
+  @Post("cuenta/cerrar-sesiones")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @Throttle(AUTH_THROTTLE)
+  async cerrarSesiones(
+    @CurrentUser() user: AuthenticatedUser,
+    @Res({ passthrough: true }) res: Response,
+    @Headers("user-agent") userAgent?: string,
+  ): Promise<AuthTokens> {
+    const tokens = await this.authService.cerrarOtrasSesiones(user.id, userAgent);
+    this.entregarSesion(res, tokens);
+    return tokens;
+  }
+
+  @Post("cuenta/email")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  @Throttle(OLVIDADA_THROTTLE)
+  async cambiarEmail(@CurrentUser() user: AuthenticatedUser, @Body() dto: CambiarEmailDto): Promise<void> {
+    await this.authService.solicitarCambioEmail(user.id, dto.email, dto.password);
+  }
+
+  @Post("cuenta/email/confirmar")
+  @HttpCode(HttpStatus.OK)
+  @Throttle(AUTH_THROTTLE)
+  confirmarEmail(@Body() dto: ConfirmarEmailDto): Promise<{ email: string }> {
+    return this.authService.confirmarCambioEmail(dto.token);
+  }
+
+  @Delete("cuenta")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  @Throttle(AUTH_THROTTLE)
+  async borrarCuenta(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: BorrarCuentaDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    await this.authService.borrarCuenta(user.id, dto.password);
+    clearRefreshCookie(res);
+    clearDispositivoCookie(res);
   }
 
   /** Público: qué botones de acceso debe mostrar la web. */

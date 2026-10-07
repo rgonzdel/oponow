@@ -35,9 +35,14 @@ export function DashboardPage() {
           <Link to="/" className="text-accent">
             <OponowLogo animacion="entrada" />
           </Link>
-          <button onClick={() => logout()} className={buttonClass("ghost")}>
-            Cerrar sesión
-          </button>
+          <div className="flex items-center gap-2">
+            <Link to="/cuenta" className={buttonClass("ghost")}>
+              Mi cuenta
+            </Link>
+            <button onClick={() => logout()} className={buttonClass("ghost")}>
+              Cerrar sesión
+            </button>
+          </div>
         </div>
       </header>
 

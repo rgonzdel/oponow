@@ -30,9 +30,14 @@ export function SiteHeader() {
         </div>
 
         {isAuthenticated ? (
-          <Link to="/dashboard" className={buttonClass("primary")}>
-            Ir al dashboard
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/cuenta" className={buttonClass("ghost")}>
+              Mi cuenta
+            </Link>
+            <Link to="/dashboard" className={buttonClass("primary")}>
+              Ir al dashboard
+            </Link>
+          </div>
         ) : (
           <div className="flex items-center gap-2">
             <Link to="/login" className={buttonClass("ghost")}>

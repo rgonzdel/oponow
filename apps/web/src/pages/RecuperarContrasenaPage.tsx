@@ -61,12 +61,12 @@ export function RecuperarContrasenaPage() {
         {enviado ? (
           <>
             <p className="text-center text-sm text-neutral-300" aria-live="polite">
-              Si hay una cuenta con
+              Si existe una cuenta con la dirección
               <span className="my-0.5 block font-medium text-ink-text">{getValues("email")}</span>
               te hemos enviado un enlace para elegir una contraseña nueva.
             </p>
             <p className="text-center text-xs text-neutral-500">
-              Caduca en 60 minutos. Mira también en la carpeta de spam.
+              Si no te llega, comprueba que la dirección es correcta y mira en la carpeta de spam. El enlace caduca en 60 minutos.
             </p>
             <Link to="/login" className={buttonClass("primary", "w-full")}>
               Volver a iniciar sesión

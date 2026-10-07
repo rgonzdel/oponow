@@ -8,6 +8,7 @@ import { ApiError } from "../lib/api-client";
 import { AuthLayout } from "../components/AuthLayout";
 import { FormField, TextInput } from "../components/FormField";
 import { buttonClass } from "../components/button";
+import { AccesoAlternativo } from "../components/AccesoAlternativo";
 
 export function RegisterPage() {
   const { register: registerUser } = useAuth();
@@ -22,15 +23,18 @@ export function RegisterPage() {
   const mutation = useMutation({
     mutationFn: (values: RegisterFormValues) =>
       registerUser(values.email, values.password),
-    onSuccess: () =>
-      navigate(searchParams.get("next") ?? "/dashboard", { replace: true }),
+    onSuccess: () => irDespuesDeEntrar(),
   });
+
+  function irDespuesDeEntrar() {
+    navigate(searchParams.get("next") ?? "/dashboard", { replace: true });
+  }
 
   return (
     <AuthLayout title="Crea tu cuenta">
       <form
         onSubmit={handleSubmit((values) => mutation.mutate(values))}
-        className="space-y-4"
+        className="auth-stagger space-y-4"
         noValidate
       >
         <FormField label="Email" error={errors.email?.message}>
@@ -60,6 +64,10 @@ export function RegisterPage() {
           {mutation.isPending ? "Creando cuenta…" : "Crear cuenta"}
         </button>
       </form>
+
+      <div className="mt-5">
+        <AccesoAlternativo modo="signup" onSuccess={irDespuesDeEntrar} />
+      </div>
 
       <p className="mt-6 text-center text-sm text-neutral-400">
         ¿Ya tienes cuenta?{" "}

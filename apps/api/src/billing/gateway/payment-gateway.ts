@@ -2,7 +2,8 @@ export const PAYMENT_GATEWAY = Symbol("PAYMENT_GATEWAY");
 
 export interface ChargeCardInput {
   customerId: string;
-  customerEmail: string;
+  /** null si la cuenta no tiene email (acceso solo con teléfono). */
+  customerEmail: string | null;
   /** Descriptivo, ej. "Oponow LITE — Técnico Auxiliar de Informática". */
   planLabel: string;
   trialDays: number;

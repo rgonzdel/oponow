@@ -2,6 +2,11 @@ import { pgEnum } from "drizzle-orm/pg-core";
 
 export const planTipoEnum = pgEnum("plan_tipo", ["free", "lite", "vip"]);
 
+export const proveedorIdentidadEnum = pgEnum("proveedor_identidad", [
+  "google",
+  "facebook",
+]);
+
 export const intentoEstadoEnum = pgEnum("intento_estado", [
   "en_progreso",
   "completado",

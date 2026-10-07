@@ -4,7 +4,7 @@ export type PlanTipo = "free" | "lite" | "vip";
 
 export interface UsuarioResumen {
   id: string;
-  email: string;
+  email: string | null;
   plan: PlanTipo;
   planExpira: string | null;
   emailVerified: boolean;

@@ -7,8 +7,10 @@ import {
 } from "react";
 import {
   apiFetch,
+  getStoredDispositivo,
   getStoredRefreshToken,
   setAccessToken,
+  setStoredDispositivo,
   setStoredRefreshToken,
 } from "../lib/api-client";
 
@@ -22,6 +24,15 @@ interface AuthTokensResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: string;
+  /** Solo tras registro o MFA: este dispositivo pasa a ser de confianza. */
+  tokenDispositivo?: string;
+}
+
+/** /auth/login en un dispositivo nuevo: hay que introducir el código del correo. */
+export interface DesafioMfa {
+  mfaRequerido: true;
+  desafioId: string;
+  email: string;
 }
 
 type AuthStatus = "loading" | "authenticated" | "anonymous";
@@ -29,7 +40,9 @@ type AuthStatus = "loading" | "authenticated" | "anonymous";
 interface AuthState {
   user: AuthUser | null;
   status: AuthStatus;
-  login: (email: string, password: string) => Promise<void>;
+  /** Devuelve el desafío si hace falta el código del correo; null si ya ha entrado. */
+  login: (email: string, password: string) => Promise<DesafioMfa | null>;
+  verificarMfa: (desafioId: string, codigo: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -76,15 +89,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  async function login(email: string, password: string) {
-    const tokens = await apiFetch<AuthTokensResponse>("/auth/login", {
-      method: "POST",
-      skipAuth: true,
-      body: JSON.stringify({ email, password }),
-    });
+  async function entrar(tokens: AuthTokensResponse) {
     setAccessToken(tokens.accessToken);
     await setStoredRefreshToken(tokens.refreshToken);
+    await setStoredDispositivo(tokens.tokenDispositivo);
     await loadUser();
+  }
+
+  async function login(email: string, password: string) {
+    const dispositivo = (await getStoredDispositivo()) ?? undefined;
+    const res = await apiFetch<AuthTokensResponse | DesafioMfa>("/auth/login", {
+      method: "POST",
+      skipAuth: true,
+      body: JSON.stringify({ email, password, dispositivo }),
+    });
+    if ("mfaRequerido" in res) return res;
+    await entrar(res);
+    return null;
+  }
+
+  async function verificarMfa(desafioId: string, codigo: string) {
+    const tokens = await apiFetch<AuthTokensResponse>("/auth/mfa/verificar", {
+      method: "POST",
+      skipAuth: true,
+      body: JSON.stringify({ desafioId, codigo }),
+    });
+    await entrar(tokens);
   }
 
   async function register(email: string, password: string) {
@@ -93,9 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       skipAuth: true,
       body: JSON.stringify({ email, password }),
     });
-    setAccessToken(tokens.accessToken);
-    await setStoredRefreshToken(tokens.refreshToken);
-    await loadUser();
+    await entrar(tokens);
   }
 
   async function logout() {
@@ -112,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, status, login, register, logout, refreshSession }}
+      value={{ user, status, login, verificarMfa, register, logout, refreshSession }}
     >
       {children}
     </AuthContext.Provider>

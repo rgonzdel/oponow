@@ -103,7 +103,7 @@ export function AdminPage() {
                     selectedId === u.id ? "bg-ink" : ""
                   }`}
                 >
-                  <td className="px-4 py-2.5 text-ink-text">{u.email}</td>
+                  <td className="px-4 py-2.5 text-ink-text">{u.email ?? "(sin email)"}</td>
                   <td className="px-4 py-2.5">
                     <span className="rounded-md bg-accent-800 px-2 py-0.5 text-[11px] font-medium text-accent-100">
                       {PLAN_LABEL[u.plan]}
@@ -150,7 +150,7 @@ export function AdminPage() {
         {selectedId && detalleQuery.data && (
           <div className="mt-8 rounded-lg border border-ink-divider bg-ink-surface p-6">
             <h2 className="text-sm font-medium text-ink-text">
-              {detalleQuery.data.email}
+              {detalleQuery.data.email ?? "(sin email)"}
             </h2>
             <p className="mt-1 text-xs text-neutral-500">
               Registrado el {formatFecha(detalleQuery.data.createdAt)} ·{" "}

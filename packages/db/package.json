@@ -12,6 +12,7 @@
     "bootstrap-roles": "tsx src/bootstrap-roles.ts",
     "apply-rls": "tsx src/rls/apply-rls.ts",
     "seed": "tsx src/seed.ts",
+    "import-banco-tai": "tsx src/import-banco-tai.ts",
     "studio": "drizzle-kit studio"
   },
   "dependencies": {

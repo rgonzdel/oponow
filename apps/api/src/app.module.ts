@@ -17,6 +17,7 @@ import { TemarioModule } from "./temario/temario.module";
 import { QuizModule } from "./quiz/quiz.module";
 import { AgendaModule } from "./agenda/agenda.module";
 import { AdminModule } from "./admin/admin.module";
+import { CorreoModule } from "./correo/correo.module";
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AdminModule } from "./admin/admin.module";
       { name: "default", ttl: 60_000, limit: 60 },
     ]),
     DatabaseModule,
+    CorreoModule,
     AuthModule,
     BillingModule,
     TemarioModule,

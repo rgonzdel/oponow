@@ -32,7 +32,7 @@ export function DashboardPage() {
       <header className="border-b border-ink-divider">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
           <Link to="/" className="text-accent">
-            <OponowLogo />
+            <OponowLogo animacion="entrada" />
           </Link>
           <button onClick={() => logout()} className={buttonClass("ghost")}>
             Cerrar sesión

@@ -5,6 +5,9 @@
 GRANT SELECT, INSERT, UPDATE, DELETE ON
   usuarios,
   refresh_tokens,
+  identidades_externas,
+  desafios_mfa,
+  dispositivos_confianza,
   intentos_test,
   respuestas_usuario,
   suscripciones_oposicion,

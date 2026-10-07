@@ -19,12 +19,25 @@ interface AuthTokensResponse {
   expiresIn: string;
 }
 
+/** /auth/login en un navegador nuevo: hay que introducir el código del correo. */
+export interface DesafioMfa {
+  mfaRequerido: true;
+  desafioId: string;
+  /** Email enmascarado al que se ha enviado el código. */
+  email: string;
+}
+
 type AuthStatus = "loading" | "authenticated" | "anonymous";
 
 interface AuthState {
   user: AuthUser | null;
   status: AuthStatus;
-  login: (email: string, password: string) => Promise<void>;
+  /** Devuelve el desafío si este navegador necesita el código del correo;
+   * null si ya ha iniciado sesión. */
+  login: (email: string, password: string) => Promise<DesafioMfa | null>;
+  /** Login con Google (/auth/google), Facebook (/auth/facebook) o con el
+   * código MFA del correo (/auth/mfa/verificar). */
+  loginCon: (path: string, body: Record<string, string>) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   /** El `plan` viaja dentro del access token, así que un cambio de plan en
@@ -71,10 +84,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
-    const tokens = await apiFetch<AuthTokensResponse>("/auth/login", {
+    const res = await apiFetch<AuthTokensResponse | DesafioMfa>("/auth/login", {
       method: "POST",
       skipAuth: true,
       body: JSON.stringify({ email, password }),
+    });
+    if ("mfaRequerido" in res) return res;
+    setAccessToken(res.accessToken);
+    await loadUser();
+    return null;
+  }
+
+  // Google, Facebook y el código MFA: el backend responde con los mismos
+  // tokens que /auth/login, así que comparten el resto del flujo.
+  async function loginCon(path: string, body: Record<string, string>) {
+    const tokens = await apiFetch<AuthTokensResponse>(path, {
+      method: "POST",
+      skipAuth: true,
+      body: JSON.stringify(body),
     });
     setAccessToken(tokens.accessToken);
     await loadUser();
@@ -99,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, status, login, register, logout, refreshSession }}
+      value={{ user, status, login, loginCon, register, logout, refreshSession }}
     >
       {children}
     </AuthContext.Provider>

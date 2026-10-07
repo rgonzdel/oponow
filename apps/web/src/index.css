@@ -16,6 +16,75 @@ body {
   color: #e9e9ed; /* ink.text */
 }
 
+/* Pantallas de acceso (AuthLayout): fondo con dos brillos de marca que se
+   desplazan despacio, tarjeta que entra subiendo y contenido escalonado. */
+@layer components {
+  .auth-fondo {
+    @apply pointer-events-none fixed inset-0 -z-10 overflow-hidden;
+  }
+  .auth-fondo::before,
+  .auth-fondo::after {
+    content: "";
+    @apply absolute rounded-full;
+    filter: blur(90px);
+    will-change: transform;
+  }
+  .auth-fondo::before {
+    width: 42rem;
+    height: 42rem;
+    left: -12rem;
+    top: -14rem;
+    background: radial-gradient(circle, rgba(145, 132, 217, 0.22), transparent 65%);
+    animation: auth-deriva 22s ease-in-out infinite alternate;
+  }
+  .auth-fondo::after {
+    width: 36rem;
+    height: 36rem;
+    right: -10rem;
+    bottom: -12rem;
+    background: radial-gradient(circle, rgba(93, 82, 148, 0.28), transparent 65%);
+    animation: auth-deriva 26s ease-in-out -8s infinite alternate-reverse;
+  }
+  .auth-card {
+    animation: auth-sube 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .auth-stagger > * {
+    animation: auth-sube 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .auth-stagger > *:nth-child(1) { animation-delay: 0.08s; }
+  .auth-stagger > *:nth-child(2) { animation-delay: 0.14s; }
+  .auth-stagger > *:nth-child(3) { animation-delay: 0.2s; }
+  .auth-stagger > *:nth-child(4) { animation-delay: 0.26s; }
+  .auth-stagger > *:nth-child(5) { animation-delay: 0.32s; }
+  .auth-stagger > *:nth-child(n + 6) { animation-delay: 0.38s; }
+  .auth-pop {
+    animation: auth-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes auth-sube {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes auth-pop {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes auth-deriva {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(6rem, 4rem) scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-fondo::before,
+  .auth-fondo::after,
+  .auth-card,
+  .auth-stagger > *,
+  .auth-pop {
+    animation: none;
+  }
+}
+
 /* Contenido de temario servido por el backend (ver apps/api/src/temario) —
    solo <h3>/<p> semánticos, la tipografía de lectura vive aquí. */
 @layer components {
@@ -97,4 +166,106 @@ body {
   .tema-box details[open] summary {
     @apply mb-2.5;
   }
+}
+
+/* Logo animado (components/OponowLogo.tsx). Mismos tiempos que la cabecera
+   animada de los correos: ciclo de 4,2 s con el movimiento al principio.
+   --logo-size la fija el componente; todo se escala con ella. */
+.logo-op {
+  --ciclo: 4.2s;
+  isolation: isolate;
+}
+.logo-op__brillo {
+  position: absolute;
+  z-index: -1;
+  left: calc(var(--logo-size) * -0.55);
+  top: 50%;
+  width: calc(var(--logo-size) * 2.1);
+  height: calc(var(--logo-size) * 2.1);
+  transform: translateY(-50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(145, 132, 217, 0.6) 0%, rgba(145, 132, 217, 0.2) 45%, rgba(145, 132, 217, 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+.logo-op__icono { transform-origin: 50% 50%; }
+.logo-op__letra { display: inline-block; }
+.logo-op__chispa {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.logo-op__chispa--0 { left: calc(var(--logo-size) * 0.9); top: calc(var(--logo-size) * -0.29); width: calc(var(--logo-size) * 0.37); color: #d2cefd; }
+.logo-op__chispa--1 { left: calc(var(--logo-size) * -0.32); top: calc(var(--logo-size) * 0.82); width: calc(var(--logo-size) * 0.26); color: #b5abfc; }
+.logo-op__chispa--2 { left: calc(var(--logo-size) * 3.95); top: calc(var(--logo-size) * -0.24); width: calc(var(--logo-size) * 0.29); color: #e7e5fe; }
+
+.logo-op[data-animacion="bucle"],
+.logo-op[data-animacion="entrada"] { --repeticiones: infinite; }
+.logo-op[data-animacion="entrada"] { --repeticiones: 1; }
+
+.logo-op[data-animacion="bucle"] .logo-op__icono,
+.logo-op[data-animacion="entrada"] .logo-op__icono {
+  animation: logo-op-giro var(--ciclo) linear var(--repeticiones), logo-op-pulso var(--ciclo) linear var(--repeticiones);
+}
+.logo-op[data-animacion="bucle"] .logo-op__brillo,
+.logo-op[data-animacion="entrada"] .logo-op__brillo {
+  animation: logo-op-brillo var(--ciclo) linear var(--repeticiones);
+}
+.logo-op[data-animacion="bucle"] .logo-op__cuna,
+.logo-op[data-animacion="entrada"] .logo-op__cuna {
+  animation: logo-op-cuna var(--ciclo) linear var(--repeticiones);
+}
+.logo-op[data-animacion="bucle"] .logo-op__letra,
+.logo-op[data-animacion="entrada"] .logo-op__letra {
+  animation: logo-op-ola var(--ciclo) linear var(--repeticiones), logo-op-destello var(--ciclo) linear var(--repeticiones);
+  animation-delay: calc(var(--i) * 0.07s), calc(var(--i) * 0.107s);
+}
+.logo-op[data-animacion="bucle"] .logo-op__chispa,
+.logo-op[data-animacion="entrada"] .logo-op__chispa {
+  animation: logo-op-chispa var(--ciclo) linear var(--repeticiones);
+}
+.logo-op__chispa--1 { animation-delay: 0.22s !important; }
+.logo-op__chispa--2 { animation-delay: 0.44s !important; }
+
+/* Giro: 0,3–1,3 s del ciclo (7,1 %–31 %), con aceleración y frenada. */
+@keyframes logo-op-giro {
+  0%, 7.1% { rotate: 0deg; animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  31%, 100% { rotate: -360deg; }
+}
+@keyframes logo-op-pulso {
+  0%, 7.1% { scale: 1; animation-timing-function: ease-out; }
+  19% { scale: 1.1; animation-timing-function: ease-in; }
+  31%, 100% { scale: 1; }
+}
+@keyframes logo-op-brillo {
+  0%, 7.1% { opacity: 0; }
+  19% { opacity: 0.95; }
+  31%, 100% { opacity: 0; }
+}
+/* Empujón de la cuña: 1,2–1,7 s. */
+@keyframes logo-op-cuna {
+  0%, 28.6% { transform: translateX(0); animation-timing-function: ease-out; }
+  34.5% { transform: translateX(6px); animation-timing-function: ease-in-out; }
+  40.5%, 100% { transform: translateX(0); }
+}
+/* Ola de letras: 0,75–1,11 s para la primera (las demás, con retraso). */
+@keyframes logo-op-ola {
+  0%, 17.9% { transform: translateY(0); animation-timing-function: ease-out; }
+  22.1% { transform: translateY(-0.19em); animation-timing-function: ease-in; }
+  26.4%, 100% { transform: translateY(0); }
+}
+/* Destello que recorre la palabra: pico hacia 1,46 s en la primera letra. */
+@keyframes logo-op-destello {
+  0%, 29.9% { color: #9184d9; }
+  34.7% { color: #e2dff8; }
+  39.5%, 100% { color: #9184d9; }
+}
+@keyframes logo-op-chispa {
+  0%, 20.2% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  27.4% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+  34.5%, 100% { opacity: 0; transform: scale(0.3) rotate(90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-op *, .logo-op { animation: none !important; }
 }

@@ -27,6 +27,18 @@ export async function setStoredRefreshToken(token: string | null) {
   else await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
 }
 
+// Token de "dispositivo de confianza" tras pasar el MFA por correo: mientras
+// sea válido (30 días) el login con contraseña no vuelve a pedir el código.
+const DISPOSITIVO_KEY = "oponow_dispositivo";
+
+export function getStoredDispositivo() {
+  return SecureStore.getItemAsync(DISPOSITIVO_KEY);
+}
+
+export async function setStoredDispositivo(token: string | null | undefined) {
+  if (token) await SecureStore.setItemAsync(DISPOSITIVO_KEY, token);
+}
+
 export class ApiError extends Error {
   status: number;
 

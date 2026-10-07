@@ -93,7 +93,7 @@ export class TemarioService {
       usuarioId: userId,
       bloqueId: bloque.id,
       ip,
-      emailSnapshot: user.email,
+      emailSnapshot: identificadorAuditoria(user, userId),
       timestamp: new Date(),
     });
 
@@ -152,7 +152,7 @@ export class TemarioService {
         usuarioId: userId,
         bloqueId: b.id,
         ip,
-        emailSnapshot: user.email,
+        emailSnapshot: identificadorAuditoria(user, userId),
         timestamp: new Date(),
       })),
     );
@@ -163,4 +163,11 @@ export class TemarioService {
       bloques: bloques.map((b) => b.contenido),
     });
   }
+}
+
+// sesiones_lectura.email_snapshot es obligatorio y sirve de evidencia ante
+// copias: si la cuenta no tiene email (Facebook puede no darlo), se guarda
+// el id del usuario.
+function identificadorAuditoria(user: { email: string | null }, userId: string): string {
+  return user.email ?? `usuario:${userId}`;
 }

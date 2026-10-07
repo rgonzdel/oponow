@@ -2,19 +2,24 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   index,
+  integer,
   pgTable,
   text,
   timestamp,
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { planTipoEnum, suscripcionEstadoEnum } from "./enums";
+import { planTipoEnum, proveedorIdentidadEnum, suscripcionEstadoEnum } from "./enums";
 import { bloquesContenido, oposiciones } from "./content";
 
 export const usuarios = pgTable("usuarios", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: text("email").notNull(),
-  passwordHash: text("password_hash").notNull(),
+  // email y password_hash son opcionales: quien entra con Google/Facebook no
+  // tiene contraseña (ver identidadesExternas), y Facebook puede no dar
+  // email. El índice único de email sigue valiendo: Postgres no considera
+  // iguales dos NULL.
+  email: text("email"),
+  passwordHash: text("password_hash"),
   emailVerified: boolean("email_verified").notNull().default(false),
   plan: planTipoEnum("plan").notNull().default("free"),
   planExpira: timestamp("plan_expira", { withTimezone: true }),
@@ -28,6 +33,64 @@ export const usuarios = pgTable("usuarios", {
     .defaultNow(),
 }, (t) => [
   uniqueIndex("usuarios_email_idx").on(t.email),
+]);
+
+// Cuentas de Google/Facebook vinculadas a un usuario. `sujeto` es el id
+// estable que da el proveedor (claim `sub` de Google, id de Facebook): el
+// email puede cambiar en el proveedor, el sujeto no.
+export const identidadesExternas = pgTable("identidades_externas", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  usuarioId: uuid("usuario_id")
+    .notNull()
+    .references(() => usuarios.id, { onDelete: "cascade" }),
+  proveedor: proveedorIdentidadEnum("proveedor").notNull(),
+  sujeto: text("sujeto").notNull(),
+  email: text("email"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+}, (t) => [
+  uniqueIndex("identidades_externas_proveedor_sujeto_idx").on(t.proveedor, t.sujeto),
+  index("identidades_externas_usuario_id_idx").on(t.usuarioId),
+]);
+
+// MFA por correo: tras una contraseña correcta en un navegador que no es de
+// confianza, se envía un código de 6 dígitos. Solo se guarda su hash.
+export const desafiosMfa = pgTable("desafios_mfa", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  usuarioId: uuid("usuario_id")
+    .notNull()
+    .references(() => usuarios.id, { onDelete: "cascade" }),
+  codigoHash: text("codigo_hash").notNull(),
+  intentos: integer("intentos").notNull().default(0),
+  reenvios: integer("reenvios").notNull().default(0),
+  expiraEn: timestamp("expira_en", { withTimezone: true }).notNull(),
+  enviadoEn: timestamp("enviado_en", { withTimezone: true }).notNull().defaultNow(),
+  usadoEn: timestamp("usado_en", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+}, (t) => [
+  index("desafios_mfa_usuario_id_idx").on(t.usuarioId),
+]);
+
+// Navegadores/dispositivos que ya pasaron el MFA: no se les vuelve a pedir
+// código hasta que caducan. El token viaja en una cookie httpOnly (web) o en
+// el body (móvil); aquí solo su hash.
+export const dispositivosConfianza = pgTable("dispositivos_confianza", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  usuarioId: uuid("usuario_id")
+    .notNull()
+    .references(() => usuarios.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull(),
+  userAgent: text("user_agent"),
+  expiraEn: timestamp("expira_en", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+}, (t) => [
+  uniqueIndex("dispositivos_confianza_token_hash_idx").on(t.tokenHash),
+  index("dispositivos_confianza_usuario_id_idx").on(t.usuarioId),
 ]);
 
 // Tokens de refresco: tabla separada (no un campo en `usuarios`) para

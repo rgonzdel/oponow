@@ -44,6 +44,41 @@ DROP POLICY IF EXISTS refresh_tokens_auth_service_update ON refresh_tokens;
 CREATE POLICY refresh_tokens_auth_service_update ON refresh_tokens
   FOR UPDATE TO auth_service USING (true) WITH CHECK (true);
 
+ALTER TABLE identidades_externas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS identidades_externas_self ON identidades_externas;
+CREATE POLICY identidades_externas_self ON identidades_externas
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
+-- Login con Google/Facebook: hay que encontrar la identidad por
+-- (proveedor, sujeto) antes de conocer al usuario. Mismo patrón que
+-- usuarios_auth_service; auth-grants.sql limita las columnas.
+DROP POLICY IF EXISTS identidades_externas_auth_service_select ON identidades_externas;
+CREATE POLICY identidades_externas_auth_service_select ON identidades_externas
+  FOR SELECT TO auth_service USING (true);
+
+ALTER TABLE desafios_mfa ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS desafios_mfa_self ON desafios_mfa;
+CREATE POLICY desafios_mfa_self ON desafios_mfa
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
+-- Verificar o reenviar un código: se busca el desafío por id antes de saber
+-- de quién es (como refresh_tokens). auth-grants.sql limita las columnas.
+DROP POLICY IF EXISTS desafios_mfa_auth_service_select ON desafios_mfa;
+CREATE POLICY desafios_mfa_auth_service_select ON desafios_mfa
+  FOR SELECT TO auth_service USING (true);
+
+DROP POLICY IF EXISTS desafios_mfa_auth_service_update ON desafios_mfa;
+CREATE POLICY desafios_mfa_auth_service_update ON desafios_mfa
+  FOR UPDATE TO auth_service USING (true) WITH CHECK (true);
+
+ALTER TABLE dispositivos_confianza ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS dispositivos_confianza_self ON dispositivos_confianza;
+CREATE POLICY dispositivos_confianza_self ON dispositivos_confianza
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
 ALTER TABLE intentos_test ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS intentos_test_self ON intentos_test;
 CREATE POLICY intentos_test_self ON intentos_test

@@ -26,7 +26,7 @@ export class AdminService {
         .select({
           id: schema.usuarios.id,
           email: schema.usuarios.email,
-          plan: schema.usuarios.plan,
+            plan: schema.usuarios.plan,
           planExpira: schema.usuarios.planExpira,
           emailVerified: schema.usuarios.emailVerified,
           createdAt: schema.usuarios.createdAt,

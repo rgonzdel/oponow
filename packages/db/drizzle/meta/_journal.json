@@ -57,6 +57,13 @@
       "when": 1791375379047,
       "tag": "0007_restablecer_contrasena",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791381528433,
+      "tag": "0008_flashcards",
+      "breakpoints": true
     }
   ]
 }

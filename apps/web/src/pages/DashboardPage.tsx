@@ -66,6 +66,15 @@ export function DashboardPage() {
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Link
+                to={miOposicion ? `/oposiciones/${miOposicion.oposicionSlug}/flashcards` : "/flashcards"}
+                className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+              >
+                <h2 className="text-sm font-medium text-ink-text">Flashcards</h2>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Memoriza la normativa con tarjetas y repaso espaciado.
+                </p>
+              </Link>
+              <Link
                 to="/fallos"
                 className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
               >

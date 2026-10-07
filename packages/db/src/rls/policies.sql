@@ -235,6 +235,59 @@ CREATE POLICY preguntas_visibles ON preguntas
     )
   );
 
+-- Flashcards: visibles si pertenecen a algún tema visible para el usuario
+-- (mismo criterio que temas/preguntas). Una tarjeta compartida por varios
+-- temas se ve en cuanto uno de ellos lo sea.
+ALTER TABLE flashcards_temas ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS flashcards_temas_visibles ON flashcards_temas;
+CREATE POLICY flashcards_temas_visibles ON flashcards_temas
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM temas t
+      WHERE t.id = flashcards_temas.tema_id
+        AND (
+          t.es_gratuito
+          OR current_setting('app.current_plan', true) = 'vip'
+          OR EXISTS (
+            SELECT 1 FROM suscripciones_oposicion so
+            WHERE so.oposicion_id = t.oposicion_id
+              AND so.usuario_id = current_setting('app.current_user_id', true)::uuid
+              AND so.activa
+          )
+        )
+    )
+  );
+
+ALTER TABLE flashcards ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS flashcards_visibles ON flashcards;
+CREATE POLICY flashcards_visibles ON flashcards
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM flashcards_temas ft
+      WHERE ft.flashcard_id = flashcards.id
+        AND EXISTS (
+          SELECT 1 FROM temas t
+          WHERE t.id = ft.tema_id
+            AND (
+              t.es_gratuito
+              OR current_setting('app.current_plan', true) = 'vip'
+              OR EXISTS (
+                SELECT 1 FROM suscripciones_oposicion so
+                WHERE so.oposicion_id = t.oposicion_id
+                  AND so.usuario_id = current_setting('app.current_user_id', true)::uuid
+                  AND so.activa
+              )
+            )
+        )
+    )
+  );
+
+ALTER TABLE flashcards_progreso ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS flashcards_progreso_self ON flashcards_progreso;
+CREATE POLICY flashcards_progreso_self ON flashcards_progreso
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
 -- Nota: el límite de "1 test diario" en plan free NO es una política RLS
 -- (RLS filtra filas, no cuenta filas). Se aplica en el servicio de NestJS
 -- que crea intentos_test, consultando cuántos intentos ya existen hoy para

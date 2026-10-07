@@ -14,7 +14,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   suscripciones_oposicion,
   sesiones_lectura,
   tareas_agenda,
-  google_calendar_conexiones
+  google_calendar_conexiones,
+  flashcards_progreso
 TO app_user;
 
 -- Contenido y catálogo: solo lectura desde la API en este paso. La
@@ -26,7 +27,9 @@ GRANT SELECT ON
   articulos,
   temas,
   bloques_contenido,
-  preguntas
+  preguntas,
+  flashcards,
+  flashcards_temas
 TO app_user;
 
 -- Para que las migraciones futuras (nuevas tablas creadas por este mismo

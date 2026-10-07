@@ -474,3 +474,151 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .icono-mfa, .icono-mfa *, .icono-mfa::after { animation: none !important; transition: none !important; }
 }
+
+/* ===== Flashcards =====
+   La tarjeta gira en 3D (anverso → reverso). Las dos caras se apilan en la
+   misma celda de rejilla para que la tarjeta tome la altura de la más alta. */
+.flashcard-escena {
+  perspective: 1400px;
+  animation: flashcard-entra 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.flashcard {
+  display: grid;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.15, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.flashcard[data-girada="true"] { transform: rotateY(180deg); }
+.flashcard:focus-visible { outline: none; }
+.flashcard:focus-visible .flashcard__cara { box-shadow: 0 0 0 3px rgba(145, 132, 217, 0.35), 0 18px 40px rgba(0, 0, 0, 0.45); }
+.flashcard__cara {
+  grid-area: 1 / 1;
+  display: flex;
+  min-height: 17rem;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.75rem 1.6rem;
+  border: 1px solid rgba(233, 233, 237, 0.16);
+  border-radius: 1rem;
+  background: linear-gradient(160deg, #2a2c3b 0%, #232532 55%, #1f2130 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flashcard__cara--reverso {
+  transform: rotateY(180deg);
+  border-color: rgba(145, 132, 217, 0.4);
+  background: linear-gradient(160deg, #2d2a45 0%, #24233a 55%, #1f2032 100%);
+}
+.flashcard:hover .flashcard__cara--anverso { border-color: rgba(145, 132, 217, 0.45); }
+.flashcard__etiqueta {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #9184d9;
+}
+.flashcard__texto {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #e9e9ed;
+}
+.flashcard__texto--respuesta { flex: 0 0 auto; font-size: 1.05rem; }
+.flashcard__pista { font-size: 0.75rem; color: #75798c; }
+.flashcard__cita {
+  border-left: 3px solid rgba(145, 132, 217, 0.55);
+  padding: 0.15rem 0 0.15rem 0.85rem;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: #b2b6ca;
+}
+.flashcard__fuente {
+  margin-top: auto;
+  align-self: flex-start;
+  border-radius: 0.375rem;
+  background: rgba(145, 132, 217, 0.14);
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #d2cefd;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.flashcard__fuente:hover { background: rgba(145, 132, 217, 0.26); }
+
+/* Al puntuar, la tarjeta sale hacia un lado con el color de la respuesta.
+   El movimiento y el fundido van en el contenedor: una opacidad sobre el
+   elemento 3D lo aplanaría y se vería la otra cara en espejo. */
+.flashcard-escena[data-saliendo="bien"] { animation: flashcard-sale-bien 0.38s ease-in forwards; }
+.flashcard-escena[data-saliendo="otra"] { animation: flashcard-sale-otra 0.38s ease-in forwards; }
+.flashcard-escena[data-saliendo="dificil"] { animation: flashcard-sale-dificil 0.38s ease-in forwards; }
+@keyframes flashcard-sale-bien { to { opacity: 0; transform: translateX(70px) rotate(4deg); } }
+@keyframes flashcard-sale-otra { to { opacity: 0; transform: translateX(-70px) rotate(-4deg); } }
+@keyframes flashcard-sale-dificil { to { opacity: 0; transform: translateY(40px) scale(0.96); } }
+.flashcard-escena[data-saliendo] .flashcard__cara { transition: border-color 0.15s, box-shadow 0.15s; }
+.flashcard-escena[data-saliendo="bien"] .flashcard__cara { border-color: #4ade80; box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25), 0 18px 40px rgba(0, 0, 0, 0.45); }
+.flashcard-escena[data-saliendo="otra"] .flashcard__cara { border-color: #f87171; box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.22), 0 18px 40px rgba(0, 0, 0, 0.45); }
+.flashcard-escena[data-saliendo="dificil"] .flashcard__cara { border-color: #fcd34d; box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.2), 0 18px 40px rgba(0, 0, 0, 0.45); }
+
+@keyframes flashcard-entra {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Botones de puntuación: aparecen al girar la tarjeta. */
+[data-visible] > .flashcard-boton { transition: opacity 0.3s, transform 0.3s, background-color 0.2s, border-color 0.2s; }
+[data-visible="false"] > .flashcard-boton { opacity: 0.35; transform: translateY(4px); }
+[data-visible="true"] > .flashcard-boton:nth-child(2) { transition-delay: 0.05s, 0.05s, 0s, 0s; }
+[data-visible="true"] > .flashcard-boton:nth-child(3) { transition-delay: 0.1s, 0.1s, 0s, 0s; }
+.flashcard-boton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid;
+  border-radius: 0.6rem;
+  padding: 0.7rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.flashcard-boton:disabled { cursor: default; }
+.flashcard-boton:not(:disabled):active { transform: scale(0.97); }
+.flashcard-boton__tecla {
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0 0.3rem;
+  font-family: inherit;
+  font-size: 0.65rem;
+  opacity: 0.75;
+}
+.flashcard-boton--otra { border-color: rgba(248, 113, 113, 0.45); background: rgba(248, 113, 113, 0.08); color: #fca5a5; }
+.flashcard-boton--otra:not(:disabled):hover { background: rgba(248, 113, 113, 0.18); }
+.flashcard-boton--dificil { border-color: rgba(252, 211, 77, 0.45); background: rgba(252, 211, 77, 0.07); color: #fcd34d; }
+.flashcard-boton--dificil:not(:disabled):hover { background: rgba(252, 211, 77, 0.16); }
+.flashcard-boton--bien { border-color: rgba(74, 222, 128, 0.45); background: rgba(74, 222, 128, 0.08); color: #86efac; }
+.flashcard-boton--bien:not(:disabled):hover { background: rgba(74, 222, 128, 0.18); }
+
+.flashcards-fin { animation: flashcard-entra 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@media (max-width: 480px) {
+  .flashcard__cara { min-height: 15rem; padding: 1.4rem 1.2rem; }
+  .flashcard__texto { font-size: 1.08rem; }
+  .flashcard-boton__tecla { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flashcard, .flashcard-escena, .flashcard-escena .flashcard, .flashcards-fin, .flashcard-boton { animation: none !important; transition: none !important; }
+}

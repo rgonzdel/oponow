@@ -18,6 +18,8 @@ import { AgendaPage } from "./pages/AgendaPage";
 import { LegalPage } from "./pages/LegalPage";
 import { AdminPage } from "./pages/AdminPage";
 import { RecuperarContrasenaPage } from "./pages/RecuperarContrasenaPage";
+import { FlashcardsOposicionesPage, FlashcardsPage } from "./pages/FlashcardsPage";
+import { FlashcardsSesionPage } from "./pages/FlashcardsSesionPage";
 import { RestablecerContrasenaPage } from "./pages/RestablecerContrasenaPage";
 
 export function App() {
@@ -50,6 +52,30 @@ export function App() {
             element={
               <RequireAuth>
                 <TestPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/flashcards"
+            element={
+              <RequireAuth>
+                <FlashcardsOposicionesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/oposiciones/:slug/flashcards"
+            element={
+              <RequireAuth>
+                <FlashcardsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/oposiciones/:slug/flashcards/repaso"
+            element={
+              <RequireAuth>
+                <FlashcardsSesionPage />
               </RequireAuth>
             }
           />

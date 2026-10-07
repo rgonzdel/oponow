@@ -15,6 +15,7 @@ import { AuthModule } from "./auth/auth.module";
 import { BillingModule } from "./billing/billing.module";
 import { TemarioModule } from "./temario/temario.module";
 import { QuizModule } from "./quiz/quiz.module";
+import { FlashcardsModule } from "./flashcards/flashcards.module";
 import { AgendaModule } from "./agenda/agenda.module";
 import { AdminModule } from "./admin/admin.module";
 import { CorreoModule } from "./correo/correo.module";
@@ -48,6 +49,7 @@ import { CorreoModule } from "./correo/correo.module";
     BillingModule,
     TemarioModule,
     QuizModule,
+    FlashcardsModule,
     AgendaModule,
     AdminModule,
   ],

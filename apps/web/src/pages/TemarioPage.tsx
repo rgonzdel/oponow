@@ -62,6 +62,12 @@ export function TemarioPage() {
           Solo se muestran los temas a los que tienes acceso con tu plan
           actual. Vamos ampliando el temario progresivamente.
         </p>
+        <Link
+          to={`/oposiciones/${slug}/flashcards`}
+          className="mt-4 inline-flex items-center gap-2 rounded-md border border-ink-divider px-3 py-1.5 text-sm text-accent transition-colors hover:border-accent"
+        >
+          Repasar con flashcards →
+        </Link>
 
         {totalOficial > 0 && (
           <div className="mt-6 flex items-center gap-4 rounded-lg border border-ink-divider bg-ink-surface p-4">

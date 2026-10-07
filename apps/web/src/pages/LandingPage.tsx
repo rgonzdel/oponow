@@ -61,7 +61,11 @@ export function LandingPage() {
   const convocatorias = new Set(disponibles.flatMap((o) => o.aniosExamenes)).size;
 
   return (
-    <div>
+    <div className="relative isolate">
+      {/* Luces difuminadas de fondo (orbes), como en las pantallas de acceso. */}
+      <div className="fondo-luces" aria-hidden>
+        <span className="fondo-luces__orbe" />
+      </div>
       <SiteHeader />
 
       <main>

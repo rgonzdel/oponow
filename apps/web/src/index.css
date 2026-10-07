@@ -334,3 +334,54 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .boton-google, .boton-google * , .boton-google::after { animation: none !important; transition: none !important; }
 }
+
+/* Luces difuminadas de fondo (orbes de degradado radial con desenfoque que
+   se desplazan despacio). Versión de tres luces para páginas largas como la
+   portada: fijas en pantalla mientras se hace scroll. */
+.fondo-luces {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fondo-luces::before,
+.fondo-luces::after,
+.fondo-luces__orbe {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+.fondo-luces::before {
+  width: 44rem;
+  height: 44rem;
+  left: -14rem;
+  top: -16rem;
+  background: radial-gradient(circle, rgba(145, 132, 217, 0.34), transparent 65%);
+  animation: auth-deriva 24s ease-in-out infinite alternate;
+}
+.fondo-luces::after {
+  width: 40rem;
+  height: 40rem;
+  right: -12rem;
+  bottom: -14rem;
+  background: radial-gradient(circle, rgba(93, 82, 148, 0.42), transparent 65%);
+  animation: auth-deriva 28s ease-in-out -9s infinite alternate-reverse;
+}
+.fondo-luces__orbe {
+  width: 30rem;
+  height: 30rem;
+  right: 8%;
+  top: 22%;
+  background: radial-gradient(circle, rgba(181, 171, 252, 0.2), transparent 65%);
+  animation: fondo-luces-flota 32s ease-in-out -5s infinite alternate;
+}
+@keyframes fondo-luces-flota {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-9rem, 6rem) scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fondo-luces::before, .fondo-luces::after, .fondo-luces__orbe { animation: none; }
+}

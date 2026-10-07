@@ -21,6 +21,7 @@ import { RecuperarContrasenaPage } from "./pages/RecuperarContrasenaPage";
 import { FlashcardsOposicionesPage, FlashcardsPage } from "./pages/FlashcardsPage";
 import { FlashcardsSesionPage } from "./pages/FlashcardsSesionPage";
 import { CuentaPage } from "./pages/CuentaPage";
+import { CheckoutExitoPage } from "./pages/CheckoutExitoPage";
 import { ConfirmarEmailPage } from "./pages/ConfirmarEmailPage";
 import { RestablecerContrasenaPage } from "./pages/RestablecerContrasenaPage";
 
@@ -128,6 +129,14 @@ export function App() {
               <RedirectIfAuthenticated>
                 <RegisterPage />
               </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path="/checkout/exito"
+            element={
+              <RequireAuth>
+                <CheckoutExitoPage />
+              </RequireAuth>
             }
           />
           <Route

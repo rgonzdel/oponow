@@ -9,8 +9,8 @@ import { buttonClass } from "../components/button";
 import { LoadingScreen } from "../components/LoadingScreen";
 import { checkoutSchema, type CheckoutFormValues } from "../lib/schemas";
 import { ApiError } from "../lib/api-client";
-import { getSubscriptionStatus, subscribeWithTrial } from "../lib/billing-client";
-import { OPOSICIONES, PLAN_PRECIO, type BillingCycle } from "@oponow/shared-types";
+import { crearCheckout, getPasarela, getSubscriptionStatus, subscribeWithTrial } from "../lib/billing-client";
+import { OPOSICIONES, PLAN_FEATURES, PLAN_PRECIO, type BillingCycle } from "@oponow/shared-types";
 
 const TRIAL_DAYS = 7;
 
@@ -36,6 +36,13 @@ export function CheckoutPage() {
   const catalogEntry = OPOSICIONES.find((o) => o.slug === slug);
   const navigate = useNavigate();
   const { refreshSession } = useAuth();
+
+  const pasarela = useQuery({ queryKey: ["billing", "pasarela"], queryFn: getPasarela, staleTime: Infinity });
+  const irAStripe = useMutation({
+    mutationFn: () => crearCheckout(slug, ciclo),
+    // La página de pago es de Stripe: el número de tarjeta nunca pasa por Oponow.
+    onSuccess: ({ url }) => window.location.assign(url),
+  });
 
   const statusQuery = useQuery({
     queryKey: ["billing", "subscription", slug],
@@ -65,7 +72,7 @@ export function CheckoutPage() {
     return <Navigate to="/oposiciones" replace />;
   }
 
-  if (statusQuery.isLoading) return <LoadingScreen />;
+  if (statusQuery.isLoading || pasarela.isLoading) return <LoadingScreen />;
 
   const nombre = statusQuery.data?.oposicionNombre ?? catalogEntry.nombre;
 
@@ -108,6 +115,38 @@ export function CheckoutPage() {
               </p>
             </div>
 
+            {pasarela.data?.tipo === "stripe" ? (
+              <div className="mt-6 space-y-4">
+                <ul className="space-y-2 text-sm text-neutral-300">
+                  {PLAN_FEATURES.map((f) => (
+                    <li key={f} className="flex gap-2">
+                      <span className="text-green-400" aria-hidden>✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                {irAStripe.isError && (
+                  <p className="text-sm text-red-400">
+                    {irAStripe.error instanceof ApiError ? irAStripe.error.message : "No se ha podido abrir la página de pago"}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => irAStripe.mutate()}
+                  disabled={irAStripe.isPending || irAStripe.isSuccess}
+                  className={buttonClass("primary", "w-full")}
+                >
+                  {irAStripe.isPending || irAStripe.isSuccess ? "Abriendo el pago seguro…" : "Continuar al pago seguro"}
+                </button>
+                <p className="flex items-center justify-center gap-1.5 text-center text-xs text-neutral-500">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  </svg>
+                  Pagarás en la página segura de Stripe con tarjeta, Apple Pay o Google Pay.
+                </p>
+              </div>
+            ) : (
             <form
               onSubmit={handleSubmit((values) => mutation.mutate(values))}
               className="mt-6 space-y-4"
@@ -183,6 +222,7 @@ export function CheckoutPage() {
                 momento desde tu cuenta.
               </p>
             </form>
+            )}
           </>
         )}
       </main>

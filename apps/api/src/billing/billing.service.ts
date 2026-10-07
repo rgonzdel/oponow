@@ -10,6 +10,7 @@ import { schema } from "@oponow/db";
 import { getRequestDb } from "../database/request-context";
 import { PAYMENT_GATEWAY, type PaymentGateway } from "./gateway/payment-gateway";
 import type { SubscribeDto } from "./dto/subscribe.dto";
+import { StripeBillingService } from "./stripe-billing.service";
 
 const TRIAL_DAYS = 7;
 // Mismos precios que packages/shared-types/src/pricing.ts (PLAN_PRECIO), en
@@ -31,12 +32,15 @@ export interface SubscriptionStatus {
   importeCentimos?: number | null;
   proximoPago?: Date | null;
   metodoPago?: MetodoPago | null;
+  /** Si está programada su cancelación: fecha en que dejará de tener acceso. */
+  cancelaEl?: Date | null;
 }
 
 @Injectable()
 export class BillingService {
   constructor(
     @Inject(PAYMENT_GATEWAY) private readonly gateway: PaymentGateway,
+    private readonly stripe: StripeBillingService,
   ) {}
 
   async listActive(userId: string): Promise<SubscriptionStatus[]> {
@@ -56,6 +60,7 @@ export class BillingService {
         tarjetaUltimos4: schema.suscripcionesOposicion.tarjetaUltimos4,
         tarjetaCaducidad: schema.suscripcionesOposicion.tarjetaCaducidad,
         bizumTelefonoUltimos: schema.suscripcionesOposicion.bizumTelefonoUltimos,
+        fechaFin: schema.suscripcionesOposicion.fechaFin,
       })
       .from(schema.suscripcionesOposicion)
       .innerJoin(
@@ -78,13 +83,14 @@ export class BillingService {
       ciclo: r.ciclo,
       // Suscripciones anteriores a guardar estos datos: se deducen.
       importeCentimos: r.importeCentimos ?? PRECIO_CENTIMOS[r.ciclo],
-      proximoPago: r.proximoCobro ?? (r.estado === "trialing" ? r.trialEndsAt : null),
+      proximoPago: r.proximoCobro ?? (r.estado === "trialing" && !r.fechaFin ? r.trialEndsAt : null),
       metodoPago:
         r.metodoPago === "bizum"
           ? { tipo: "bizum", telefonoUltimos: r.bizumTelefonoUltimos }
           : r.metodoPago === "tarjeta"
             ? { tipo: "tarjeta", marca: r.tarjetaMarca, ultimos4: r.tarjetaUltimos4, caducidad: r.tarjetaCaducidad }
             : null,
+      cancelaEl: r.fechaFin,
     }));
   }
 
@@ -242,6 +248,10 @@ export class BillingService {
       .limit(1);
     if (!sub) throw new NotFoundException("No tienes una suscripción activa a esta oposición");
 
+    if (sub.externa?.startsWith("sub_") && this.stripe.configurado) {
+      await this.stripe.cancelarAlFinal(sub.externa);
+      return { oposicionSlug, oposicionNombre: oposicion.nombre, subscribed: true, estado: null, trialEndsAt: null };
+    }
     if (sub.externa) await this.gateway.cancelSubscription(sub.externa);
     await db
       .update(schema.suscripcionesOposicion)

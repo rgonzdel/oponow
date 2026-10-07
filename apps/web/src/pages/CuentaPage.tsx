@@ -7,7 +7,13 @@ import { LoadingScreen } from "../components/LoadingScreen";
 import { FormField, TextInput } from "../components/FormField";
 import { buttonClass } from "../components/button";
 import { ApiError } from "../lib/api-client";
-import { cancelSubscription, listMySubscriptions, type SubscriptionStatus } from "../lib/billing-client";
+import {
+  abrirPortalPagos,
+  cancelSubscription,
+  getPasarela,
+  listMySubscriptions,
+  type SubscriptionStatus,
+} from "../lib/billing-client";
 import {
   borrarCuenta,
   cambiarContrasena,
@@ -225,6 +231,9 @@ function SeccionSuscripcion({
   const queryClient = useQueryClient();
   const { refreshSession } = useAuth();
   const [confirmando, setConfirmando] = useState<string | null>(null);
+  const pasarela = useQuery({ queryKey: ["billing", "pasarela"], queryFn: getPasarela, staleTime: Infinity });
+  const portal = useMutation({ mutationFn: abrirPortalPagos, onSuccess: ({ url }) => window.location.assign(url) });
+  const conStripe = pasarela.data?.tipo === "stripe";
   const cancelar = useMutation({
     mutationFn: (slug: string) => cancelSubscription(slug),
     onSuccess: async () => {
@@ -252,6 +261,7 @@ function SeccionSuscripcion({
           )}
         </div>
       ) : (
+        <>
         <ul className="space-y-3">
           {suscripciones.map((s) => (
             <li key={s.oposicionSlug} className="rounded-md border border-ink-divider p-4">
@@ -280,11 +290,17 @@ function SeccionSuscripcion({
                   <MetodoPago metodo={s.metodoPago ?? null} />
                 </Dato>
               </dl>
-              {confirmando === s.oposicionSlug ? (
+              {s.cancelaEl && (
+                <p className="mt-3 rounded-md bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
+                  Cancelada: mantienes el acceso hasta el {FECHA.format(new Date(s.cancelaEl))} y no se te cobrará más.
+                </p>
+              )}
+              {s.cancelaEl ? null : confirmando === s.oposicionSlug ? (
                 <div className="mt-3 rounded-md border border-red-400/40 bg-red-500/10 p-3">
                   <p className="text-sm text-ink-text">
-                    ¿Cancelar la suscripción? Dejarás de tener acceso a los temas de pago de esta oposición. Tu progreso se
-                    conserva.
+                    {conStripe
+                      ? "¿Cancelar la suscripción? No se te volverá a cobrar y mantendrás el acceso hasta el final del periodo ya pagado (o de la prueba). Tu progreso se conserva."
+                      : "¿Cancelar la suscripción? Dejarás de tener acceso a los temas de pago de esta oposición. Tu progreso se conserva."}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button type="button" onClick={() => cancelar.mutate(s.oposicionSlug)} disabled={cancelar.isPending} className="rounded-md border border-red-400/60 px-3 py-1.5 text-sm text-red-300 transition-colors hover:bg-red-500/15">
@@ -304,6 +320,16 @@ function SeccionSuscripcion({
             </li>
           ))}
         </ul>
+        {conStripe && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-ink-divider pt-4">
+            <p className="text-xs text-neutral-500">Cambia la tarjeta, descarga tus facturas o reactiva la suscripción.</p>
+            <button type="button" onClick={() => portal.mutate()} disabled={portal.isPending || portal.isSuccess} className={buttonClass("ghost")}>
+              {portal.isPending || portal.isSuccess ? "Abriendo…" : "Gestionar pago y facturas"}
+            </button>
+            {portal.isError && <p className="w-full text-xs text-red-400">{mensajeError(portal.error, "No se ha podido abrir la gestión de pagos")}</p>}
+          </div>
+        )}
+        </>
       )}
     </Tarjeta>
   );

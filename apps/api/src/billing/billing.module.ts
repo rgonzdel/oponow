@@ -3,10 +3,13 @@ import { BillingController } from "./billing.controller";
 import { BillingService } from "./billing.service";
 import { PAYMENT_GATEWAY } from "./gateway/payment-gateway";
 import { MockPaymentGateway } from "./gateway/mock-payment.gateway";
+import { StripeBillingService } from "./stripe-billing.service";
+import { StripeWebhookController } from "./stripe-webhook.controller";
 
 @Module({
-  controllers: [BillingController],
+  controllers: [StripeWebhookController, BillingController],
   providers: [
+    StripeBillingService,
     BillingService,
     // Único punto que hay que tocar para pasar a Stripe real: cambiar
     // useClass por StripePaymentGateway (mismo contrato, ver payment-gateway.ts).

@@ -16,6 +16,8 @@ export interface SubscriptionStatus {
     | { tipo: "tarjeta"; marca: string | null; ultimos4: string | null; caducidad: string | null }
     | { tipo: "bizum"; telefonoUltimos: string | null }
     | null;
+  /** Cancelación programada: fecha en que se pierde el acceso. */
+  cancelaEl?: string | null;
 }
 
 export interface SubscribePayload {
@@ -46,4 +48,21 @@ export function subscribeWithTrial(payload: SubscribePayload) {
 
 export function cancelSubscription(oposicionSlug: string) {
   return apiFetch<SubscriptionStatus>(`/billing/subscriptions/${oposicionSlug}/cancelar`, { method: "POST" });
+}
+
+/** "stripe": página de pago de Stripe; "simulada": formulario propio de pruebas. */
+export function getPasarela() {
+  return apiFetch<{ tipo: "stripe" | "simulada" }>("/billing/pasarela");
+}
+
+export function crearCheckout(oposicionSlug: string, ciclo: "mensual" | "anual") {
+  return apiFetch<{ url: string }>("/billing/checkout", { method: "POST", body: JSON.stringify({ oposicionSlug, ciclo }) });
+}
+
+export function confirmarCheckout(sessionId: string) {
+  return apiFetch<{ oposicionSlug: string }>("/billing/checkout/confirmar", { method: "POST", body: JSON.stringify({ sessionId }) });
+}
+
+export function abrirPortalPagos() {
+  return apiFetch<{ url: string }>("/billing/portal", { method: "POST" });
 }

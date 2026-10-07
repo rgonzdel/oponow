@@ -11,8 +11,24 @@ export const registerSchema = z.object({
   password: z.string().min(8, "Mínimo 8 caracteres").max(72),
 });
 
+export const recuperarSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
+
+export const restablecerSchema = z
+  .object({
+    password: z.string().min(8, "Mínimo 8 caracteres").max(72, "Máximo 72 caracteres"),
+    confirmacion: z.string(),
+  })
+  .refine((v) => v.password === v.confirmacion, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmacion"],
+  });
+
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+export type RecuperarFormValues = z.infer<typeof recuperarSchema>;
+export type RestablecerFormValues = z.infer<typeof restablecerSchema>;
 
 // Refleja apps/api/src/billing/dto/subscribe.dto.ts. El número de tarjeta
 // se valida ya sin espacios (el formulario los quita al enviar).

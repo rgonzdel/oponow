@@ -17,6 +17,8 @@ import { FallosPage } from "./pages/FallosPage";
 import { AgendaPage } from "./pages/AgendaPage";
 import { LegalPage } from "./pages/LegalPage";
 import { AdminPage } from "./pages/AdminPage";
+import { RecuperarContrasenaPage } from "./pages/RecuperarContrasenaPage";
+import { RestablecerContrasenaPage } from "./pages/RestablecerContrasenaPage";
 
 export function App() {
   return (
@@ -100,6 +102,8 @@ export function App() {
               </RedirectIfAuthenticated>
             }
           />
+          <Route path="/recuperar-contrasena" element={<RecuperarContrasenaPage />} />
+          <Route path="/restablecer-contrasena" element={<RestablecerContrasenaPage />} />
           <Route
             path="/dashboard"
             element={

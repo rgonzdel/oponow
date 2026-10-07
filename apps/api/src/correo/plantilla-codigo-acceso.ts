@@ -6,9 +6,9 @@
 export const CID_CABECERA = "cabecera-oponow@oponow.com";
 export const CID_ESCUDO = "escudo-oponow@oponow.com";
 export const CID_RELOJ = "reloj-oponow@oponow.com";
-const WEB = "https://www.oponow.com";
+export const WEB = "https://www.oponow.com";
 
-const C = {
+export const C = {
   fondo: "#eef0f8",
   tarjeta: "#ffffff",
   cabecera: "#161826",
@@ -23,7 +23,7 @@ const C = {
   avisoFondo: "#fff8eb",
   avisoBorde: "#f5b544",
 };
-const FUENTE = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+export const FUENTE = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 const FUENTE_CODIGO = "'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
 
 export interface DatosCodigoAcceso {
@@ -216,7 +216,7 @@ export function describirDispositivo(ua?: string): string {
   return sistema ? `${navegador} en ${sistema}` : navegador;
 }
 
-function formatearFecha(fecha: Date): string {
+export function formatearFecha(fecha: Date): string {
   const texto = new Intl.DateTimeFormat("es-ES", {
     timeZone: "Europe/Madrid",
     day: "numeric",
@@ -228,7 +228,7 @@ function formatearFecha(fecha: Date): string {
   return `${texto} (hora peninsular)`;
 }
 
-function escapar(s: string): string {
+export function escapar(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

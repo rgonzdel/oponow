@@ -50,6 +50,13 @@
       "when": 1791322671636,
       "tag": "0006_login_externo_y_mfa",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791375379047,
+      "tag": "0007_restablecer_contrasena",
+      "breakpoints": true
     }
   ]
 }

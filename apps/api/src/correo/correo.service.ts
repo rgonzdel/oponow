@@ -12,6 +12,19 @@ import {
   textoCodigoAcceso,
   type DatosCodigoAcceso,
 } from "./plantilla-codigo-acceso";
+import {
+  ASUNTO_RESTABLECER_CONTRASENA,
+  htmlRestablecerContrasena,
+  textoRestablecerContrasena,
+  type DatosRestablecerContrasena,
+} from "./plantilla-restablecer-contrasena";
+
+interface Mensaje {
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+}
 
 /**
  * Envío de correo transaccional por SMTP con el buzón propio del dominio
@@ -71,13 +84,34 @@ export class CorreoService {
   }
 
   async enviarCodigoAcceso(datos: DatosCodigoAcceso): Promise<void> {
-    const mensaje = {
-      to: datos.email,
-      replyTo: this.responderA,
-      subject: asuntoCodigoAcceso(datos.codigo),
-      text: textoCodigoAcceso(datos),
-      html: htmlCodigoAcceso(datos),
-    };
+    await this.enviar(
+      {
+        to: datos.email,
+        subject: asuntoCodigoAcceso(datos.codigo),
+        text: textoCodigoAcceso(datos),
+        html: htmlCodigoAcceso(datos),
+      },
+      // Solo para desarrollo local: sin SMTP, el código se ve en el log.
+      `Código de acceso para ${datos.email}: ${datos.codigo}`,
+    );
+  }
+
+  async enviarRestablecerContrasena(datos: DatosRestablecerContrasena): Promise<void> {
+    await this.enviar(
+      {
+        to: datos.email,
+        subject: ASUNTO_RESTABLECER_CONTRASENA,
+        text: textoRestablecerContrasena(datos),
+        html: htmlRestablecerContrasena(datos),
+      },
+      `Enlace para restablecer la contraseña de ${datos.email}: ${datos.enlace}`,
+    );
+  }
+
+  /** `sinSmtp`: lo que se escribe en el log cuando no hay forma de enviar
+   * (desarrollo local), para poder seguir el flujo igualmente. */
+  private async enviar(datos: Mensaje, sinSmtp: string): Promise<void> {
+    const mensaje = { ...datos, replyTo: this.responderA };
     if (this.reenvio) {
       const res = await fetch(this.reenvio.url, {
         method: "POST",
@@ -97,8 +131,7 @@ export class CorreoService {
       return;
     }
     if (!this.transporte) {
-      // Solo para desarrollo local: sin SMTP, el código se ve en el log.
-      this.logger.warn(`SMTP sin configurar. Código de acceso para ${datos.email}: ${datos.codigo}`);
+      this.logger.warn(`SMTP sin configurar. ${sinSmtp}`);
       return;
     }
     await this.transporte.sendMail({

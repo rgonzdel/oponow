@@ -21,6 +21,7 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
@@ -69,6 +70,15 @@ export function LoginPage() {
             {...register("password")}
           />
         </FormField>
+        <div className="-mt-2 text-right">
+          <Link
+            to="/recuperar-contrasena"
+            state={{ email: watch("email") }}
+            className="text-xs text-neutral-400 transition-colors hover:text-accent"
+          >
+            ¿Has olvidado tu contraseña?
+          </Link>
+        </div>
 
         {mutation.isError && (
           <p className="text-sm text-red-400">

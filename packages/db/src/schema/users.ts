@@ -74,6 +74,24 @@ export const desafiosMfa = pgTable("desafios_mfa", {
   index("desafios_mfa_usuario_id_idx").on(t.usuarioId),
 ]);
 
+// "He olvidado mi contraseña": enlace de un solo uso enviado al correo. Solo
+// se guarda el hash del token (como los refresh tokens).
+export const restablecimientosContrasena = pgTable("restablecimientos_contrasena", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  usuarioId: uuid("usuario_id")
+    .notNull()
+    .references(() => usuarios.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull(),
+  expiraEn: timestamp("expira_en", { withTimezone: true }).notNull(),
+  usadoEn: timestamp("usado_en", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+}, (t) => [
+  uniqueIndex("restablecimientos_contrasena_token_hash_idx").on(t.tokenHash),
+  index("restablecimientos_contrasena_usuario_id_idx").on(t.usuarioId),
+]);
+
 // Navegadores/dispositivos que ya pasaron el MFA: no se les vuelve a pedir
 // código hasta que caducan. El token viaja en una cookie httpOnly (web) o en
 // el body (móvil); aquí solo su hash.

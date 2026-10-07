@@ -8,6 +8,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   identidades_externas,
   desafios_mfa,
   dispositivos_confianza,
+  restablecimientos_contrasena,
   intentos_test,
   respuestas_usuario,
   suscripciones_oposicion,

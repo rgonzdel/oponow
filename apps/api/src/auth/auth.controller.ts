@@ -24,6 +24,7 @@ import { LoginDto } from "./dto/login.dto";
 import { FacebookLoginDto, GoogleLoginDto } from "./dto/social.dto";
 import { MfaReenviarDto, MfaVerificarDto } from "./dto/mfa.dto";
 import { RefreshDto } from "./dto/refresh.dto";
+import { ComprobarEnlaceDto, OlvidadaDto, RestablecerDto } from "./dto/contrasena.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { CurrentUser } from "./decorators/current-user.decorator";
 import type { AuthenticatedUser } from "./strategies/jwt.strategy";
@@ -40,6 +41,8 @@ import {
 const AUTH_THROTTLE = { default: { limit: 5, ttl: 60_000 } };
 // Cada reenvío manda un correo: más estricto todavía.
 const MFA_REENVIO_THROTTLE = { default: { limit: 3, ttl: 10 * 60_000 } };
+// "He olvidado mi contraseña" también manda correos.
+const OLVIDADA_THROTTLE = { default: { limit: 5, ttl: 10 * 60_000 } };
 
 @Controller("auth")
 export class AuthController {
@@ -96,6 +99,40 @@ export class AuthController {
     @Headers("user-agent") userAgent?: string,
   ): Promise<void> {
     await this.authService.reenviarMfa(dto.desafioId, userAgent);
+  }
+
+  /** Envía el enlace para elegir contraseña nueva. Siempre 204, exista o
+   * no la cuenta. */
+  @Post("contrasena/olvidada")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle(OLVIDADA_THROTTLE)
+  async contrasenaOlvidada(
+    @Body() dto: OlvidadaDto,
+    @Headers("user-agent") userAgent?: string,
+  ): Promise<void> {
+    await this.authService.solicitarRestablecerContrasena(dto.email, userAgent);
+  }
+
+  // El token va en el body (no en la URL de la API) para que no quede en
+  // los registros de acceso.
+  @Post("contrasena/comprobar")
+  @HttpCode(HttpStatus.OK)
+  @Throttle(AUTH_THROTTLE)
+  comprobarEnlace(@Body() dto: ComprobarEnlaceDto): Promise<{ email: string }> {
+    return this.authService.comprobarEnlaceContrasena(dto.token);
+  }
+
+  @Post("contrasena/restablecer")
+  @HttpCode(HttpStatus.OK)
+  @Throttle(AUTH_THROTTLE)
+  async restablecerContrasena(
+    @Body() dto: RestablecerDto,
+    @Res({ passthrough: true }) res: Response,
+    @Headers("user-agent") userAgent?: string,
+  ): Promise<AuthTokens> {
+    const tokens = await this.authService.restablecerContrasena(dto.token, dto.password, userAgent);
+    this.entregarSesion(res, tokens);
+    return tokens;
   }
 
   /** Público: qué botones de acceso debe mostrar la web. */

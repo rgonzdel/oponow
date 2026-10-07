@@ -73,6 +73,18 @@ DROP POLICY IF EXISTS desafios_mfa_auth_service_update ON desafios_mfa;
 CREATE POLICY desafios_mfa_auth_service_update ON desafios_mfa
   FOR UPDATE TO auth_service USING (true) WITH CHECK (true);
 
+ALTER TABLE restablecimientos_contrasena ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS restablecimientos_contrasena_self ON restablecimientos_contrasena;
+CREATE POLICY restablecimientos_contrasena_self ON restablecimientos_contrasena
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
+-- El enlace del correo solo trae el token: se busca por su hash antes de
+-- saber de quién es. auth-grants.sql limita las columnas.
+DROP POLICY IF EXISTS restablecimientos_contrasena_auth_service_select ON restablecimientos_contrasena;
+CREATE POLICY restablecimientos_contrasena_auth_service_select ON restablecimientos_contrasena
+  FOR SELECT TO auth_service USING (true);
+
 ALTER TABLE dispositivos_confianza ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS dispositivos_confianza_self ON dispositivos_confianza;
 CREATE POLICY dispositivos_confianza_self ON dispositivos_confianza

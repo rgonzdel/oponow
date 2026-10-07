@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   HttpException,
   HttpStatus,
@@ -12,7 +13,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { createHmac, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
 import * as argon2 from "argon2";
-import { and, eq, sql as dsql } from "drizzle-orm";
+import { and, eq, gt, isNull, sql as dsql } from "drizzle-orm";
 import { createDb, schema, type Database, type Sql } from "@oponow/db";
 import { AUTH_DATABASE_POOL } from "../database/database.module";
 import { getRequestDb } from "../database/request-context";
@@ -57,6 +58,12 @@ const MFA_MAX_REENVIOS = 3;
 const MFA_REENVIO_ESPERA_S = 30;
 const DISPOSITIVO_TTL_MS = 30 * 86_400_000;
 const MFA_INVALIDO = "El código ha caducado o ya no es válido. Vuelve a iniciar sesión.";
+
+const RESTABLECER_MIN = 60;
+// Un correo por minuto como mucho para la misma cuenta (además del límite
+// por IP del controlador): evita usar el formulario para inundar un buzón.
+const RESTABLECER_ESPERA_S = 60;
+const ENLACE_INVALIDO = "El enlace no es válido o ha caducado. Pide uno nuevo.";
 
 const INVALID_CREDENTIALS = "Credenciales inválidas";
 const INVALID_REFRESH = "Refresh token inválido o expirado";
@@ -362,6 +369,134 @@ export class AuthService {
         "No hemos podido enviarte el código. Inténtalo de nuevo en unos minutos.",
       );
     }
+  }
+
+  /**
+   * "He olvidado mi contraseña". No dice si el email existe (la respuesta es
+   * la misma), y el correo se envía en segundo plano para que el tiempo de
+   * respuesta tampoco lo delate.
+   */
+  async solicitarRestablecerContrasena(email: string, userAgent?: string): Promise<void> {
+    const [user] = await this.authDb
+      .select({ id: schema.usuarios.id, email: schema.usuarios.email })
+      .from(schema.usuarios)
+      .where(dsql`lower(${schema.usuarios.email}) = ${email.toLowerCase()}`)
+      .limit(1);
+    if (!user?.email) return;
+
+    const db = getRequestDb();
+    await db.execute(dsql`SELECT set_config('app.current_user_id', ${user.id}, false)`);
+    const [reciente] = await db
+      .select({ id: schema.restablecimientosContrasena.id })
+      .from(schema.restablecimientosContrasena)
+      .where(
+        and(
+          eq(schema.restablecimientosContrasena.usuarioId, user.id),
+          gt(schema.restablecimientosContrasena.createdAt, new Date(Date.now() - RESTABLECER_ESPERA_S * 1000)),
+        ),
+      )
+      .limit(1);
+    if (reciente) return;
+
+    const token = generateRefreshToken();
+    await db.insert(schema.restablecimientosContrasena).values({
+      usuarioId: user.id,
+      tokenHash: hashRefreshToken(token),
+      expiraEn: new Date(Date.now() + RESTABLECER_MIN * 60_000),
+    });
+    const web = this.configService.get<string>("WEB_ORIGIN", "https://www.oponow.com").replace(/\/$/, "");
+    void this.correo
+      .enviarRestablecerContrasena({
+        email: user.email,
+        enlace: `${web}/restablecer-contrasena?token=${token}`,
+        minutosValidez: RESTABLECER_MIN,
+        userAgent,
+      })
+      .catch((e) =>
+        this.logger.error(`No se pudo enviar el enlace de contraseña: ${e instanceof Error ? e.message : String(e)}`),
+      );
+  }
+
+  /** Al abrir el enlace: si sigue valiendo, a qué cuenta corresponde. */
+  async comprobarEnlaceContrasena(token: string): Promise<{ email: string }> {
+    const enlace = await this.enlaceVigente(token);
+    const [user] = await this.authDb
+      .select({ email: schema.usuarios.email })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, enlace.usuarioId))
+      .limit(1);
+    if (!user?.email) throw new BadRequestException(ENLACE_INVALIDO);
+    return { email: enmascararEmail(user.email) };
+  }
+
+  /**
+   * Fija la contraseña nueva, cierra el resto de sesiones e inicia sesión
+   * aquí. Abrir el enlace del correo demuestra que el email es suyo, así que
+   * este navegador queda como de confianza (no pide el código MFA).
+   */
+  async restablecerContrasena(token: string, password: string, userAgent?: string): Promise<AuthTokens> {
+    const enlace = await this.enlaceVigente(token);
+    const [user] = await this.authDb
+      .select({ plan: schema.usuarios.plan, esAdmin: schema.usuarios.esAdmin })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, enlace.usuarioId))
+      .limit(1);
+    if (!user) throw new BadRequestException(ENLACE_INVALIDO);
+
+    const db = getRequestDb();
+    await db.execute(dsql`SELECT
+      set_config('app.current_user_id', ${enlace.usuarioId}, false),
+      set_config('app.current_plan', ${user.plan}, false),
+      set_config('app.is_admin', ${String(user.esAdmin)}, false)`);
+
+    // Un solo uso, también con dos peticiones a la vez: solo una consigue
+    // marcarlo. De paso se anulan los demás enlaces pendientes de la cuenta.
+    const ahora = new Date();
+    const marcados = await db
+      .update(schema.restablecimientosContrasena)
+      .set({ usadoEn: ahora })
+      .where(
+        and(
+          eq(schema.restablecimientosContrasena.usuarioId, enlace.usuarioId),
+          isNull(schema.restablecimientosContrasena.usadoEn),
+        ),
+      )
+      .returning({ id: schema.restablecimientosContrasena.id });
+    if (!marcados.some((m) => m.id === enlace.id)) throw new BadRequestException(ENLACE_INVALIDO);
+
+    await db
+      .update(schema.usuarios)
+      .set({ passwordHash: await argon2.hash(password, ARGON2_OPTIONS), emailVerified: true })
+      .where(eq(schema.usuarios.id, enlace.usuarioId));
+    // Si alguien más tenía la contraseña, pierde la sesión y la confianza
+    // de su navegador (tendría que volver a pasar el código del correo).
+    await db
+      .update(schema.refreshTokens)
+      .set({ revokedAt: ahora })
+      .where(and(eq(schema.refreshTokens.usuarioId, enlace.usuarioId), isNull(schema.refreshTokens.revokedAt)));
+    await db
+      .delete(schema.dispositivosConfianza)
+      .where(eq(schema.dispositivosConfianza.usuarioId, enlace.usuarioId));
+
+    const tokens = await this.issueTokens(db, enlace.usuarioId, user.plan, user.esAdmin, userAgent);
+    return { ...tokens, tokenDispositivo: await this.confiarDispositivo(db, enlace.usuarioId, userAgent) };
+  }
+
+  private async enlaceVigente(token: string) {
+    const [enlace] = await this.authDb
+      .select({
+        id: schema.restablecimientosContrasena.id,
+        usuarioId: schema.restablecimientosContrasena.usuarioId,
+        expiraEn: schema.restablecimientosContrasena.expiraEn,
+        usadoEn: schema.restablecimientosContrasena.usadoEn,
+      })
+      .from(schema.restablecimientosContrasena)
+      .where(eq(schema.restablecimientosContrasena.tokenHash, hashRefreshToken(token)))
+      .limit(1);
+    if (!enlace || enlace.usadoEn || enlace.expiraEn < new Date()) {
+      throw new BadRequestException(ENLACE_INVALIDO);
+    }
+    return enlace;
   }
 
   async refresh(refreshToken: string, userAgent?: string): Promise<AuthTokens> {

@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuth, type DesafioMfa } from "../auth/AuthContext";
 import { ApiError, apiFetch } from "../lib/api-client";
 import { buttonClass } from "./button";
+import { IconoEstado, type EstadoIcono } from "./IconoEstado";
 
 const REENVIO_S = 30;
 const LONGITUD = 6;
@@ -10,7 +11,7 @@ const LONGITUD = 6;
 // iniciar la sesión, que redirige al panel.
 const ANIMACION_OK_MS = 1600;
 
-type Estado = "espera" | "ok" | "error";
+type Estado = EstadoIcono;
 
 /** Segundo paso del login en un navegador nuevo: el código enviado al correo. */
 export function CodigoMfa({
@@ -100,7 +101,10 @@ export function CodigoMfa({
       }}
     >
       <div className="flex justify-center">
-        <IconoEstado estado={estado} />
+        <IconoEstado
+          estado={estado}
+          etiquetas={{ espera: "Correo enviado", ok: "Código correcto", error: "Código incorrecto" }}
+        />
       </div>
       <p className="text-center text-sm text-neutral-300" aria-live="polite">
         {estado === "ok" ? (
@@ -170,25 +174,3 @@ export function CodigoMfa({
   );
 }
 
-/**
- * Sobre que se transforma en check (verde) o en X (rojo). No hay fundidos:
- * los trazos del sobre se "desdibujan" mientras se dibujan los del nuevo
- * icono (stroke-dashoffset), y el resultado se queda fijo. Estilos en
- * index.css (.icono-mfa).
- */
-function IconoEstado({ estado }: { estado: Estado }) {
-  return (
-    <span className="icono-mfa" data-estado={estado} role="img" aria-label={estado === "ok" ? "Código correcto" : estado === "error" ? "Código incorrecto" : "Correo enviado"}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-        {/* Sobre */}
-        <rect className="icono-mfa__sobre" x="3" y="5" width="18" height="14" rx="2.5" pathLength={1} />
-        <path className="icono-mfa__sobre icono-mfa__sobre--solapa" d="m4 7 8 6 8-6" pathLength={1} />
-        {/* Check */}
-        <path className="icono-mfa__check" d="M5.5 12.5 10 17l8.5-9.5" strokeWidth={2.2} pathLength={1} />
-        {/* X */}
-        <path className="icono-mfa__x icono-mfa__x--1" d="M7 7l10 10" strokeWidth={2.2} pathLength={1} />
-        <path className="icono-mfa__x icono-mfa__x--2" d="M17 7 7 17" strokeWidth={2.2} pathLength={1} />
-      </svg>
-    </span>
-  );
-}

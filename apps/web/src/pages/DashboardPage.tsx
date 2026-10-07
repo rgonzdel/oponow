@@ -5,6 +5,7 @@ import { OponowLogo } from "../components/OponowLogo";
 import { buttonClass } from "../components/button";
 import { ResumenWidget } from "../components/ResumenWidget";
 import { MiniCalendar } from "../components/MiniCalendar";
+import { DescargarInforme } from "../components/DescargarInforme";
 import { listMySubscriptions } from "../lib/billing-client";
 
 const PLAN_LABEL: Record<string, string> = {
@@ -106,8 +107,9 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="lg:order-1">
+          <div className="space-y-4 lg:order-1">
             <ResumenWidget />
+            <DescargarInforme />
           </div>
         </div>
 

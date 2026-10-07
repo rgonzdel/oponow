@@ -78,7 +78,7 @@ const formateadorDeDia = new Intl.DateTimeFormat("en-CA", {
 });
 
 /** Día natural español ("YYYY-MM-DD") al que pertenece un instante. */
-function claveDeDia(fecha: Date): string {
+export function claveDeDia(fecha: Date): string {
   return formateadorDeDia.format(fecha);
 }
 
@@ -88,16 +88,16 @@ function claveDeDia(fecha: Date): string {
  * domingos del año en que cambia la hora — que es justo lo que rompería un
  * recorrido hecho a base de medianoches.
  */
-function anclaDeClave(clave: string): Date {
+export function anclaDeClave(clave: string): Date {
   const [anio, mes, dia] = clave.split("-").map(Number);
   return new Date(Date.UTC(anio, mes - 1, dia, 12));
 }
 
-function claveDeAncla(ancla: Date): string {
+export function claveDeAncla(ancla: Date): string {
   return ancla.toISOString().slice(0, 10);
 }
 
-function diaAnterior(ancla: Date): Date {
+export function diaAnterior(ancla: Date): Date {
   return new Date(ancla.getTime() - MS_POR_DIA);
 }
 
@@ -113,7 +113,7 @@ function claveDePeriodo(fecha: Date, groupBy: FallosGroupBy): string {
  * hacia atrás desde hoy. Si hoy todavía no tiene ningún intento pero ayer sí,
  * la racha sigue "viva" (no se corta hasta que se salta un día entero).
  */
-function calcularRacha(diasConIntento: Set<string>): number {
+export function calcularRacha(diasConIntento: Set<string>): number {
   let cursor = anclaDeClave(claveDeDia(new Date()));
   if (!diasConIntento.has(claveDeAncla(cursor))) {
     cursor = diaAnterior(cursor);

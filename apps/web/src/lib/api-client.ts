@@ -105,4 +105,17 @@ export async function apiFetch<T>(
   return res.json() as Promise<T>;
 }
 
+/** Igual que apiFetch, pero devuelve el cuerpo como Blob (PDF, etc.). */
+export async function apiFetchBlob(path: string, options: ApiFetchOptions = {}): Promise<Blob> {
+  let res = await rawFetch(path, options);
+  if (res.status === 401 && !options.skipAuth && (await tryRefresh())) {
+    res = await rawFetch(path, options);
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiError(res.status, body);
+  }
+  return res.blob();
+}
+
 const HTTP_NO_CONTENT = 204;

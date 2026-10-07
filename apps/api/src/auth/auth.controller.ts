@@ -112,7 +112,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Headers("user-agent") userAgent?: string,
   ): Promise<AuthTokens> {
-    const tokens = await this.authService.loginGoogle(dto.credential, userAgent);
+    const tokens = await this.authService.loginGoogle(dto, userAgent);
     setRefreshCookie(res, tokens.refreshToken, this.authService.refreshTtlMs);
     return tokens;
   }

@@ -48,6 +48,10 @@ export function AccesoAlternativo({
   );
 }
 
+// Botón propio (blanco, con hover y la G animada) en lugar del botón que
+// pinta Google en un iframe, que no se puede estilar. Abre la misma ventana
+// emergente de Google con el flujo de código de autorización: la API canjea
+// el código por el ID token y lo verifica igual que antes.
 function BotonGoogle({
   clientId,
   modo,
@@ -60,9 +64,11 @@ function BotonGoogle({
   onError: (m: string | null) => void;
 }) {
   const { loginCon } = useAuth();
-  const contenedor = useRef<HTMLDivElement>(null);
-  // El callback de Google se registra una sola vez; con la ref siempre ve
-  // las funciones actuales.
+  const cliente = useRef<{ requestCode(): void } | null>(null);
+  const [listo, setListo] = useState(false);
+  const [entrando, setEntrando] = useState(false);
+  // Los callbacks de Google se registran una sola vez; con la ref siempre
+  // ven las funciones actuales.
   const callbacks = useRef({ loginCon, onSuccess, onError });
   callbacks.current = { loginCon, onSuccess, onError };
 
@@ -70,40 +76,68 @@ function BotonGoogle({
     let cancelado = false;
     cargarScript("https://accounts.google.com/gsi/client")
       .then(() => {
-        const el = contenedor.current;
-        if (cancelado || !el || !window.google) return;
-        window.google.accounts.id.initialize({
+        const oauth2 = window.google?.accounts.oauth2;
+        if (cancelado || !oauth2) return;
+        cliente.current = oauth2.initCodeClient({
           client_id: clientId,
+          scope: "openid email profile",
           ux_mode: "popup",
-          context: modo,
-          callback: ({ credential }) => {
+          callback: (r) => {
             const c = callbacks.current;
-            c.onError(null);
-            c.loginCon("/auth/google", { credential })
+            if (!r.code) {
+              setEntrando(false);
+              if (r.error && r.error !== "access_denied") c.onError("No se ha podido entrar con Google");
+              return;
+            }
+            c.loginCon("/auth/google", { code: r.code })
               .then(c.onSuccess)
-              .catch((e) => c.onError(mensajeError(e, "No se ha podido entrar con Google")));
+              .catch((e) => c.onError(mensajeError(e, "No se ha podido entrar con Google")))
+              .finally(() => setEntrando(false));
+          },
+          error_callback: (e) => {
+            setEntrando(false);
+            // Cerrar la ventana de Google no es un error que haya que mostrar.
+            if (e.type !== "popup_closed") callbacks.current.onError("No se ha podido abrir la ventana de Google");
           },
         });
-        window.google.accounts.id.renderButton(el, {
-          type: "standard",
-          theme: "filled_black",
-          size: "large",
-          shape: "rectangular",
-          text: modo === "signup" ? "signup_with" : "continue_with",
-          logo_alignment: "center",
-          locale: "es",
-          width: el.clientWidth || 320,
-        });
+        setListo(true);
       })
       .catch(() => onError("No se ha podido cargar el acceso con Google"));
     return () => {
       cancelado = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clientId, modo]);
+  }, [clientId]);
 
-  // Altura reservada para que el botón de Google no haga saltar el layout al cargar.
-  return <div ref={contenedor} className="flex h-10 w-full justify-center overflow-hidden rounded-md" />;
+  return (
+    <button
+      type="button"
+      disabled={!listo || entrando}
+      onClick={() => {
+        onError(null);
+        setEntrando(true);
+        cliente.current?.requestCode();
+      }}
+      className="boton-google"
+    >
+      <span className="boton-google__g" aria-hidden>
+        <LogoGoogle />
+      </span>
+      <span>{entrando ? "Conectando con Google…" : modo === "signup" ? "Registrarse con Google" : "Continuar con Google"}</span>
+    </button>
+  );
+}
+
+// Logo oficial de Google (colores y proporciones sin modificar).
+function LogoGoogle() {
+  return (
+    <svg viewBox="0 0 48 48" width="20" height="20">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+    </svg>
+  );
 }
 
 function BotonFacebook({

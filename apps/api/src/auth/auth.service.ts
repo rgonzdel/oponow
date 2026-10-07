@@ -23,7 +23,7 @@ import {
 } from "./token.util";
 import type { RegisterDto } from "./dto/register.dto";
 import type { LoginDto } from "./dto/login.dto";
-import { verificarIdTokenGoogle } from "./proveedores/google-id-token";
+import { canjearCodigoGoogle, verificarIdTokenGoogle } from "./proveedores/google-id-token";
 import { verificarTokenFacebook } from "./proveedores/facebook";
 import { CorreoService } from "../correo/correo.service";
 
@@ -409,9 +409,21 @@ export class AuthService {
     };
   }
 
-  async loginGoogle(credential: string, userAgent?: string): Promise<AuthTokens> {
+  async loginGoogle(
+    datos: { credential?: string; code?: string },
+    userAgent?: string,
+  ): Promise<AuthTokens> {
     const clientId = this.googleClientId();
     if (!clientId) throw new ServiceUnavailableException("El acceso con Google no está disponible");
+    let credential = datos.credential;
+    if (datos.code) {
+      const secreto =
+        this.configService.get<string>("GOOGLE_LOGIN_CLIENT_SECRET") ||
+        this.configService.get<string>("GOOGLE_CLIENT_SECRET");
+      if (!secreto) throw new ServiceUnavailableException("El acceso con Google no está disponible");
+      credential = (await canjearCodigoGoogle(datos.code, clientId, secreto)) ?? undefined;
+    }
+    if (!credential) throw new UnauthorizedException("No se ha podido verificar tu cuenta de Google");
     const perfil = await verificarIdTokenGoogle(credential, clientId);
     if (!perfil) throw new UnauthorizedException("No se ha podido verificar tu cuenta de Google");
     return this.loginExterno("google", perfil, userAgent);

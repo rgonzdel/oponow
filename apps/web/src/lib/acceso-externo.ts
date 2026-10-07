@@ -36,6 +36,15 @@ declare global {
   interface Window {
     google?: {
       accounts: {
+        oauth2: {
+          initCodeClient(opts: {
+            client_id: string;
+            scope: string;
+            ux_mode: "popup";
+            callback: (r: { code?: string; error?: string }) => void;
+            error_callback?: (e: { type: string }) => void;
+          }): { requestCode(): void };
+        };
         id: {
           initialize(opts: {
             client_id: string;

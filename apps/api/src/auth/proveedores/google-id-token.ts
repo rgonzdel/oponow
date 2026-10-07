@@ -32,6 +32,32 @@ function decodificar<T>(parte: string): T {
   return JSON.parse(Buffer.from(parte, "base64url").toString("utf8")) as T;
 }
 
+/**
+ * Canjea el código de autorización del flujo en ventana emergente de Google
+ * Identity Services (redirect_uri "postmessage") por el ID token de la cuenta.
+ * Devuelve null si Google rechaza el código.
+ */
+export async function canjearCodigoGoogle(
+  codigo: string,
+  clientId: string,
+  clientSecret: string,
+): Promise<string | null> {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code: codigo,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: "postmessage",
+      grant_type: "authorization_code",
+    }),
+  });
+  if (!res.ok) return null;
+  const { id_token } = (await res.json()) as { id_token?: string };
+  return id_token ?? null;
+}
+
 /** Devuelve el perfil si el token es válido para `clientId`; null si no. */
 export async function verificarIdTokenGoogle(
   token: string,

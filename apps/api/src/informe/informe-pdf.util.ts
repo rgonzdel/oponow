@@ -1,5 +1,5 @@
 import { createElement as h, type ReactNode } from "react";
-import { Circle, Document, Page, StyleSheet, Svg, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { Document, Page, Path, StyleSheet, Svg, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { DatosInforme, TemaInforme } from "./informe.service";
 
 // Mismo patrón que temario/pdf/temario-pdf.util.ts: createElement en vez de
@@ -10,7 +10,7 @@ const Pag = Page as any;
 const V = View as any;
 const T = Text as any;
 const S = Svg as any;
-const C = Circle as any;
+const P = Path as any;
 
 // Informe pensado para leerse e imprimirse: fondo claro, cabecera con los
 // colores de marca (Nocturne) y un semáforo verde / ámbar / rojo para los
@@ -42,7 +42,6 @@ const s = StyleSheet.create({
   pagina: { paddingTop: 0, paddingBottom: 54, paddingHorizontal: 40, fontSize: 9.5, color: COLOR.texto },
   cabecera: { backgroundColor: COLOR.ink, marginHorizontal: -40, paddingHorizontal: 40, paddingTop: 26, paddingBottom: 22, marginBottom: 18 },
   marca: { flexDirection: "row", alignItems: "center", marginBottom: 14 },
-  marcaTexto: { fontSize: 12, fontFamily: "Helvetica-Bold", color: "#e9e9ed", marginLeft: 4 },
   titulo: { fontSize: 22, lineHeight: 1.2, fontFamily: "Helvetica-Bold", color: "#ffffff" },
   subtitulo: { fontSize: 10, lineHeight: 1.3, color: "#b2b6ca", marginTop: 4 },
   meta: { flexDirection: "row", marginTop: 12 },
@@ -101,10 +100,14 @@ function colorPct(pct: number) {
 const fmt = (n: number) => n.toLocaleString("es-ES");
 const fmtNota = (n: number | null) => (n === null ? "-" : n.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
 
-function logo(tam = 14) {
-  return h(S, { width: tam, height: tam, viewBox: "0 0 44 44" },
-    h(C, { cx: 22, cy: 22, r: 18, fill: COLOR.acento }),
-    h(C, { cx: 22, cy: 22, r: 11.5, fill: COLOR.ink }));
+// La "O" del logo (la misma del avatar de Google y de la web: anillo
+// abierto con la cuña), sin el texto. Geometría de OponowLogo.tsx.
+function logo(tam = 38) {
+  // viewBox con margen: el trazo del anillo y la punta de la cuña llegan al
+  // borde de 0 0 44 44 y se recortarían.
+  return h(S, { width: tam, height: tam, viewBox: "-3 -3 50 50" },
+    h(P, { d: "M37.98 27.82 A17 17 0 1 1 37.98 16.18", stroke: COLOR.acento, strokeWidth: 4.5, strokeLinecap: "round", fill: "none" }),
+    h(P, { d: "M34 15 L44 22 L34 29 Z", fill: COLOR.acento }));
 }
 
 function seccion(titulo: string, nota: string | null, ...hijos: ReactNode[]) {
@@ -241,7 +244,7 @@ export async function generarInformePdf(d: DatosInforme): Promise<Buffer> {
 
       // Cabecera
       h(V, { style: s.cabecera },
-        h(V, { style: s.marca }, logo(), h(T, { style: s.marcaTexto }, "ponow")),
+        h(V, { style: s.marca }, logo()),
         h(T, { style: s.titulo }, "Informe de progreso"),
         h(T, { style: s.subtitulo }, d.oposiciones.length ? d.oposiciones.join(" · ") : "Preparación de oposiciones"),
         h(V, { style: s.meta },

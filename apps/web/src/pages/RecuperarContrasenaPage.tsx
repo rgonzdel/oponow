@@ -49,24 +49,24 @@ export function RecuperarContrasenaPage() {
   const estado = enviar.isError ? "error" : enviado ? "ok" : "espera";
 
   return (
-    <AuthLayout title={enviado ? "Revisa tu correo" : "Recupera tu contraseña"}>
+    <AuthLayout title={enviado ? "Solicitud recibida" : "Recupera tu contraseña"}>
       <div className="auth-pop space-y-4">
         <div className="flex justify-center">
           <IconoEstado
             estado={estado}
-            etiquetas={{ espera: "Correo", ok: "Enlace enviado", error: "No se ha podido enviar" }}
+            etiquetas={{ espera: "Correo", ok: "Solicitud recibida", error: "No se ha podido enviar" }}
           />
         </div>
 
         {enviado ? (
           <>
             <p className="text-center text-sm text-neutral-300" aria-live="polite">
-              Si existe una cuenta con la dirección
-              <span className="my-0.5 block font-medium text-ink-text">{getValues("email")}</span>
-              te hemos enviado un enlace para elegir una contraseña nueva.
+              Si la dirección que has escrito corresponde a una cuenta de Oponow, recibirás un correo con un
+              enlace para elegir una contraseña nueva.
             </p>
             <p className="text-center text-xs text-neutral-500">
-              Si no te llega, comprueba que la dirección es correcta y mira en la carpeta de spam. El enlace caduca en 60 minutos.
+              ¿No lo recibes en unos minutos? Revisa la carpeta de spam o comprueba que escribiste bien la
+              dirección. El enlace caduca en 60 minutos.
             </p>
             <Link to="/login" className={buttonClass("primary", "w-full")}>
               Volver a iniciar sesión

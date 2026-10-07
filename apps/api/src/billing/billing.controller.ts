@@ -18,14 +18,14 @@ export class BillingController {
 
   /** Qué pasarela usa este entorno: Stripe (pago real/prueba) o la simulada. */
   @Get("pasarela")
-  pasarela(): { tipo: "stripe" | "simulada" } {
-    return { tipo: this.stripe.configurado ? "stripe" : "simulada" };
+  pasarela(): { tipo: "stripe" | "simulada"; clavePublica: string | null } {
+    return { tipo: this.stripe.configurado ? "stripe" : "simulada", clavePublica: this.stripe.clavePublica };
   }
 
   @Post("checkout")
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  checkout(@CurrentUser() user: AuthenticatedUser, @Body() dto: CheckoutDto): Promise<{ url: string }> {
-    return this.stripe.crearCheckout(user.id, dto.oposicionSlug, dto.ciclo ?? "mensual");
+  checkout(@CurrentUser() user: AuthenticatedUser, @Body() dto: CheckoutDto) {
+    return this.stripe.crearCheckout(user.id, dto.oposicionSlug, dto.ciclo ?? "mensual", dto.integrado ?? false);
   }
 
   @Post("checkout/confirmar")

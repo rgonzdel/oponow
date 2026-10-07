@@ -46,6 +46,8 @@ export class StripeBillingService {
   private readonly stripe: Stripe | null;
   private readonly secretoWebhook: string | undefined;
   private readonly web: string;
+  /** Clave publicable (pk_…): la usa Stripe.js en la web para el pago integrado. */
+  readonly clavePublica: string | null;
   // Managed Payments: Stripe actúa como vendedor legal y gestiona e ingresa
   // el IVA (con comisión adicional). Activado por decisión de negocio; se
   // puede apagar con STRIPE_MANAGED_PAYMENTS=false. Requiere que el producto
@@ -59,6 +61,7 @@ export class StripeBillingService {
     this.secretoWebhook = config.get<string>("STRIPE_WEBHOOK_SECRET");
     this.web = config.get<string>("WEB_ORIGIN", "https://www.oponow.com").replace(/\/$/, "");
     this.managedPayments = config.get<string>("STRIPE_MANAGED_PAYMENTS") !== "false";
+    this.clavePublica = config.get<string>("STRIPE_PUBLISHABLE_KEY") || null;
   }
 
   get configurado(): boolean {
@@ -70,8 +73,17 @@ export class StripeBillingService {
     return this.stripe;
   }
 
-  /** Abre la página de pago de Stripe para suscribirse a una oposición. */
-  async crearCheckout(userId: string, oposicionSlug: string, ciclo: Ciclo): Promise<{ url: string }> {
+/**
+   * Sesión de pago de Stripe para suscribirse a una oposición. "integrado":
+   * el formulario de Stripe se pinta en una ventana dentro de Oponow
+   * (Stripe.js con el clientSecret); si no, página de pago aparte (url).
+   */
+  async crearCheckout(
+    userId: string,
+    oposicionSlug: string,
+    ciclo: Ciclo,
+    integrado = false,
+  ): Promise<{ url: string } | { clientSecret: string; sessionId: string }> {
     const stripe = this.cliente();
     const db = getRequestDb();
     const [user] = await db
@@ -103,9 +115,18 @@ export class StripeBillingService {
       subscription_data: { metadata, ...(yaProbo ? {} : { trial_period_days: TRIAL_DAYS }) },
       locale: "es",
       managed_payments: { enabled: this.managedPayments },
-      success_url: `${this.web}/checkout/exito?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${this.web}/checkout?oposicion=${encodeURIComponent(oposicionSlug)}&ciclo=${ciclo}`,
+      ...(integrado && this.clavePublica
+        ? // Sin redirección al terminar: la web cierra la ventana y confirma.
+          { ui_mode: "embedded_page" as const, redirect_on_completion: "never" as const }
+        : {
+            success_url: `${this.web}/checkout/exito?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${this.web}/checkout?oposicion=${encodeURIComponent(oposicionSlug)}&ciclo=${ciclo}`,
+          }),
     });
+    if (integrado && this.clavePublica) {
+      if (!sesion.client_secret) throw new ServiceUnavailableException("Stripe no ha devuelto el formulario de pago");
+      return { clientSecret: sesion.client_secret, sessionId: sesion.id };
+    }
     if (!sesion.url) throw new ServiceUnavailableException("Stripe no ha devuelto la página de pago");
     return { url: sesion.url };
   }

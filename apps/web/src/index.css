@@ -622,3 +622,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .flashcard, .flashcard-escena, .flashcard-escena .flashcard, .flashcards-fin, .flashcard-boton { animation: none !important; transition: none !important; }
 }
+
+/* Ventana de pago de Stripe integrada: el fondo se oscurece y la ventana sube. */
+.pago-modal { animation: pago-modal-fondo 0.25s ease-out both; }
+.pago-modal__ventana { animation: pago-modal-entra 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes pago-modal-fondo { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pago-modal-entra { from { opacity: 0; transform: translateY(18px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .pago-modal, .pago-modal__ventana { animation: none; }
+}

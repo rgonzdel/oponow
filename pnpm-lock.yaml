@@ -202,6 +202,9 @@ importers:
       '@oponow/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
+      '@stripe/stripe-js':
+        specifier: ^10.0.0
+        version: 10.0.0
       '@tanstack/react-query':
         specifier: ^5.62.7
         version: 5.101.4(react@18.3.1)
@@ -2222,6 +2225,10 @@ packages:
 
   '@sinclair/typebox@0.27.12':
     resolution: {integrity: sha512-hhyNJ+nbR6ZR7pToHvllEFun9TL0sbL+tk/ON75lo+Xas054uez98qRbsuNt7MBCyZKK4+8Yli/OAGZhmfBZ/g==}
+
+  '@stripe/stripe-js@10.0.0':
+    resolution: {integrity: sha512-y5LKFTtnz1ciM+IQfrDfHcpjGlsm5Ao4onaUn4scurI/B6rNhrmV+ScTPDo+3Ges5oF8ol4tBkBAIZyVXVBIXw==}
+    engines: {node: '>=12.16'}
 
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
@@ -7707,6 +7714,8 @@ snapshots:
     optional: true
 
   '@sinclair/typebox@0.27.12': {}
+
+  '@stripe/stripe-js@10.0.0': {}
 
   '@swc/helpers@0.5.23':
     dependencies:

@@ -2,7 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
+import { PagoStripeModal } from "../components/PagoStripeModal";
 import { SiteHeader } from "../components/SiteHeader";
 import { FormField, TextInput } from "../components/FormField";
 import { buttonClass } from "../components/button";
@@ -38,6 +40,7 @@ export function CheckoutPage() {
   const { refreshSession } = useAuth();
 
   const pasarela = useQuery({ queryKey: ["billing", "pasarela"], queryFn: getPasarela, staleTime: Infinity });
+  const [pagoAbierto, setPagoAbierto] = useState(false);
   const irAStripe = useMutation({
     mutationFn: () => crearCheckout(slug, ciclo),
     // La página de pago es de Stripe: el número de tarjeta nunca pasa por Oponow.
@@ -132,7 +135,7 @@ export function CheckoutPage() {
                 )}
                 <button
                   type="button"
-                  onClick={() => irAStripe.mutate()}
+                  onClick={() => (pasarela.data?.clavePublica ? setPagoAbierto(true) : irAStripe.mutate())}
                   disabled={irAStripe.isPending || irAStripe.isSuccess}
                   className={buttonClass("primary", "w-full")}
                 >
@@ -143,8 +146,19 @@ export function CheckoutPage() {
                     <rect x="5" y="11" width="14" height="10" rx="2" />
                     <path d="M8 11V7a4 4 0 0 1 8 0v4" />
                   </svg>
-                  Pagarás en la página segura de Stripe con tarjeta, Apple Pay o Google Pay.
+                  Pago seguro con Stripe: tarjeta, Apple Pay o Google Pay.
                 </p>
+                {pagoAbierto && pasarela.data?.clavePublica && (
+                  <PagoStripeModal
+                    clavePublica={pasarela.data.clavePublica}
+                    oposicionSlug={slug}
+                    ciclo={ciclo}
+                    onCerrar={() => setPagoAbierto(false)}
+                    onCompletado={(sessionId) =>
+                      navigate(`/checkout/exito?session_id=${encodeURIComponent(sessionId)}`, { replace: true })
+                    }
+                  />
+                )}
               </div>
             ) : (
             <form

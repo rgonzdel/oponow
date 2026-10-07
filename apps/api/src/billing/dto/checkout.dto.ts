@@ -1,4 +1,4 @@
-import { IsIn, IsOptional, IsString, Length, Matches } from "class-validator";
+import { IsBoolean, IsIn, IsOptional, IsString, Length, Matches } from "class-validator";
 
 export class CheckoutDto {
   @IsString()
@@ -8,6 +8,11 @@ export class CheckoutDto {
   @IsOptional()
   @IsIn(["mensual", "anual"])
   ciclo?: "mensual" | "anual";
+
+  /** true: formulario de Stripe dentro de Oponow (ventana integrada). */
+  @IsOptional()
+  @IsBoolean()
+  integrado?: boolean;
 }
 
 export class ConfirmarCheckoutDto {

@@ -52,7 +52,15 @@ export function cancelSubscription(oposicionSlug: string) {
 
 /** "stripe": página de pago de Stripe; "simulada": formulario propio de pruebas. */
 export function getPasarela() {
-  return apiFetch<{ tipo: "stripe" | "simulada" }>("/billing/pasarela");
+  return apiFetch<{ tipo: "stripe" | "simulada"; clavePublica: string | null }>("/billing/pasarela");
+}
+
+/** Sesión para el formulario de Stripe dentro de Oponow (ventana integrada). */
+export function crearCheckoutIntegrado(oposicionSlug: string, ciclo: "mensual" | "anual") {
+  return apiFetch<{ clientSecret: string; sessionId: string }>("/billing/checkout", {
+    method: "POST",
+    body: JSON.stringify({ oposicionSlug, ciclo, integrado: true }),
+  });
 }
 
 export function crearCheckout(oposicionSlug: string, ciclo: "mensual" | "anual") {

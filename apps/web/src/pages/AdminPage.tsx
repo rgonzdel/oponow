@@ -35,6 +35,13 @@ const ROL_CHIP: Record<Rol, string> = {
   opositor: "border border-ink-divider text-neutral-500",
 };
 
+const ROL_PLURAL: Record<Exclude<Rol, "opositor">, [string, string]> = {
+  admin: ["administrador", "administradores"],
+  soporte: ["de soporte", "de soporte"],
+  lectura: ["de solo lectura", "de solo lectura"],
+  editor: ["editor", "editores"],
+};
+
 type Pestana = "resumen" | "usuarios" | "roles" | "contenido";
 const PESTANAS: { id: Pestana; texto: string; permiso: Permiso }[] = [
   { id: "resumen", texto: "Resumen", permiso: "ver_estadisticas" },
@@ -111,7 +118,7 @@ function SeccionResumen() {
         <Cifra valor={r.usuarios} texto="Usuarios" pista={`${r.altas.dias7} nuevos esta semana · ${r.altas.dias30} en 30 días`} />
         <Cifra valor={r.suscripciones.activas} texto="Suscripciones de pago" pista={`${r.suscripciones.enPrueba} en prueba gratuita`} />
         <Cifra valor={r.suscripciones.pagoPendiente} texto="Pagos pendientes" pista="Cobro fallido: conviene avisarles" tono={r.suscripciones.pagoPendiente ? "aviso" : undefined} />
-        <Cifra valor={Object.values(r.equipo).reduce((a, b) => a + b, 0)} texto="Personas del equipo" pista={Object.entries(r.equipo).filter(([, n]) => n > 0).map(([rol, n]) => `${n} ${ROL_LABEL[rol as Rol].toLowerCase()}`).join(" · ") || "—"} />
+        <Cifra valor={Object.values(r.equipo).reduce((a, b) => a + b, 0)} texto="Personas del equipo" pista={Object.entries(r.equipo).filter(([, n]) => n > 0).map(([rol, n]) => `${n} ${ROL_PLURAL[rol as Exclude<Rol, "opositor">][n === 1 ? 0 : 1]}`).join(" · ") || "—"} />
       </div>
       <Tarjeta titulo="Usuarios por plan">
         <div className="space-y-2">

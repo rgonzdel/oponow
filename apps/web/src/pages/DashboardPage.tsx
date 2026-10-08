@@ -98,6 +98,17 @@ export function DashboardPage() {
                   Crea tareas y sincronízalas con Google Calendar o Apple Calendar.
                 </p>
               </Link>
+              {user?.permisos?.includes("ver_contabilidad") && (
+                <Link
+                  to="/contabilidad"
+                  className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+                >
+                  <h2 className="text-sm font-medium text-ink-text">Contabilidad</h2>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Ventas, comisiones, IVA e ingresos previstos de Stripe.
+                  </p>
+                </Link>
+              )}
               {user?.permisos?.includes("panel") && (
                 <Link
                   to="/admin"

@@ -22,6 +22,7 @@ import {
 const PLAN_LABEL: Record<PlanTipo, string> = { free: "Gratis", lite: "Lite", vip: "VIP" };
 const ROL_LABEL: Record<Rol, string> = {
   admin: "Administrador",
+  contabilidad: "Contabilidad",
   soporte: "Soporte",
   lectura: "Solo lectura",
   editor: "Editor de contenido",
@@ -29,6 +30,7 @@ const ROL_LABEL: Record<Rol, string> = {
 };
 const ROL_CHIP: Record<Rol, string> = {
   admin: "bg-accent-800 text-accent-100",
+  contabilidad: "bg-emerald-500/15 text-emerald-300",
   soporte: "bg-sky-500/15 text-sky-300",
   lectura: "bg-neutral-500/20 text-neutral-300",
   editor: "bg-amber-400/15 text-amber-300",
@@ -37,6 +39,7 @@ const ROL_CHIP: Record<Rol, string> = {
 
 const ROL_PLURAL: Record<Exclude<Rol, "opositor">, [string, string]> = {
   admin: ["administrador", "administradores"],
+  contabilidad: ["de contabilidad", "de contabilidad"],
   soporte: ["de soporte", "de soporte"],
   lectura: ["de solo lectura", "de solo lectura"],
   editor: ["editor", "editores"],

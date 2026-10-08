@@ -21,6 +21,7 @@ import { RecuperarContrasenaPage } from "./pages/RecuperarContrasenaPage";
 import { FlashcardsOposicionesPage, FlashcardsPage } from "./pages/FlashcardsPage";
 import { FlashcardsSesionPage } from "./pages/FlashcardsSesionPage";
 import { CuentaPage } from "./pages/CuentaPage";
+import { ContabilidadPage } from "./pages/ContabilidadPage";
 import { CheckoutExitoPage } from "./pages/CheckoutExitoPage";
 import { ConfirmarEmailPage } from "./pages/ConfirmarEmailPage";
 import { RestablecerContrasenaPage } from "./pages/RestablecerContrasenaPage";
@@ -136,6 +137,14 @@ export function App() {
             element={
               <RequireAuth>
                 <CheckoutExitoPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/contabilidad"
+            element={
+              <RequireAuth>
+                <ContabilidadPage />
               </RequireAuth>
             }
           />

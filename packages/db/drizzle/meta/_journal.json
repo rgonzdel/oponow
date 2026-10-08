@@ -78,6 +78,13 @@
       "when": 1791416256108,
       "tag": "0010_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791423780533,
+      "tag": "0011_rol_contabilidad",
+      "breakpoints": true
     }
   ]
 }

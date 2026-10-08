@@ -2,7 +2,7 @@ import { apiFetch } from "./api-client";
 
 export type PlanTipo = "free" | "lite" | "vip";
 // Refleja apps/api/src/auth/roles.ts.
-export type Rol = "opositor" | "admin" | "editor" | "soporte" | "lectura";
+export type Rol = "opositor" | "admin" | "editor" | "soporte" | "lectura" | "contabilidad";
 export type Permiso =
   | "panel"
   | "ver_estadisticas"
@@ -10,7 +10,8 @@ export type Permiso =
   | "ver_suscripciones"
   | "cambiar_plan"
   | "asignar_roles"
-  | "ver_contenido";
+  | "ver_contenido"
+  | "ver_contabilidad";
 
 export interface UsuarioResumen {
   id: string;

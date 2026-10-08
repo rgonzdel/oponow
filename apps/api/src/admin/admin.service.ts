@@ -8,7 +8,7 @@ import type { UpdatePlanDto } from "./dto/update-plan.dto";
 
 const DEFAULT_PAGE_SIZE = 20;
 // Orden en el panel: de más a menos permisos, y el opositor al final.
-const ORDEN_ROLES: Rol[] = ["admin", "soporte", "lectura", "editor", "opositor"];
+const ORDEN_ROLES: Rol[] = ["admin", "contabilidad", "soporte", "lectura", "editor", "opositor"];
 const DIA_MS = 86_400_000;
 
 /**

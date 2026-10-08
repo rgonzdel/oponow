@@ -3,7 +3,7 @@
 // políticas RLS (packages/db/src/rls/policies.sql) refuerzan lo esencial
 // con app.current_role.
 
-export const ROLES = ["opositor", "admin", "editor", "soporte", "lectura"] as const;
+export const ROLES = ["opositor", "admin", "editor", "soporte", "lectura", "contabilidad"] as const;
 export type Rol = (typeof ROLES)[number];
 
 export const PERMISOS = {
@@ -14,6 +14,7 @@ export const PERMISOS = {
   cambiar_plan: "Cambiar el plan de un usuario",
   asignar_roles: "Asignar y quitar roles del equipo",
   ver_contenido: "Acceso completo al temario, tests y flashcards de todas las oposiciones",
+  ver_contabilidad: "Ver la contabilidad: ventas, comisiones, IVA e ingresos previstos (Stripe)",
 } as const;
 export type Permiso = keyof typeof PERMISOS;
 
@@ -21,7 +22,7 @@ export const DEFINICION_ROLES: Record<Rol, { nombre: string; descripcion: string
   admin: {
     nombre: "Administrador",
     descripcion: "Acceso total: usuarios, planes, roles y contenido.",
-    permisos: ["panel", "ver_estadisticas", "ver_usuarios", "ver_suscripciones", "cambiar_plan", "asignar_roles", "ver_contenido"],
+    permisos: ["panel", "ver_estadisticas", "ver_usuarios", "ver_suscripciones", "cambiar_plan", "asignar_roles", "ver_contenido", "ver_contabilidad"],
   },
   soporte: {
     nombre: "Soporte",
@@ -32,6 +33,11 @@ export const DEFINICION_ROLES: Record<Rol, { nombre: string; descripcion: string
     nombre: "Solo lectura",
     descripcion: "Consulta estadísticas, usuarios y suscripciones sin poder cambiar nada.",
     permisos: ["panel", "ver_estadisticas", "ver_usuarios", "ver_suscripciones"],
+  },
+  contabilidad: {
+    nombre: "Contabilidad",
+    descripcion: "Consulta las ventas, comisiones, IVA e ingresos previstos de Stripe. No ve datos personales de los usuarios.",
+    permisos: ["panel", "ver_contabilidad"],
   },
   editor: {
     nombre: "Editor de contenido",

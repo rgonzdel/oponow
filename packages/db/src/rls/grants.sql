@@ -11,6 +11,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   restablecimientos_contrasena,
   intentos_test,
   respuestas_usuario,
+  examenes,
+  respuestas_examen,
   suscripciones_oposicion,
   sesiones_lectura,
   tareas_agenda,

@@ -81,6 +81,15 @@ export function DashboardPage() {
                 </p>
               </Link>
               <Link
+                to={`/oposiciones/${miOposicion?.oposicionSlug ?? "tai"}/examen`}
+                className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
+              >
+                <h2 className="text-sm font-medium text-ink-text">Modo examen</h2>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Exámenes cronometrados como el real, con modo avanzado anti-distracciones.
+                </p>
+              </Link>
+              <Link
                 to="/fallos"
                 className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
               >

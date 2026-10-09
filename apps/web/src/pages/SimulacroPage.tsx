@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { ExamenRunner, formatearTiempo, type RespuestaExamen } from "../components/ExamenRunner";
 import { useAuth } from "../auth/AuthContext";
 import { SiteHeader } from "../components/SiteHeader";
 import { buttonClass } from "../components/button";
@@ -32,6 +33,174 @@ const ALL: Entry[] = [
 
 const TOTAL_SECONDS = 90 * 60;
 
+// ── Modo examen del simulacro ────────────────────────────────────────────
+// Es público (sin cuenta), así que la sesión vive en el navegador: el fin del
+// tiempo se guarda como instante, de modo que recargar no lo detiene.
+
+interface SesionExamen {
+  fin: number;
+  inicio: number;
+  respuestas: Record<string, RespuestaExamen>;
+  modoAvanzado: boolean;
+  maxSalidas: number;
+  salidas: number;
+  segundosFuera: number;
+}
+
+interface InfoExamenSimulacro {
+  motivo: "usuario" | "tiempo" | "salidas";
+  segundosUsados: number;
+  modoAvanzado: boolean;
+  salidas: number;
+  segundosFuera: number;
+}
+
+const CLAVE_SESION = (slug: string) => `oponow:simulacro-examen:${slug}`;
+
+function leerSesion(slug: string): SesionExamen | null {
+  try {
+    const raw = localStorage.getItem(CLAVE_SESION(slug));
+    return raw ? (JSON.parse(raw) as SesionExamen) : null;
+  } catch {
+    return null;
+  }
+}
+
+function guardarSesion(slug: string, sesion: SesionExamen | null) {
+  try {
+    if (sesion) localStorage.setItem(CLAVE_SESION(slug), JSON.stringify(sesion));
+    else localStorage.removeItem(CLAVE_SESION(slug));
+  } catch {
+    // Sin almacenamiento (modo privado): el examen funciona igual, sin poder retomarlo.
+  }
+}
+
+const PREGUNTAS_EXAMEN = DATA.preguntas.map((q) => ({
+  id: `principal-${q.n}`,
+  enunciado: q.enunciado,
+  opciones: q.opciones,
+}));
+
+function SimulacroExamen({
+  slug,
+  titulo,
+  onTerminar,
+}: {
+  slug: string;
+  titulo: string;
+  onTerminar: (respuestas: Record<string, number>, info: InfoExamenSimulacro) => void;
+}) {
+  const [sesion, setSesion] = useState<SesionExamen | null>(() => leerSesion(slug));
+  const [modoAvanzado, setModoAvanzado] = useState(false);
+  const motivoFinal = useRef<InfoExamenSimulacro["motivo"]>("usuario");
+
+  if (!sesion) {
+    return (
+      <div>
+      <SiteHeader />
+      <main className="mx-auto max-w-xl px-6 py-12">
+        <div className="rounded-lg border border-ink-divider bg-ink-surface p-6">
+          <span className="text-xs font-medium uppercase tracking-wide text-accent">Modo examen</span>
+          <h1 className="mt-2 text-xl font-medium text-ink-text">{titulo}</h1>
+          <p className="mt-3 text-sm text-neutral-400">
+            {PREGUNTAS_EXAMEN.length} preguntas en 90 minutos. No verás las soluciones hasta entregarlo; cada fallo resta
+            un tercio de acierto y, al acabarse el tiempo, el examen se entrega solo.
+          </p>
+          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-md border border-ink-divider bg-ink p-4">
+            <input
+              type="checkbox"
+              checked={modoAvanzado}
+              onChange={(e) => setModoAvanzado(e.target.checked)}
+              className="mt-1 accent-[#9184d9]"
+            />
+            <span>
+              <span className="text-sm font-medium text-ink-text">Modo avanzado</span>
+              <span className="mt-1 block text-xs text-neutral-400">
+                Pantalla completa obligatoria; con 3 salidas (cambiar de pestaña, minimizar, salir de pantalla
+                completa) el examen se entrega solo. Sin copiar ni pegar.
+              </span>
+            </span>
+          </label>
+          <button
+            type="button"
+            onClick={() => {
+              const nueva: SesionExamen = {
+                inicio: Date.now(),
+                fin: Date.now() + TOTAL_SECONDS * 1000,
+                respuestas: {},
+                modoAvanzado,
+                maxSalidas: 3,
+                salidas: 0,
+                segundosFuera: 0,
+              };
+              guardarSesion(slug, nueva);
+              setSesion(nueva);
+            }}
+            className={buttonClass("primary", "mt-6 w-full")}
+          >
+            Empezar examen
+          </button>
+          <Link to={`/oposiciones/${slug}/simulacro`} className="mt-3 block text-center text-xs text-neutral-500 hover:text-accent">
+            Prefiero practicar sin tiempo límite
+          </Link>
+        </div>
+      </main>
+      </div>
+    );
+  }
+
+  const actualizar = (cambio: (s: SesionExamen) => SesionExamen) => {
+    const nueva = cambio(leerSesion(slug) ?? sesion);
+    guardarSesion(slug, nueva);
+    return nueva;
+  };
+
+  const terminar = () => {
+    const final = leerSesion(slug) ?? sesion;
+    guardarSesion(slug, null);
+    const respuestas: Record<string, number> = {};
+    for (const [id, r] of Object.entries(final.respuestas)) {
+      if (r.opcionElegida !== null) respuestas[id] = r.opcionElegida;
+    }
+    onTerminar(respuestas, {
+      motivo: motivoFinal.current,
+      segundosUsados: Math.min(TOTAL_SECONDS, Math.round((Math.min(Date.now(), final.fin) - final.inicio) / 1000)),
+      modoAvanzado: final.modoAvanzado,
+      salidas: final.salidas,
+      segundosFuera: final.segundosFuera,
+    });
+  };
+
+  return (
+    <ExamenRunner
+      titulo={titulo}
+      subtitulo={sesion.modoAvanzado ? "Simulacro oficial · modo avanzado" : "Simulacro oficial"}
+      preguntas={PREGUNTAS_EXAMEN}
+      respuestasIniciales={sesion.respuestas}
+      segundosRestantes={Math.max(0, Math.round((sesion.fin - Date.now()) / 1000))}
+      duracionSegundos={TOTAL_SECONDS}
+      modoAvanzado={sesion.modoAvanzado}
+      maxSalidas={sesion.maxSalidas}
+      salidasIniciales={sesion.salidas}
+      guardar={async (id, r) => {
+        actualizar((s) => ({ ...s, respuestas: { ...s.respuestas, [id]: r } }));
+      }}
+      registrarSalida={async (fase, segundos) => {
+        const s = actualizar((x) =>
+          fase === "salida" ? { ...x, salidas: x.salidas + 1 } : { ...x, segundosFuera: x.segundosFuera + segundos },
+        );
+        const entregado = s.salidas >= s.maxSalidas;
+        if (entregado) motivoFinal.current = "salidas";
+        return { salidas: s.salidas, entregado };
+      }}
+      entregar={async (motivo) => {
+        motivoFinal.current = motivo;
+      }}
+      alTerminar={terminar}
+    />
+  );
+}
+
 function formatTime(totalSeconds: number) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -48,6 +217,8 @@ export function SimulacroPage() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [finished, setFinished] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
+  const [params, setParams] = useSearchParams();
+  const [infoExamen, setInfoExamen] = useState<InfoExamenSimulacro | null>(null);
 
   useEffect(() => {
     if (finished) return;
@@ -85,6 +256,22 @@ export function SimulacroPage() {
 
   if (!op || !op.disponible) {
     return <Navigate to="/oposiciones" replace />;
+  }
+
+  if (params.get("modo") === "examen" && !finished) {
+    return (
+      <SimulacroExamen
+        slug={op.slug}
+        titulo={`${op.siglas} · Primera parte · convocatoria 2024`}
+        onTerminar={(respuestas, info) => {
+          setAnswers(respuestas);
+          setFinished(true);
+          setIndex(0);
+          setInfoExamen(info);
+          setParams({}, { replace: true });
+        }}
+      />
+    );
   }
 
   const answeredCount = DATA.preguntas.filter(
@@ -209,6 +396,18 @@ export function SimulacroPage() {
               <p className="mt-2 text-xs text-neutral-500">
                 {correct} aciertos · {wrong} fallos · {blank} en blanco
               </p>
+              {infoExamen && (
+                <p className="mt-2 text-xs text-neutral-400">
+                  Modo examen ·{" "}
+                  {infoExamen.motivo === "tiempo"
+                    ? "entregado al acabarse el tiempo"
+                    : infoExamen.motivo === "salidas"
+                      ? "entregado por salir de la pantalla"
+                      : "entregado por ti"}{" "}
+                  · {formatearTiempo(infoExamen.segundosUsados)} usados
+                  {infoExamen.modoAvanzado ? ` · ${infoExamen.salidas} salidas` : ""}
+                </p>
+              )}
             </div>
           ) : (
             <div className="rounded-lg border border-ink-divider bg-ink-surface p-5">
@@ -256,6 +455,12 @@ export function SimulacroPage() {
             </div>
           </div>
 
+          {!finished && (
+            <Link to="?modo=examen" className={buttonClass("secondary", "w-full")}>
+              Hacerlo en modo examen
+            </Link>
+          )}
+
           {!finished ? (
             <button
               type="button"
@@ -272,6 +477,7 @@ export function SimulacroPage() {
                 setAnswers({});
                 setIndex(0);
                 setSecondsLeft(TOTAL_SECONDS);
+                setInfoExamen(null);
               }}
               className={buttonClass("secondary", "w-full")}
             >

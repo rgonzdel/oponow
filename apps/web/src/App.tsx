@@ -13,6 +13,8 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { TestPage } from "./pages/TestPage";
+import { ExamenConfigPage } from "./pages/ExamenConfigPage";
+import { ExamenPage } from "./pages/ExamenPage";
 import { FallosPage } from "./pages/FallosPage";
 import { AgendaPage } from "./pages/AgendaPage";
 import { LegalPage } from "./pages/LegalPage";
@@ -35,6 +37,22 @@ export function App() {
           <Route path="/oposiciones" element={<OposicionesPage />} />
           <Route path="/oposiciones/:slug" element={<OposicionLandingPage />} />
           <Route path="/oposiciones/:slug/simulacro" element={<SimulacroPage />} />
+          <Route
+            path="/oposiciones/:slug/examen"
+            element={
+              <RequireAuth>
+                <ExamenConfigPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/examen/:id"
+            element={
+              <RequireAuth>
+                <ExamenPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/oposiciones/:slug/temario"
             element={

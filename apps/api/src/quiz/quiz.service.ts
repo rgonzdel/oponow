@@ -177,7 +177,13 @@ export class QuizService {
             eq(schema.intentosTest.esDiario, true),
           ),
         );
-      if (intentosHoy.some((i) => i.fecha >= hoy)) {
+      // Un examen (modo examen) también gasta el test gratuito del día.
+      const [examenHoy] = await db
+        .select({ id: schema.examenes.id })
+        .from(schema.examenes)
+        .where(and(eq(schema.examenes.usuarioId, userId), gte(schema.examenes.inicio, hoy)))
+        .limit(1);
+      if (examenHoy || intentosHoy.some((i) => i.fecha >= hoy)) {
         throw new ForbiddenException(
           "Ya has hecho tu test gratuito de hoy — vuelve mañana o hazte con el plan completo.",
         );

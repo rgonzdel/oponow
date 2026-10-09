@@ -26,3 +26,7 @@ export const metodoPagoEnum = pgEnum("metodo_pago", ["tarjeta", "bizum"]);
 // Rol dentro de Oponow. "opositor" es el usuario normal; el resto son roles
 // del equipo con acceso al panel (permisos en apps/api/src/auth/roles.ts).
 export const rolUsuarioEnum = pgEnum("rol_usuario", ["opositor", "admin", "editor", "soporte", "lectura", "contabilidad"]);
+
+// Por qué se entregó un examen: lo entregó el opositor, se acabó el tiempo o
+// salió de la pantalla del examen más veces de las permitidas (modo avanzado).
+export const examenMotivoEntregaEnum = pgEnum("examen_motivo_entrega", ["usuario", "tiempo", "salidas"]);

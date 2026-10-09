@@ -95,12 +95,16 @@ export class InformeService {
         fecha: schema.intentosTest.fecha,
         puntuacion: schema.intentosTest.puntuacion,
         temaId: schema.intentosTest.temaId,
+        examenId: schema.intentosTest.examenId,
       })
       .from(schema.intentosTest)
       .where(and(eq(schema.intentosTest.usuarioId, userId), eq(schema.intentosTest.estado, "completado")))
       .orderBy(desc(schema.intentosTest.fecha));
     const racha = calcularRacha(new Set(intentos.map((i) => claveDeDia(i.fecha))));
     const intentosPeriodo = intentos.filter((i) => enPeriodo(i.fecha));
+    // Un examen de varios temas deja un intento por tema: en los totales y en
+    // la actividad diaria cuenta como un solo test.
+    const contarTests = (lista: typeof intentos) => new Set(lista.map((i) => i.examenId ?? i.id)).size;
 
     const respuestas = (
       await db
@@ -180,7 +184,7 @@ export class InformeService {
       const aciertos = resp.filter((r) => r.esCorrecta).length;
       return {
         clave,
-        tests: intentosPeriodo.filter((i) => claveDe(i.fecha) === clave).length,
+        tests: contarTests(intentosPeriodo.filter((i) => claveDe(i.fecha) === clave)),
         aciertos,
         fallos: resp.length - aciertos,
       };
@@ -231,7 +235,7 @@ export class InformeService {
       hasta: hoy,
       oposiciones: [...new Set(temas.map((t) => t.oposicion).filter(Boolean))],
       kpis: {
-        tests: intentosPeriodo.length,
+        tests: contarTests(intentosPeriodo),
         respondidas: respuestas.length,
         aciertos,
         fallos: respuestas.length - aciertos,

@@ -85,6 +85,13 @@
       "when": 1791423780533,
       "tag": "0011_rol_contabilidad",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791576078054,
+      "tag": "0012_modo_examen",
+      "breakpoints": true
     }
   ]
 }

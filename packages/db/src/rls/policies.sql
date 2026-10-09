@@ -115,6 +115,30 @@ CREATE POLICY respuestas_usuario_self ON respuestas_usuario
     )
   );
 
+ALTER TABLE examenes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS examenes_self ON examenes;
+CREATE POLICY examenes_self ON examenes
+  USING (usuario_id = current_setting('app.current_user_id', true)::uuid)
+  WITH CHECK (usuario_id = current_setting('app.current_user_id', true)::uuid);
+
+ALTER TABLE respuestas_examen ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS respuestas_examen_self ON respuestas_examen;
+CREATE POLICY respuestas_examen_self ON respuestas_examen
+  USING (
+    EXISTS (
+      SELECT 1 FROM examenes e
+      WHERE e.id = respuestas_examen.examen_id
+        AND e.usuario_id = current_setting('app.current_user_id', true)::uuid
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM examenes e
+      WHERE e.id = respuestas_examen.examen_id
+        AND e.usuario_id = current_setting('app.current_user_id', true)::uuid
+    )
+  );
+
 ALTER TABLE suscripciones_oposicion ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS suscripciones_oposicion_self ON suscripciones_oposicion;
 CREATE POLICY suscripciones_oposicion_self ON suscripciones_oposicion

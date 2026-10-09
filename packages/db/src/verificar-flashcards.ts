@@ -26,7 +26,7 @@ export function normalizar(s: string): string {
 }
 
 /** Texto vigente (última versión) de cada precepto, por su título. */
-async function preceptos(boeId: string): Promise<Map<string, string>> {
+export async function preceptos(boeId: string): Promise<Map<string, string>> {
   const res = await fetch(`${API}/${boeId}/texto`, { headers: { Accept: "application/xml" } });
   if (!res.ok) throw new Error(`BOE respondió ${res.status} para ${boeId}`);
   const xml = await res.text();

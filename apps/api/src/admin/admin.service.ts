@@ -161,7 +161,10 @@ export class AdminService {
       ? await db
           .select({
             id: schema.suscripcionesOposicion.id,
+            oposicionId: schema.suscripcionesOposicion.oposicionId,
             oposicionNombre: schema.oposiciones.nombre,
+            // Sin suscripción en la pasarela: la asignó el equipo desde el panel.
+            asignadaPorEquipo: sql<boolean>`${schema.suscripcionesOposicion.stripeSubscriptionId} is null`,
             activa: schema.suscripcionesOposicion.activa,
             estado: schema.suscripcionesOposicion.estado,
             fechaInicio: schema.suscripcionesOposicion.fechaInicio,
@@ -173,6 +176,131 @@ export class AdminService {
       : null;
 
     return { ...usuario, suscripciones };
+  }
+
+  /** Oposiciones del catálogo, para elegir cuál asignar. */
+  async oposiciones() {
+    const db = getRequestDb();
+    return db
+      .select({ id: schema.oposiciones.id, slug: schema.oposiciones.slug, nombre: schema.oposiciones.nombre })
+      .from(schema.oposiciones)
+      .orderBy(schema.oposiciones.nombre);
+  }
+
+  /**
+   * Da acceso a una oposición sin pasar por el pago: una suscripción activa
+   * sin id de pasarela (así se distingue de las de Stripe), que desbloquea el
+   * contenido igual que una de pago (RLS temas_visibles). Si el usuario ya la
+   * tuvo y está inactiva, se reactiva; si tiene una de pago activa, no se toca.
+   */
+  async asignarOposicion(actorId: string, usuarioId: string, oposicionId: string) {
+    const db = getRequestDb();
+    const [usuario] = await db
+      .select({ email: schema.usuarios.email })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, usuarioId))
+      .limit(1);
+    if (!usuario) throw new NotFoundException("Usuario no encontrado");
+    const [oposicion] = await db
+      .select({ nombre: schema.oposiciones.nombre })
+      .from(schema.oposiciones)
+      .where(eq(schema.oposiciones.id, oposicionId))
+      .limit(1);
+    if (!oposicion) throw new NotFoundException("Oposición no encontrada");
+
+    const [existente] = await db
+      .select({
+        id: schema.suscripcionesOposicion.id,
+        activa: schema.suscripcionesOposicion.activa,
+        externa: schema.suscripcionesOposicion.stripeSubscriptionId,
+      })
+      .from(schema.suscripcionesOposicion)
+      .where(
+        and(
+          eq(schema.suscripcionesOposicion.usuarioId, usuarioId),
+          eq(schema.suscripcionesOposicion.oposicionId, oposicionId),
+        ),
+      )
+      .limit(1);
+    if (existente?.activa) {
+      throw new ConflictException(
+        existente.externa
+          ? "Ya tiene una suscripción de pago activa a esta oposición"
+          : "Ya tiene asignada esta oposición",
+      );
+    }
+
+    const datos = {
+      activa: true,
+      estado: "active" as const,
+      fechaInicio: new Date(),
+      fechaFin: null,
+      trialEndsAt: null,
+      stripeSubscriptionId: null,
+      importeCentimos: null,
+      proximoCobro: null,
+      metodoPago: null,
+      tarjetaMarca: null,
+      tarjetaUltimos4: null,
+      tarjetaCaducidad: null,
+      bizumTelefonoUltimos: null,
+    };
+    if (existente) {
+      await db.update(schema.suscripcionesOposicion).set(datos).where(eq(schema.suscripcionesOposicion.id, existente.id));
+    } else {
+      await db.insert(schema.suscripcionesOposicion).values({ usuarioId, oposicionId, ...datos });
+    }
+    await this.ajustarPlan(usuarioId);
+    this.logger.log(`Oposición asignada por ${actorId}: ${usuario.email ?? usuarioId} → ${oposicion.nombre}`);
+    return this.getUsuario(usuarioId, true);
+  }
+
+  /** Quita una oposición asignada desde el panel. Las de pago se cancelan en Stripe. */
+  async quitarOposicion(actorId: string, usuarioId: string, suscripcionId: string) {
+    const db = getRequestDb();
+    const [sub] = await db
+      .select({
+        id: schema.suscripcionesOposicion.id,
+        activa: schema.suscripcionesOposicion.activa,
+        externa: schema.suscripcionesOposicion.stripeSubscriptionId,
+        oposicion: schema.oposiciones.nombre,
+      })
+      .from(schema.suscripcionesOposicion)
+      .innerJoin(schema.oposiciones, eq(schema.oposiciones.id, schema.suscripcionesOposicion.oposicionId))
+      .where(and(eq(schema.suscripcionesOposicion.id, suscripcionId), eq(schema.suscripcionesOposicion.usuarioId, usuarioId)))
+      .limit(1);
+    if (!sub) throw new NotFoundException("Suscripción no encontrada");
+    if (sub.externa) {
+      throw new ConflictException("Es una suscripción de pago: se cancela desde Stripe o desde «Mi cuenta» del usuario");
+    }
+    if (sub.activa) {
+      await db
+        .update(schema.suscripcionesOposicion)
+        .set({ activa: false, estado: "canceled", fechaFin: new Date() })
+        .where(eq(schema.suscripcionesOposicion.id, sub.id));
+      await this.ajustarPlan(usuarioId);
+      this.logger.log(`Oposición retirada por ${actorId}: ${usuarioId} → ${sub.oposicion}`);
+    }
+    return this.getUsuario(usuarioId, true);
+  }
+
+  /** Mismo criterio que la pasarela: Lite con alguna suscripción activa, Free sin ninguna; VIP no se toca. */
+  private async ajustarPlan(usuarioId: string) {
+    const db = getRequestDb();
+    const [user] = await db
+      .select({ plan: schema.usuarios.plan })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, usuarioId))
+      .limit(1);
+    const [{ n }] = await db
+      .select({ n: count() })
+      .from(schema.suscripcionesOposicion)
+      .where(and(eq(schema.suscripcionesOposicion.usuarioId, usuarioId), eq(schema.suscripcionesOposicion.activa, true)));
+    if (user?.plan === "free" && n > 0) {
+      await db.update(schema.usuarios).set({ plan: "lite" }).where(eq(schema.usuarios.id, usuarioId));
+    } else if (user?.plan === "lite" && n === 0) {
+      await db.update(schema.usuarios).set({ plan: "free" }).where(eq(schema.usuarios.id, usuarioId));
+    }
   }
 
   async updatePlan(id: string, dto: UpdatePlanDto) {

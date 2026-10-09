@@ -18,6 +18,8 @@ export interface SubscriptionStatus {
     | null;
   /** Cancelación programada: fecha en que se pierde el acceso. */
   cancelaEl?: string | null;
+  /** Acceso dado por el equipo de Oponow (sin pago). */
+  asignadaPorEquipo?: boolean;
 }
 
 export interface SubscribePayload {

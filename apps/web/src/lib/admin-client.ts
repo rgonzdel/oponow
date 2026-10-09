@@ -10,6 +10,7 @@ export type Permiso =
   | "ver_suscripciones"
   | "cambiar_plan"
   | "asignar_roles"
+  | "asignar_oposiciones"
   | "ver_contenido"
   | "ver_contabilidad";
 
@@ -32,7 +33,10 @@ export interface UsuariosPagina {
 
 export interface SuscripcionResumen {
   id: string;
+  oposicionId: string;
   oposicionNombre: string;
+  /** Dada desde el panel, sin pago (no tiene suscripción en Stripe). */
+  asignadaPorEquipo: boolean;
   activa: boolean;
   estado: string;
   fechaInicio: string;
@@ -84,6 +88,29 @@ export function updatePlan(id: string, plan: PlanTipo) {
   return apiFetch<UsuarioResumen>(`/admin/usuarios/${id}/plan`, {
     method: "PATCH",
     body: JSON.stringify({ plan }),
+  });
+}
+
+export interface OposicionCatalogo {
+  id: string;
+  slug: string;
+  nombre: string;
+}
+
+export function listOposiciones() {
+  return apiFetch<OposicionCatalogo[]>("/admin/oposiciones");
+}
+
+export function asignarOposicion(usuarioId: string, oposicionId: string) {
+  return apiFetch<UsuarioDetalle>(`/admin/usuarios/${usuarioId}/oposiciones`, {
+    method: "POST",
+    body: JSON.stringify({ oposicionId }),
+  });
+}
+
+export function quitarOposicion(usuarioId: string, suscripcionId: string) {
+  return apiFetch<UsuarioDetalle>(`/admin/usuarios/${usuarioId}/oposiciones/${suscripcionId}`, {
+    method: "DELETE",
   });
 }
 

@@ -269,6 +269,9 @@ function SeccionSuscripcion({
                 <span className="text-sm text-ink-text">{s.oposicionNombre}</span>
                 <Chip tono={s.estado === "past_due" ? "aviso" : "ok"}>{ESTADO_SUSCRIPCION[s.estado ?? ""] ?? "Activa"}</Chip>
               </div>
+              {s.asignadaPorEquipo ? (
+                <p className="mt-3 text-sm text-neutral-400">Acceso concedido por el equipo de Oponow, sin coste para ti.</p>
+              ) : (
               <dl className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
                 <Dato titulo="Próximo pago">
                   {s.proximoPago ? FECHA.format(new Date(s.proximoPago)) : "—"}
@@ -290,12 +293,13 @@ function SeccionSuscripcion({
                   <MetodoPago metodo={s.metodoPago ?? null} />
                 </Dato>
               </dl>
+              )}
               {s.cancelaEl && (
                 <p className="mt-3 rounded-md bg-amber-400/10 px-3 py-2 text-xs text-amber-300">
                   Cancelada: mantienes el acceso hasta el {FECHA.format(new Date(s.cancelaEl))} y no se te cobrará más.
                 </p>
               )}
-              {s.cancelaEl ? null : confirmando === s.oposicionSlug ? (
+              {s.cancelaEl || s.asignadaPorEquipo ? null : confirmando === s.oposicionSlug ? (
                 <div className="mt-3 rounded-md border border-red-400/40 bg-red-500/10 p-3">
                   <p className="text-sm text-ink-text">
                     {conStripe

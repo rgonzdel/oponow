@@ -197,6 +197,18 @@ DROP POLICY IF EXISTS suscripciones_oposicion_admin_read ON suscripciones_oposic
 CREATE POLICY suscripciones_oposicion_admin_read ON suscripciones_oposicion
   FOR SELECT USING (current_setting('app.is_admin', true) = 'true');
 
+-- Asignar o retirar una oposición a mano desde el panel (solo
+-- administración; la API además exige el permiso asignar_oposiciones).
+DROP POLICY IF EXISTS suscripciones_oposicion_admin_insert ON suscripciones_oposicion;
+CREATE POLICY suscripciones_oposicion_admin_insert ON suscripciones_oposicion
+  FOR INSERT WITH CHECK (current_setting('app.current_role', true) = 'admin');
+
+DROP POLICY IF EXISTS suscripciones_oposicion_admin_update ON suscripciones_oposicion;
+CREATE POLICY suscripciones_oposicion_admin_update ON suscripciones_oposicion
+  FOR UPDATE
+  USING (current_setting('app.current_role', true) = 'admin')
+  WITH CHECK (current_setting('app.current_role', true) = 'admin');
+
 -- ===== Catálogo público (leyes, artículos, oposiciones) =====
 -- Sin dato de usuario; RLS explícita igualmente por higiene y para que
 -- quede documentado que la decisión de "público" fue intencional.

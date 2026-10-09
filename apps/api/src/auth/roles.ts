@@ -13,6 +13,7 @@ export const PERMISOS = {
   ver_suscripciones: "Ver las suscripciones de cada usuario",
   cambiar_plan: "Cambiar el plan de un usuario",
   asignar_roles: "Asignar y quitar roles del equipo",
+  asignar_oposiciones: "Dar o quitar a un usuario el acceso a una oposición sin pasar por el pago",
   ver_contenido: "Acceso completo al temario, tests y flashcards de todas las oposiciones",
   ver_contabilidad: "Ver la contabilidad: ventas, comisiones, IVA e ingresos previstos (Stripe)",
 } as const;
@@ -21,8 +22,8 @@ export type Permiso = keyof typeof PERMISOS;
 export const DEFINICION_ROLES: Record<Rol, { nombre: string; descripcion: string; permisos: Permiso[] }> = {
   admin: {
     nombre: "Administrador",
-    descripcion: "Acceso total: usuarios, planes, roles y contenido.",
-    permisos: ["panel", "ver_estadisticas", "ver_usuarios", "ver_suscripciones", "cambiar_plan", "asignar_roles", "ver_contenido", "ver_contabilidad"],
+    descripcion: "Acceso total: usuarios, planes, roles, oposiciones asignadas y contenido.",
+    permisos: ["panel", "ver_estadisticas", "ver_usuarios", "ver_suscripciones", "cambiar_plan", "asignar_roles", "asignar_oposiciones", "ver_contenido", "ver_contabilidad"],
   },
   soporte: {
     nombre: "Soporte",

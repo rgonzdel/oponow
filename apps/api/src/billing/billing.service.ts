@@ -34,6 +34,8 @@ export interface SubscriptionStatus {
   metodoPago?: MetodoPago | null;
   /** Si está programada su cancelación: fecha en que dejará de tener acceso. */
   cancelaEl?: Date | null;
+  /** Acceso dado por el equipo desde el panel (sin pago). */
+  asignadaPorEquipo?: boolean;
 }
 
 @Injectable()
@@ -61,6 +63,7 @@ export class BillingService {
         tarjetaCaducidad: schema.suscripcionesOposicion.tarjetaCaducidad,
         bizumTelefonoUltimos: schema.suscripcionesOposicion.bizumTelefonoUltimos,
         fechaFin: schema.suscripcionesOposicion.fechaFin,
+        externa: schema.suscripcionesOposicion.stripeSubscriptionId,
       })
       .from(schema.suscripcionesOposicion)
       .innerJoin(
@@ -91,6 +94,10 @@ export class BillingService {
             ? { tipo: "tarjeta", marca: r.tarjetaMarca, ultimos4: r.tarjetaUltimos4, caducidad: r.tarjetaCaducidad }
             : null,
       cancelaEl: r.fechaFin,
+      // Asignada desde el panel: sin cobros ni método de pago.
+      ...(r.externa
+        ? {}
+        : { asignadaPorEquipo: true, importeCentimos: null, proximoPago: null, metodoPago: null, cancelaEl: null }),
     }));
   }
 

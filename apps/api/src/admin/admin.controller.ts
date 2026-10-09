@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { IsUUID } from "class-validator";
 import { AdminService } from "./admin.service";
 import { ListUsuariosQueryDto } from "./dto/list-usuarios-query.dto";
 import { UpdatePlanDto } from "./dto/update-plan.dto";
@@ -7,6 +8,11 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { PermisoGuard, RequierePermiso } from "../auth/guards/permiso.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import type { AuthenticatedUser } from "../auth/strategies/jwt.strategy";
+
+class AsignarOposicionDto {
+  @IsUUID()
+  oposicionId!: string;
+}
 
 // Cada ruta exige un permiso concreto según el rol (ver auth/roles.ts).
 @Controller("admin")
@@ -48,6 +54,32 @@ export class AdminController {
   @RequierePermiso("cambiar_plan")
   updatePlan(@Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdatePlanDto) {
     return this.adminService.updatePlan(id, dto);
+  }
+
+  @Get("oposiciones")
+  @RequierePermiso("asignar_oposiciones")
+  oposiciones() {
+    return this.adminService.oposiciones();
+  }
+
+  @Post("usuarios/:id/oposiciones")
+  @RequierePermiso("asignar_oposiciones")
+  asignarOposicion(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: AsignarOposicionDto,
+  ) {
+    return this.adminService.asignarOposicion(user.id, id, dto.oposicionId);
+  }
+
+  @Delete("usuarios/:id/oposiciones/:suscripcionId")
+  @RequierePermiso("asignar_oposiciones")
+  quitarOposicion(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Param("suscripcionId", ParseUUIDPipe) suscripcionId: string,
+  ) {
+    return this.adminService.quitarOposicion(user.id, id, suscripcionId);
   }
 
   @Patch("usuarios/:id/rol")

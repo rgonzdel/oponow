@@ -10,8 +10,11 @@ import {
   getContenido,
   getResumen,
   getRoles,
+  asignarOposicion,
   getUsuario,
+  listOposiciones,
   listUsuarios,
+  quitarOposicion,
   updatePlan,
   updateRol,
   type Permiso,
@@ -316,7 +319,11 @@ function FichaUsuario({ id, permisos, esYo, onCambio }: { id: string; permisos: 
           {cambiarRol.isError && <p className="mt-1 text-xs text-red-400">{mensaje(cambiarRol.error, "No se ha podido cambiar el rol")}</p>}
         </Campo>
 
-        {u.suscripciones && (
+        {u.suscripciones && permisos.includes("asignar_oposiciones") && (
+          <OposicionesUsuario usuarioId={id} suscripciones={u.suscripciones} onCambio={onCambio} />
+        )}
+
+        {u.suscripciones && !permisos.includes("asignar_oposiciones") && (
           <Campo titulo="Suscripciones">
             {u.suscripciones.length === 0 ? (
               <p className="text-sm text-neutral-500">Ninguna.</p>
@@ -326,7 +333,7 @@ function FichaUsuario({ id, permisos, esYo, onCambio }: { id: string; permisos: 
                   <li key={s.id} className="text-sm text-ink-text">
                     {s.oposicionNombre}
                     <span className="ml-2 text-xs text-neutral-500">
-                      {s.activa ? s.estado : "inactiva"} · desde {fecha(s.fechaInicio)}
+                      {s.activa ? (s.asignadaPorEquipo ? "asignada por el equipo" : s.estado) : "inactiva"} · desde {fecha(s.fechaInicio)}
                     </span>
                   </li>
                 ))}
@@ -336,6 +343,112 @@ function FichaUsuario({ id, permisos, esYo, onCambio }: { id: string; permisos: 
         )}
       </div>
     </Tarjeta>
+  );
+}
+
+/**
+ * Oposiciones del usuario con la opción de darle acceso a otra sin pasar por
+ * el pago, o de retirar una que se le dio desde aquí. Las de pago se ven pero
+ * no se tocan: se gestionan en Stripe.
+ */
+function OposicionesUsuario({
+  usuarioId,
+  suscripciones,
+  onCambio,
+}: {
+  usuarioId: string;
+  suscripciones: NonNullable<Awaited<ReturnType<typeof getUsuario>>["suscripciones"]>;
+  onCambio: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const catalogo = useQuery({ queryKey: ["admin", "oposiciones"], queryFn: listOposiciones });
+  const [elegida, setElegida] = useState("");
+  const [quitando, setQuitando] = useState<string | null>(null);
+
+  const actualizar = (datos: Awaited<ReturnType<typeof getUsuario>>) => {
+    queryClient.setQueryData(["admin", "usuario", usuarioId], datos);
+    onCambio();
+  };
+  const asignar = useMutation({
+    mutationFn: () => asignarOposicion(usuarioId, elegida),
+    onSuccess: (datos) => {
+      setElegida("");
+      actualizar(datos);
+    },
+  });
+  const quitar = useMutation({
+    mutationFn: (suscripcionId: string) => quitarOposicion(usuarioId, suscripcionId),
+    onSuccess: (datos) => {
+      setQuitando(null);
+      actualizar(datos);
+    },
+  });
+
+  const activas = new Set(suscripciones.filter((s) => s.activa).map((s) => s.oposicionId));
+  const disponibles = (catalogo.data ?? []).filter((o) => !activas.has(o.id));
+  const ordenadas = [...suscripciones].sort((a, b) => Number(b.activa) - Number(a.activa));
+
+  return (
+    <Campo titulo="Oposiciones">
+      {ordenadas.length === 0 ? (
+        <p className="text-sm text-neutral-500">No tiene acceso a ninguna oposición de pago.</p>
+      ) : (
+        <ul className="space-y-2">
+          {ordenadas.map((s) => (
+            <li key={s.id} className="rounded-md border border-ink-divider px-3 py-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className={`text-sm ${s.activa ? "text-ink-text" : "text-neutral-500 line-through"}`}>{s.oposicionNombre}</span>
+                {s.activa && s.asignadaPorEquipo && quitando !== s.id && (
+                  <button type="button" onClick={() => { setQuitando(s.id); quitar.reset(); }} className="text-xs text-neutral-400 hover:text-red-300">
+                    Quitar
+                  </button>
+                )}
+              </div>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                {!s.activa
+                  ? `Sin acceso${s.fechaFin ? ` desde el ${fecha(s.fechaFin)}` : ""}`
+                  : s.asignadaPorEquipo
+                    ? `Asignada por el equipo el ${fecha(s.fechaInicio)} · sin coste`
+                    : `Suscripción de pago (${s.estado}) desde el ${fecha(s.fechaInicio)} · se gestiona en Stripe`}
+              </p>
+              {quitando === s.id && (
+                <div className="mt-2 rounded-md border border-red-400/40 bg-red-500/10 p-2 text-xs text-neutral-300">
+                  <p>¿Quitarle el acceso a {s.oposicionNombre}? Conserva su progreso, pero deja de ver los temas de pago.</p>
+                  <div className="mt-2 flex gap-2">
+                    <button type="button" disabled={quitar.isPending} onClick={() => quitar.mutate(s.id)} className="rounded-md border border-red-400/60 px-3 py-1 text-red-300 hover:bg-red-500/15">
+                      {quitar.isPending ? "Quitando…" : "Sí, quitar"}
+                    </button>
+                    <button type="button" onClick={() => setQuitando(null)} className={buttonClass("ghost")}>Cancelar</button>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {quitar.isError && <p className="mt-1 text-xs text-red-400">{mensaje(quitar.error, "No se ha podido quitar la oposición")}</p>}
+
+      <div className="mt-3 flex gap-2">
+        <select
+          value={elegida}
+          onChange={(e) => { setElegida(e.target.value); asignar.reset(); }}
+          disabled={!disponibles.length}
+          aria-label="Oposición a asignar"
+          className="min-w-0 flex-1 rounded-md border border-ink-divider bg-ink px-2 py-1.5 text-sm text-ink-text outline-none focus:border-accent"
+        >
+          <option value="">{catalogo.isLoading ? "Cargando…" : disponibles.length ? "Elige una oposición…" : "Ya tiene todas"}</option>
+          {disponibles.map((o) => <option key={o.id} value={o.id}>{o.nombre}</option>)}
+        </select>
+        <button type="button" disabled={!elegida || asignar.isPending} onClick={() => asignar.mutate()} className={buttonClass("primary")}>
+          {asignar.isPending ? "Asignando…" : "Asignar"}
+        </button>
+      </div>
+      <p className="mt-1 text-xs text-neutral-500">
+        Le da acceso completo a esa oposición al momento y sin pago, hasta que se lo quites.
+      </p>
+      {asignar.isSuccess && <p className="mt-1 text-xs text-green-400">Oposición asignada.</p>}
+      {asignar.isError && <p className="mt-1 text-xs text-red-400">{mensaje(asignar.error, "No se ha podido asignar la oposición")}</p>}
+    </Campo>
   );
 }
 

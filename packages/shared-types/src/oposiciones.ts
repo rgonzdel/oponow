@@ -40,11 +40,12 @@ export const OPOSICIONES: Oposicion[] = [
     requisitos:
       "Bachillerato, Técnico (FP de Grado Medio) o equivalente. También válida la prueba de acceso a la universidad para mayores de 25 años.",
     estructuraExamen: [
-      "Ejercicio único de 120 minutos, sin fase de concurso (oposición pura).",
-      "Primera parte: cuestionario tipo test de 80 preguntas (+5 de reserva) sobre los 4 bloques del temario.",
-      "Segunda parte: un supuesto práctico a elegir entre dos propuestos —uno del Bloque III y otro del Bloque IV—, con 20 preguntas (+5 de reserva).",
+      "Ejercicio único de 120 minutos con dos partes, ambas obligatorias y eliminatorias, que se hacen en la misma sesión.",
+      "Primera parte: cuestionario de un máximo de 80 preguntas (+5 de reserva) sobre el programa.",
+      "Segunda parte: un supuesto práctico a elegir entre dos, uno del bloque III y otro del bloque IV, con 20 preguntas (+5 de reserva).",
       "Cada error resta un tercio de un acierto; las preguntas en blanco no penalizan.",
-      "Tras superar el ejercicio, curso selectivo organizado por el INAP antes del nombramiento como funcionario de carrera.",
+      "Se califica de 0 a 100: cada parte de 0 a 50, con un mínimo de 25 en cada una.",
+      "Fuente: anexo V de la convocatoria de 18 de diciembre de 2025 (BOE-A-2025-26262).",
     ],
     bloques: [
       { numero: "I", nombre: "Organización del Estado y Administración Electrónica", temas: 9 },
@@ -74,9 +75,12 @@ export const OPOSICIONES: Oposicion[] = [
     requisitos:
       "Título de Graduado en Educación Secundaria Obligatoria (ESO), Graduado Escolar, Técnico (FP de Grado Medio) o equivalente.",
     estructuraExamen: [
-      "Temario en dos bloques: Organización Pública (16 temas) y Actividad Administrativa y Ofimática (12 temas).",
-      "Programa fijado en el Anexo I de la convocatoria (BOE-A-2025-26262), de acceso libre al Cuerpo.",
-      "Consulta siempre el BOE de la convocatoria vigente para la estructura exacta del ejercicio (número de preguntas, duración y criterios de corrección pueden variar entre convocatorias).",
+      "Ejercicio único de 90 minutos con dos partes, ambas obligatorias y eliminatorias, que se hacen en la misma sesión.",
+      "Primera parte: hasta 60 preguntas (+5 de reserva): 30 del bloque I y 30 psicotécnicas (aptitudes administrativas, numéricas o verbales).",
+      "Segunda parte: hasta 50 preguntas (+5 de reserva) del bloque II; las de Windows y Office se refieren a Windows 11 y Microsoft 365 de escritorio.",
+      "Cada error resta un tercio de un acierto; las preguntas en blanco no penalizan.",
+      "Se califica de 0 a 100: cada parte de 0 a 50, con un mínimo de 25 en cada una.",
+      "Fuente: anexo I de la convocatoria de 18 de diciembre de 2025 (BOE-A-2025-26262).",
     ],
     bloques: [
       { numero: "I", nombre: "Organización Pública", temas: 16 },
@@ -94,7 +98,7 @@ export const OPOSICIONES: Oposicion[] = [
     nombre: "Gestión de Sistemas e Informática",
     siglas: "GSI",
     organismo: "Administración General del Estado",
-    grupo: "B",
+    grupo: "A2",
     disponible: true,
     resumen:
       "Administración de sistemas, ciberseguridad y gestión de proyectos TIC en la Administración General del Estado, un escalón por encima de TAI.",
@@ -103,15 +107,22 @@ export const OPOSICIONES: Oposicion[] = [
     requisitos:
       "Título universitario de Grado, o Diplomado/Ingeniero Técnico, o equivalente.",
     estructuraExamen: [
-      "Programa de 10 temas específicos fijado en el Anexo III de la convocatoria (BOE-A-2025-26906).",
-      "Sistema de concurso-oposición: fase de oposición con ejercicio(s) sobre el programa, más valoración de méritos.",
-      "Consulta siempre el BOE de la convocatoria vigente para la estructura exacta del ejercicio.",
+      "Fase de oposición con dos ejercicios obligatorios y eliminatorios, seguida de un curso selectivo.",
+      "Primer ejercicio: cuestionario de hasta 100 preguntas (+5 de reserva) sobre el programa, en 90 minutos; cada error resta un tercio de un acierto.",
+      "Segundo ejercicio: un supuesto práctico escrito a elegir entre dos, con 5 preguntas, en un máximo de 180 minutos.",
+      "Cada ejercicio se califica de 0 a 50, con un mínimo de 25; en el segundo se valoran conocimientos técnicos (30), análisis (10), sistemática (5) y expresión escrita (5).",
+      "Fuente: anexo IX de la convocatoria de 18 de diciembre de 2025 (BOE-A-2025-26262).",
     ],
-    bloques: [{ numero: "único", nombre: "Materias específicas", temas: 10 }],
+    bloques: [
+      { numero: "I", nombre: "Organización del Estado y Administración electrónica", temas: 10 },
+      { numero: "II", nombre: "Tecnología básica", temas: 16 },
+      { numero: "III", nombre: "Desarrollo de sistemas", temas: 15 },
+      { numero: "IV", nombre: "Sistemas y comunicaciones", temas: 16 },
+    ],
     plazasInfo:
       "Convocatorias más reducidas que TAI o Auxiliar Administrativo, dentro de la oferta anual de empleo TIC de la AGE. Cifra orientativa — consulta siempre el BOE de la convocatoria vigente.",
     sueldoInfo:
-      "Sueldo base de Grupo B fijado cada año en la Ley de Presupuestos Generales del Estado, más complemento de destino y específico según el puesto. Orientativo: 24.000–32.000 € brutos/año al inicio.",
+      "Sueldo base del Subgrupo A2 fijado cada año en la Ley de Presupuestos Generales del Estado, más complemento de destino y específico según el puesto. Orientativo: 24.000–32.000 € brutos/año al inicio.",
     aniosExamenes: [],
     totalPreguntas: 0,
   },
@@ -130,8 +141,12 @@ export const OPOSICIONES: Oposicion[] = [
       "Título de Bachiller, Técnico (FP de Grado Medio) o equivalente.",
     estructuraExamen: [
       "Temario en seis bloques (45 temas): Organización del Estado y de la Administración pública, Organización de oficinas públicas, Derecho administrativo general, Gestión de personal, Gestión financiera, e Informática básica y ofimática.",
-      "Programa fijado en el Anexo III de la convocatoria (BOE-A-2025-26262), de acceso libre al Cuerpo.",
-      "Consulta siempre el BOE de la convocatoria vigente para la estructura exacta del ejercicio (número de preguntas, duración y criterios de corrección pueden variar entre convocatorias).",
+      "Ejercicio único de 100 minutos con dos partes, ambas obligatorias y eliminatorias, que se hacen en la misma sesión.",
+      "Primera parte: hasta 70 preguntas (+5 de reserva): 40 de los bloques I a V y 30 del bloque VI (ofimática con Windows 11 y Microsoft 365).",
+      "Segunda parte: un supuesto práctico a elegir entre dos, sobre los bloques II a V, con 20 preguntas (+5 de reserva).",
+      "Cada error resta un tercio de un acierto; las preguntas en blanco no penalizan.",
+      "Se califica de 0 a 100: cada parte de 0 a 50, con un mínimo de 25 en cada una.",
+      "Fuente: anexo III de la convocatoria de 18 de diciembre de 2025 (BOE-A-2025-26262).",
     ],
     bloques: [
       { numero: "I", nombre: "Organización del Estado y de la Administración pública", temas: 11 },

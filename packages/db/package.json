@@ -14,6 +14,8 @@
     "seed": "tsx src/seed.ts",
     "import-banco-tai": "tsx src/import-banco-tai.ts",
     "verificar-banco-tai-boe": "tsx src/verificar-banco-tai-boe.ts",
+    "verificar-banco-oficial": "tsx src/verificar-banco-oficial.ts",
+    "import-banco-oficial": "tsx src/import-banco-oficial.ts",
     "studio": "drizzle-kit studio",
     "verificar-flashcards": "tsx src/verificar-flashcards.ts",
     "import-flashcards": "tsx src/import-flashcards.ts"

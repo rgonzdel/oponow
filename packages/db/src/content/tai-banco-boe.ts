@@ -63,7 +63,7 @@ export function aPreguntaBancoTai(p: PreguntaBoe, indice: number): PreguntaBanco
     enunciado: p.e,
     opciones,
     respuestaCorrecta: posicion,
-    justificacionIa: `${p.j ? p.j + " " : ""}El ${articulo} de ${norma.nombre} dispone: «${p.cita.replace(/\.$/, "")}».`,
+    justificacionIa: `${p.j ? p.j + " " : ""}El ${articulo} ${norma.nombre.startsWith("el ") ? "del " + norma.nombre.slice(3) : "de " + norma.nombre} dispone: «${p.cita.replace(/\.$/, "")}».`,
     mnemotecnia: p.m ?? "",
     dificultad: p.d,
   };

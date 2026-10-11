@@ -37,6 +37,7 @@ function destinoTai(id: string): Destino | null {
   if (id.startsWith("of-lpac-") || id.startsWith("of-at-") || FIRMA_TAI.has(id)) return ["tai", 2];
   if (id.startsWith("of-age-") || ["of-fu-19", "of-fu-20", "of-fu-21"].includes(id)) return ["tai", 5];
   if (id.startsWith("of-gp-")) return ["tai", 8];
+  if (id.startsWith("of-dp-")) return ["tai", 4];
   if (id.startsWith("of-ci-") || id.startsWith("of-pd-")) return ["tai", 16];
   return null;
 }

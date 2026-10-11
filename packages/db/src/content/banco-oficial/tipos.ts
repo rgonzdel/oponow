@@ -8,6 +8,7 @@ import { NORMAS_BANCO, type PreguntaBoe } from "../tai-banco-boe";
 export const NORMAS_OFICIALES = {
   ...NORMAS_BANCO,
   CC: { boeId: "BOE-A-1889-4763", nombre: "el Código Civil", corto: "Código Civil" },
+  LOREG: { boeId: "BOE-A-1985-11672", nombre: "la Ley Orgánica 5/1985, del Régimen Electoral General", corto: "LOREG" },
   LODP: { boeId: "BOE-A-1981-10325", nombre: "la Ley Orgánica 3/1981, del Defensor del Pueblo", corto: "LO 3/1981" },
   LPRL: { boeId: "BOE-A-1995-24292", nombre: "la Ley 31/1995, de Prevención de Riesgos Laborales", corto: "Ley 31/1995" },
   RD208: { boeId: "BOE-A-1996-4997", nombre: "el Real Decreto 208/1996, de servicios de información administrativa y atención al ciudadano", corto: "RD 208/1996" },

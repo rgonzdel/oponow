@@ -6,6 +6,8 @@
 //   pnpm --filter @oponow/db verificar-banco-oficial
 import { NORMAS_OFICIALES, bancoOficial, preguntasDe, SLUGS_OFICIALES } from "./content/banco-oficial";
 import { normalizar, preceptos, type ResultadoVerificacion } from "./verificar-flashcards";
+import { TAI_BANCO_PREGUNTAS } from "./content/tai-banco-preguntas";
+import { TAI_BANCO_BOE_PREGUNTAS } from "./content/tai-banco-boe";
 
 const plano = (s: string) => normalizar(s).toLowerCase();
 

@@ -5,6 +5,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 import { preguntasDe, SLUGS_OFICIALES } from "./content/banco-oficial";
+import { bloqueOficial, TEMAS_OFICIALES } from "./content/banco-oficial/temas-oficiales";
 import { verificarBancoOficial } from "./verificar-banco-oficial";
 import { sslModeFor } from "./ssl";
 
@@ -12,8 +13,11 @@ config({ path: path.resolve(__dirname, "../../../.env") });
 
 // Importa el banco oficial (content/banco-oficial) en los temas ya sembrados
 // de cada oposición. Igual que import-banco-tai.ts: no crea temas (si falta
-// alguno, aborta sin escribir nada), es idempotente por (tema_id, enunciado)
-// y antes comprueba todo el banco contra el BOE.
+// alguno, aborta sin escribir nada) salvo los del programa oficial listados en
+// temas-oficiales.ts, que crea con un bloque de contenido (epígrafe literal y
+// texto literal del BOE de los preceptos que preguntan) y regenera en cada
+// importación. Es idempotente por (tema_id, enunciado) y antes comprueba todo
+// el banco contra el BOE.
 //   sin argumentos: simulación;  --apply: escribe (una transacción);
 //   --slug <oposición>: solo esa oposición.
 async function main() {
@@ -33,7 +37,12 @@ async function main() {
   const client = postgres(url, { max: 1, ssl: sslModeFor(url) });
   const db = drizzle(client, { schema });
   try {
-    const planes: { slug: string; filas: { temaId: string; p: ReturnType<typeof preguntasDe>[number]; id?: string }[] }[] = [];
+    const planes: {
+      slug: string;
+      oposicionId: string;
+      filas: { temaId: string; p: ReturnType<typeof preguntasDe>[number]; id?: string }[];
+      bloques: { orden: number; contenido: string }[];
+    }[] = [];
     for (const slug of slugs) {
       const banco = preguntasDe(slug);
       const [op] = await db.select({ id: schema.oposiciones.id }).from(schema.oposiciones).where(eq(schema.oposiciones.slug, slug)).limit(1);
@@ -46,20 +55,26 @@ async function main() {
             .where(and(eq(schema.temas.oposicionId, op.id), inArray(schema.temas.orden, ordenes)))
         : [];
       const temaIdPorOrden = new Map(temas.map((t) => [t.orden, t.id]));
+      const oficiales = TEMAS_OFICIALES[slug] ?? {};
+      const crear = ordenes.filter((o) => !temaIdPorOrden.has(o) && oficiales[o]);
+      for (const o of crear) temaIdPorOrden.set(o, `nuevo:${o}`);
       const faltan = ordenes.filter((o) => !temaIdPorOrden.has(o));
       if (faltan.length) throw new Error(`Faltan temas de ${slug}: ${faltan.join(", ")}`);
       const existentes = temas.length
         ? await db
             .select({ id: schema.preguntas.id, temaId: schema.preguntas.temaId, enunciado: schema.preguntas.enunciado })
             .from(schema.preguntas)
-            .where(inArray(schema.preguntas.temaId, [...temaIdPorOrden.values()]))
+            .where(inArray(schema.preguntas.temaId, temas.map((t) => t.id)))
         : [];
       const idExistente = new Map(existentes.map((e) => [`${e.temaId}|${e.enunciado}`, e.id]));
       const filas = banco.map((p) => {
         const temaId = temaIdPorOrden.get(p.temaOrden)!;
         return { temaId, p, id: idExistente.get(`${temaId}|${p.enunciado}`) };
       });
-      planes.push({ slug, filas });
+      const bloques = Object.keys(oficiales).map(Number).filter((o) => ordenes.includes(o)).map((o) => ({ orden: o, contenido: "" }));
+      for (const b of bloques) b.contenido = await bloqueOficial(slug, b.orden);
+      planes.push({ slug, filas, oposicionId: op.id, bloques });
+      for (const o of crear) console.log(`  (se crea el tema ${o}: ${oficiales[o].titulo})`);
       console.log(`\n${slug}: ${banco.length} en el banco, ${filas.filter((f) => !f.id).length} nuevas`);
       for (const orden of ordenes.sort((a, b) => a - b)) {
         const temaId = temaIdPorOrden.get(orden)!;
@@ -74,8 +89,21 @@ async function main() {
       return;
     }
     await db.transaction(async (tx) => {
-      for (const { filas } of planes) {
-        for (const { temaId, p, id } of filas) {
+      for (const { slug, oposicionId, filas, bloques } of planes) {
+        const idReal = new Map<string, string>();
+        for (const { orden, contenido } of bloques) {
+          const { titulo } = TEMAS_OFICIALES[slug][orden];
+          let [tema] = await tx.select({ id: schema.temas.id }).from(schema.temas)
+            .where(and(eq(schema.temas.oposicionId, oposicionId), eq(schema.temas.orden, orden))).limit(1);
+          if (!tema) [tema] = await tx.insert(schema.temas).values({ oposicionId, orden, titulo, esGratuito: false }).returning({ id: schema.temas.id });
+          idReal.set(`nuevo:${orden}`, tema.id);
+          const [bloque] = await tx.select({ id: schema.bloquesContenido.id }).from(schema.bloquesContenido)
+            .where(and(eq(schema.bloquesContenido.temaId, tema.id), eq(schema.bloquesContenido.orden, 1))).limit(1);
+          if (bloque) await tx.update(schema.bloquesContenido).set({ contenido }).where(eq(schema.bloquesContenido.id, bloque.id));
+          else await tx.insert(schema.bloquesContenido).values({ temaId: tema.id, orden: 1, contenido });
+        }
+        for (const { temaId: t, p, id } of filas) {
+          const temaId = idReal.get(t) ?? t;
           const datos = {
             opciones: p.opciones,
             respuestaCorrecta: p.respuestaCorrecta,

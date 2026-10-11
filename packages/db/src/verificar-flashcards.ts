@@ -38,6 +38,27 @@ export async function preceptos(boeId: string): Promise<Map<string, string>> {
   return mapa;
 }
 
+/**
+ * Texto vigente de cada precepto conservando los párrafos (para mostrarlo),
+ * por su título normalizado; sin la línea del título.
+ */
+export async function preceptosLegibles(boeId: string): Promise<Map<string, string>> {
+  const res = await fetch(`${API}/${boeId}/texto`, { headers: { Accept: "application/xml" } });
+  if (!res.ok) throw new Error(`BOE respondió ${res.status} para ${boeId}`);
+  const xml = await res.text();
+  const mapa = new Map<string, string>();
+  for (const m of xml.matchAll(/<bloque id="[^"]+" tipo="precepto" titulo="([^"]*)">([\s\S]*?)<\/bloque>/g)) {
+    const versiones = [...m[2].matchAll(/<version[^>]*>([\s\S]*?)<\/version>/g)];
+    if (!versiones.length) continue;
+    const parrafos = [...versiones.at(-1)![1].matchAll(/<p class="([^"]*)"[^>]*>([\s\S]*?)<\/p>/g)]
+      .filter(([, clase]) => !/articulo|nota|refPost|cita/.test(clase))
+      .map(([, , html]) => textoPlano(html).replace(/[ \s]+/g, " ").trim())
+      .filter(Boolean);
+    mapa.set(normalizar(m[1]), parrafos.join("\n\n"));
+  }
+  return mapa;
+}
+
 export interface ResultadoVerificacion {
   total: number;
   errores: string[];

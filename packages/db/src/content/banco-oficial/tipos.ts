@@ -19,6 +19,12 @@ export const NORMAS_OFICIALES = {
   LCONF: { boeId: "BOE-A-2020-14046", nombre: "la Ley 6/2020, de servicios electrónicos de confianza", corto: "Ley 6/2020" },
   RD203: { boeId: "BOE-A-2021-5032", nombre: "el Reglamento de actuación y funcionamiento del sector público por medios electrónicos (RD 203/2021)", corto: "RD 203/2021" },
   RPOSTAL: { boeId: "BOE-A-2024-10010", nombre: "el Reglamento de los servicios postales (RD 437/2024)", corto: "RD 437/2024" },
+  LBLANQ: { boeId: "BOE-A-2010-6737", nombre: "la Ley 10/2010, de prevención del blanqueo de capitales y de la financiación del terrorismo", corto: "Ley 10/2010" },
+  LTRANSP: { boeId: "BOE-A-2013-12887", nombre: "la Ley 19/2013, de transparencia, acceso a la información pública y buen gobierno", corto: "Ley 19/2013" },
+  LOIGUALDAD: { boeId: "BOE-A-2007-6115", nombre: "la Ley Orgánica 3/2007, para la igualdad efectiva de mujeres y hombres", corto: "LO 3/2007" },
+  RD486: { boeId: "BOE-A-1997-8669", nombre: "el Real Decreto 486/1997, sobre lugares de trabajo", corto: "RD 486/1997" },
+  RD487: { boeId: "BOE-A-1997-8670", nombre: "el Real Decreto 487/1997, sobre manipulación manual de cargas", corto: "RD 487/1997" },
+  RD488: { boeId: "BOE-A-1997-8671", nombre: "el Real Decreto 488/1997, sobre equipos con pantallas de visualización", corto: "RD 488/1997" },
 } as const;
 
 export type NormaOficial = keyof typeof NORMAS_OFICIALES;

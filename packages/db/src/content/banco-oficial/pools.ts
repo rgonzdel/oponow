@@ -17,5 +17,6 @@ import { TAI3_GOBIERNO } from "./tai3-gobierno";
 import { TAI3_JUSTICIA } from "./tai3-justicia";
 import { TAI3_TERRITORIAL } from "./tai3-territorial";
 import { TAI3_HACIENDA } from "./tai3-hacienda";
+import { CORREOS3 } from "./correos3";
 
-export const POOLS: PreguntaOficial[] = [...LPAC, ...DEFENSOR, ...AGE, ...TREBEP, ...ATENCION_CIUDADANO, ...FUENTES, ...PRESUPUESTO, ...LCSP, ...FIRMA, ...CIBER, ...DATOS, ...POSTAL, ...PRL, ...POSTAL2, ...TAI3_CORTES, ...TAI3_GOBIERNO, ...TAI3_JUSTICIA, ...TAI3_TERRITORIAL, ...TAI3_HACIENDA];
+export const POOLS: PreguntaOficial[] = [...LPAC, ...DEFENSOR, ...AGE, ...TREBEP, ...ATENCION_CIUDADANO, ...FUENTES, ...PRESUPUESTO, ...LCSP, ...FIRMA, ...CIBER, ...DATOS, ...POSTAL, ...PRL, ...POSTAL2, ...TAI3_CORTES, ...TAI3_GOBIERNO, ...TAI3_JUSTICIA, ...TAI3_TERRITORIAL, ...TAI3_HACIENDA, ...CORREOS3];

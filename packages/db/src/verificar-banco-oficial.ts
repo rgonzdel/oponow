@@ -27,7 +27,7 @@ export async function verificarBancoOficial(): Promise<ResultadoVerificacion> {
     for (const m of p.mal) if (plano(m).includes(clave)) errores.push(`${p.id}: la clave aparece en el distractor «${m}»`);
   }
   for (const slug of SLUGS_OFICIALES) {
-    const vistos = new Set<string>();
+    const vistos = new Set<string>(slug === "tai" ? [...TAI_BANCO_PREGUNTAS, ...TAI_BANCO_BOE_PREGUNTAS].map((p) => plano(p.enunciado)) : []);
     for (const p of preguntasDe(slug)) {
       if (vistos.has(plano(p.enunciado))) errores.push(`${slug}/${p.id}: enunciado repetido en la oposición`);
       vistos.add(plano(p.enunciado));

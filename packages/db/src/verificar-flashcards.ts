@@ -25,8 +25,35 @@ export function normalizar(s: string): string {
     .trim();
 }
 
+/**
+ * Tratados de la UE: no están en la API de legislación consolidada, pero el
+ * BOE publica en su web el texto del DOUE (versiones consolidadas, DOUE C 83
+ * de 30.3.2010). "DOUE-Z-2010-70005" es el TUE; "DOUE-Z-2010-70002#TFUE", el
+ * TFUE dentro del documento conjunto de los Tratados. Devuelve los artículos
+ * en orden, con sus párrafos (sin rótulos de títulos y capítulos ni las
+ * referencias «(antiguo artículo …)»).
+ */
+async function articulosDoue(id: string): Promise<[string, string[]][]> {
+  const [doc, parte] = id.split("#");
+  const res = await fetch(`https://www.boe.es/buscar/doc.php?id=${doc}`);
+  if (!res.ok) throw new Error(`BOE respondió ${res.status} para ${doc}`);
+  let p = [...(await res.text()).matchAll(/<p class="[^"]*"[^>]*>([\s\S]*?)<\/p>/g)].map((m) => textoPlano(m[1]).replace(/[ \s]+/g, " ").trim());
+  if (parte === "TFUE") {
+    const ini = p.findIndex((x, i) => x === "PRIMERA PARTE" && p[i + 1] === "PRINCIPIOS");
+    const fin = p.findIndex((x, i) => i > ini && /^PROTOCOLO/.test(x));
+    p = p.slice(ini, fin > ini ? fin : undefined);
+  }
+  const arts: [string, string[]][] = [];
+  for (const x of p) {
+    if (/^Artículo \d+( bis| ter)?$/.test(x)) arts.push([x, []]);
+    else if (arts.length && x && !/^\(antiguo/.test(x) && x !== x.toUpperCase()) arts.at(-1)![1].push(x);
+  }
+  return arts;
+}
+
 /** Texto vigente (última versión) de cada precepto, por su título. */
 export async function preceptos(boeId: string): Promise<Map<string, string>> {
+  if (boeId.startsWith("DOUE-")) return new Map((await articulosDoue(boeId)).map(([t, ps]) => [normalizar(t), normalizar(ps.join(" "))]));
   const res = await fetch(`${API}/${boeId}/texto`, { headers: { Accept: "application/xml" } });
   if (!res.ok) throw new Error(`BOE respondió ${res.status} para ${boeId}`);
   const xml = await res.text();
@@ -43,6 +70,7 @@ export async function preceptos(boeId: string): Promise<Map<string, string>> {
  * por su título normalizado; sin la línea del título.
  */
 export async function preceptosLegibles(boeId: string): Promise<Map<string, string>> {
+  if (boeId.startsWith("DOUE-")) return new Map((await articulosDoue(boeId)).map(([t, ps]) => [normalizar(t), ps.join("\n\n")]));
   const res = await fetch(`${API}/${boeId}/texto`, { headers: { Accept: "application/xml" } });
   if (!res.ok) throw new Error(`BOE respondió ${res.status} para ${boeId}`);
   const xml = await res.text();

@@ -77,6 +77,7 @@ function ampliacion(p: { id: string; norma: string; art: string }): Destino[] {
   if (pre("of-gp-") || pre("t3-gp-") || (pre("tai-boe-t08-") && (norma === "LGP" || p.art === "Artículo 134"))) d.push([AUX, 15]);
   if (pre("t3-gp-")) d.push([ADM, 33]);
   if (pre("of-c3-") && norma === "LOIGUALDAD") d.push([AUX, 16], [ADM, 22]);
+  if (pre("of-ci-") && norma === "ENS" && num(id) <= 22) d.push(["correos", 10]);
   if (pre("of-fi-") && (norma === "RD203" || (norma === "LRJSP" && ["Artículo 38", "Artículo 39"].includes(p.art)) || (norma === "LPAC" && num(id) <= 6))) d.push([AUX, 20], [ADM, 14]);
   return d;
 }

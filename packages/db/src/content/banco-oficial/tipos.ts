@@ -23,6 +23,7 @@ export const NORMAS_OFICIALES = {
   LTRANSP: { boeId: "BOE-A-2013-12887", nombre: "la Ley 19/2013, de transparencia, acceso a la información pública y buen gobierno", corto: "Ley 19/2013" },
   LOIGUALDAD: { boeId: "BOE-A-2007-6115", nombre: "la Ley Orgánica 3/2007, para la igualdad efectiva de mujeres y hombres", corto: "LO 3/2007" },
   RD951: { boeId: "BOE-A-2005-14836", nombre: "el Real Decreto 951/2005, marco general para la mejora de la calidad en la Administración General del Estado", corto: "RD 951/2005" },
+  LGS: { boeId: "BOE-A-2003-20977", nombre: "la Ley 38/2003, General de Subvenciones", corto: "Ley 38/2003" },
   RD486: { boeId: "BOE-A-1997-8669", nombre: "el Real Decreto 486/1997, sobre lugares de trabajo", corto: "RD 486/1997" },
   RD487: { boeId: "BOE-A-1997-8670", nombre: "el Real Decreto 487/1997, sobre manipulación manual de cargas", corto: "RD 487/1997" },
   RD488: { boeId: "BOE-A-1997-8671", nombre: "el Real Decreto 488/1997, sobre equipos con pantallas de visualización", corto: "RD 488/1997" },

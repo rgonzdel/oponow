@@ -1,0 +1,61 @@
+// Correos, programa oficial tema 1 «Correos: marco normativo postal y
+// naturaleza jurídica …» → tema 10 de la BD: disposiciones adicionales y
+// finales de la Ley 43/2010 (BOE-A-2010-20139) que no preguntan postal.ts ni
+// postal2.ts.
+import type { Destino, PreguntaOficial } from "./tipos";
+
+const T10: Destino[] = [["correos", 10]];
+const lp = (x: Omit<PreguntaOficial, "norma" | "destinos">): PreguntaOficial => ({ norma: "LPOSTAL", destinos: T10, ...x });
+
+export const CORREOS4: PreguntaOficial[] = [
+  lp({ id: "of-c4-01", art: "Disposición adicional primera",
+    cita: "se suscribirá un contrato regulador de la prestación del servicio postal universal entre los ministerios de Economía y Hacienda y Fomento y el citado operador, que se celebrará, por sucesivos períodos quinquenales",
+    clave: "períodos quinquenales",
+    e: "Según la disposición adicional primera de la Ley 43/2010, el contrato regulador de la prestación del servicio postal universal entre los Ministerios y Correos se celebrará por sucesivos:",
+    ok: "Períodos quinquenales.", mal: ["Períodos anuales.", "Períodos de veinte años.", "Períodos bienales."], d: 2 }),
+  lp({ id: "of-c4-02", art: "Disposición adicional segunda",
+    cita: "Periódicamente y como máximo, cada cinco años, la Comisión Delegada del Gobierno para Asuntos Económicos, previo informe de la Comisión Nacional del Sector Postal, valorará el cumplimiento de las condiciones de prestación del servicio postal universal",
+    clave: "Comisión Delegada del Gobierno para Asuntos Económicos",
+    e: "Conforme a la disposición adicional segunda de la Ley 43/2010, ¿qué órgano valora periódicamente, como máximo cada cinco años, el cumplimiento de las condiciones de prestación del servicio postal universal por el operador designado?",
+    ok: "La Comisión Delegada del Gobierno para Asuntos Económicos.", mal: ["El Tribunal de Cuentas.", "La Agencia Española de Protección de Datos.", "El Consejo de Administración de Correos."], d: 3 }),
+  lp({ id: "of-c4-03", art: "Disposición adicional cuarta",
+    cita: "Se crea, adscrita al Ministerio de Fomento, la Comisión Filatélica del Estado, como órgano consultivo",
+    clave: "Comisión Filatélica del Estado",
+    e: "Según la disposición adicional cuarta de la Ley 43/2010, el órgano consultivo con funciones de consulta, asesoramiento y propuesta en materia de emisión de sellos es:",
+    ok: "La Comisión Filatélica del Estado.", mal: ["La Real Casa de la Moneda.", "La Comisión Nacional de los Mercados y la Competencia.", "El Consejo de Estado."], d: 2 }),
+  lp({ id: "of-c4-04", art: "Disposición adicional quinta",
+    cita: "La Orden Civil del Mérito Postal y la Medalla al Mérito Filatélico son las condecoraciones que, en el ámbito postal, pueden otorgarse",
+    clave: "Orden Civil del Mérito Postal",
+    e: "Conforme a la disposición adicional quinta de la Ley 43/2010, las condecoraciones que pueden otorgarse en el ámbito postal son la Medalla al Mérito Filatélico y:",
+    ok: "La Orden Civil del Mérito Postal.", mal: ["La Gran Cruz de Carlos III.", "La Medalla de Oro al Mérito en el Trabajo.", "La Orden del Mérito Civil."], d: 3 }),
+  lp({ id: "of-c4-05", art: "Disposición adicional quinta",
+    cita: "podrá nombrar carteros honorarios entre aquellas personas que se hayan destacado en el apoyo al servicio postal",
+    clave: "carteros honorarios",
+    e: "Según la disposición adicional quinta de la Ley 43/2010, el Presidente de la Sociedad Estatal Correos y Telégrafos podrá nombrar, entre quienes se hayan destacado en el apoyo al servicio postal:",
+    ok: "Carteros honorarios.", mal: ["Inspectores postales.", "Consejeros de la CNMC.", "Funcionarios de carrera."], d: 2 }),
+  lp({ id: "of-c4-06", art: "Disposición adicional sexta",
+    cita: "Se crea el sello de excelencia de empresa postal sostenible",
+    clave: "sello de excelencia de empresa postal sostenible",
+    e: "Conforme a la disposición adicional sexta de la Ley 43/2010, para distinguir a los operadores postales que destaquen por su gestión medioambiental, social, laboral y de responsabilidad social corporativa se crea:",
+    ok: "El sello de excelencia de empresa postal sostenible.", mal: ["El distintivo de igualdad en la empresa.", "La etiqueta ecológica europea.", "El certificado de calidad ISO postal."], d: 2 }),
+  lp({ id: "of-c4-07", art: "Disposición adicional octava",
+    cita: "c) El acceso universal a la Administración Pública.",
+    clave: "acceso universal a la Administración Pública",
+    e: "¿Cuál de los siguientes es un servicio de interés económico general asignado a Correos por la disposición adicional octava de la Ley 43/2010?",
+    ok: "El acceso universal a la Administración Pública.", mal: ["La recaudación de todos los tributos estatales.", "La expedición del DNI.", "La gestión del censo electoral."], d: 2 }),
+  lp({ id: "of-c4-08", art: "Disposición adicional octava",
+    cita: "b) La accesibilidad a servicios financieros básicos. Este servicio se presta en régimen de libre competencia.",
+    clave: "servicios financieros básicos",
+    e: "Conforme a la disposición adicional octava de la Ley 43/2010, entre los servicios de interés económico general asignados a Correos, el que se presta en régimen de libre competencia es:",
+    ok: "La accesibilidad a servicios financieros básicos.", mal: ["El servicio postal universal en exclusiva.", "La emisión de moneda.", "La notificación de sentencias judiciales en exclusiva."], d: 3 }),
+  lp({ id: "of-c4-09", art: "Disposición final tercera",
+    cita: "se considera como servicio complementario a los servicios postales el servicio de giro postal",
+    clave: "giro postal",
+    e: "Según la disposición final tercera de la Ley 43/2010, se considera servicio complementario a los servicios postales, mediante el cual se ordenan pagos a personas por cuenta y encargo de otras a través de la red postal:",
+    ok: "El servicio de giro postal.", mal: ["El servicio de apartado de correos.", "La venta de lotería.", "El servicio de paquetería exprés."], d: 1 }),
+  lp({ id: "of-c4-10", art: "Disposición final cuarta",
+    cita: "Esta ley se dicta al amparo de la competencia exclusiva del Estado en materia de correos prevista en el artículo 149.1.21.ª de la Constitución.",
+    clave: "149.1.21.ª",
+    e: "Conforme a la disposición final cuarta de la Ley 43/2010, esta ley se dicta al amparo de la competencia exclusiva del Estado en materia de correos prevista en el artículo de la Constitución:",
+    ok: "149.1.21.ª", mal: ["148.1.5.ª", "149.1.1.ª", "150.2"], d: 3 }),
+];

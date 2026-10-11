@@ -1,0 +1,61 @@
+// Administrativo 25 (programa BOE-A-2025-26262): «El personal funcionario al
+// servicio de las Administraciones públicas: funcionarios de carrera y
+// funcionarios interinos. La selección de los funcionarios.» TREBEP
+// (BOE-A-2015-11719) art. 10, en los apartados que no pregunta personal.ts.
+import type { Destino, PreguntaOficial } from "./tipos";
+
+const T25: Destino[] = [["administrativo-estado", 25]];
+const eb = (x: Omit<PreguntaOficial, "norma" | "destinos">): PreguntaOficial => ({ norma: "TREBEP", destinos: T25, ...x });
+
+export const INTERINOS: PreguntaOficial[] = [
+  eb({ id: "of-in-01", art: "Artículo 10",
+    cita: "b) La sustitución transitoria de los titulares, durante el tiempo estrictamente necesario.",
+    clave: "sustitución transitoria de los titulares",
+    e: "¿Cuál de las siguientes circunstancias permite nombrar funcionarios interinos según el artículo 10.1 del TREBEP?",
+    ok: "La sustitución transitoria de los titulares, el tiempo estrictamente necesario.", mal: ["La cobertura indefinida de puestos de libre designación sin convocatoria.", "La realización de tareas propias del personal eventual de confianza.", "La sustitución de los funcionarios en huelga durante el conflicto."], d: 1 }),
+  eb({ id: "of-in-02", art: "Artículo 10",
+    cita: "c) La ejecución de programas de carácter temporal, que no podrán tener una duración superior a tres años, ampliable hasta doce meses más",
+    clave: "duración superior a tres años, ampliable hasta doce meses más",
+    e: "Conforme al artículo 10.1.c) del TREBEP, los programas de carácter temporal que justifican el nombramiento de interinos no podrán tener una:",
+    ok: "Duración superior a tres años, ampliable hasta doce meses más.", mal: ["Duración superior a un año, sin posibilidad de ampliación.", "Duración superior a cinco años, ampliable otros cinco.", "Duración inferior a seis meses, en ningún caso."], d: 2 }),
+  eb({ id: "of-in-03", art: "Artículo 10",
+    cita: "d) El exceso o acumulación de tareas por plazo máximo de nueve meses, dentro de un periodo de dieciocho meses.",
+    clave: "nueve meses, dentro de un periodo de dieciocho meses",
+    e: "Según el artículo 10.1.d) del TREBEP, el nombramiento de interinos por exceso o acumulación de tareas tiene un plazo máximo de:",
+    ok: "Nueve meses, dentro de un periodo de dieciocho meses.", mal: ["Seis meses, dentro de un periodo de doce meses.", "Doce meses, dentro de un periodo de veinticuatro meses.", "Tres meses, dentro de un periodo de seis meses."], d: 2 }),
+  eb({ id: "of-in-04", art: "Artículo 10",
+    cita: "rigiéndose en todo caso por los principios de igualdad, mérito, capacidad, publicidad y celeridad, y tendrán por finalidad la cobertura inmediata del puesto",
+    clave: "publicidad y celeridad",
+    e: "Conforme al artículo 10.2 del TREBEP, los procedimientos de selección del personal funcionario interino serán públicos y se regirán por los principios de igualdad, mérito, capacidad y:",
+    ok: "Publicidad y celeridad, para la cobertura inmediata del puesto.", mal: ["Libre designación y confianza, sin necesidad de convocatoria.", "Antigüedad y preferencia de los ya interinos en otro puesto.", "Discrecionalidad y reserva, sin publicidad de las bases."], d: 2 }),
+  eb({ id: "of-in-05", art: "Artículo 10",
+    cita: "El nombramiento derivado de estos procedimientos de selección en ningún caso dará lugar al reconocimiento de la condición de funcionario de carrera.",
+    clave: "en ningún caso dará lugar al reconocimiento de la condición de funcionario de carrera",
+    e: "Según el artículo 10.2 del TREBEP, el nombramiento como funcionario interino:",
+    ok: "En ningún caso dará lugar al reconocimiento de la condición de funcionario de carrera.", mal: ["Dará lugar a la condición de funcionario de carrera a los tres años de servicio.", "Dará lugar a la condición de funcionario de carrera si se supera un curso.", "Dará lugar a la condición de personal laboral fijo al cabo de dos años."], d: 1 }),
+  eb({ id: "of-in-06", art: "Artículo 10",
+    cita: "a) Por la cobertura reglada del puesto por personal funcionario de carrera a través de cualquiera de los procedimientos legalmente establecidos.",
+    clave: "cobertura reglada del puesto por personal funcionario de carrera",
+    e: "Conforme al artículo 10.3 del TREBEP, la Administración formalizará de oficio la finalización de la interinidad, entre otras causas:",
+    ok: "Por la cobertura reglada del puesto por personal funcionario de carrera.", mal: ["Por la solicitud de un permiso por asuntos particulares del interino.", "Por el cambio de titular del órgano del que depende el puesto.", "Por el traslado del interino a otro municipio de la misma provincia."], d: 2 }),
+  eb({ id: "of-in-07", art: "Artículo 10",
+    cita: "sin derecho a compensación alguna",
+    clave: "sin derecho a compensación alguna",
+    e: "Según el artículo 10.3 del TREBEP, cuando la Administración formaliza de oficio la finalización de la relación de interinidad por alguna de las causas previstas, el cese se produce:",
+    ok: "Sin derecho a compensación alguna.", mal: ["Con una indemnización de veinte días por año.", "Con derecho a una plaza de funcionario de carrera.", "Con abono de tres mensualidades de sueldo."], d: 2 }),
+  eb({ id: "of-in-08", art: "Artículo 10",
+    cita: "transcurridos tres años desde el nombramiento del personal funcionario interino se producirá el fin de la relación de interinidad",
+    clave: "transcurridos tres años desde el nombramiento",
+    e: "Conforme al artículo 10.4 del TREBEP, en los nombramientos por plaza vacante, como regla general la relación de interinidad finaliza:",
+    ok: "Transcurridos tres años desde el nombramiento del interino.", mal: ["Transcurridos cinco años desde el nombramiento del interino.", "Cuando el interino cumpla sesenta y cinco años de edad.", "Cuando el interino lo solicite por escrito a la Administración."], d: 2 }),
+  eb({ id: "of-in-09", art: "Artículo 10",
+    cita: "salvo que el correspondiente proceso selectivo quede desierto, en cuyo caso se podrá efectuar otro nombramiento de personal funcionario interino",
+    clave: "proceso selectivo quede desierto",
+    e: "Según el artículo 10.4 del TREBEP, transcurridos tres años la vacante solo podrá ser ocupada por funcionarios de carrera, salvo que:",
+    ok: "El correspondiente proceso selectivo quede desierto.", mal: ["El interino supere una evaluación del desempeño.", "Lo autorice el sindicato más representativo.", "El interino acredite cargas familiares."], d: 3 }),
+  eb({ id: "of-in-10", art: "Artículo 10",
+    cita: "le será aplicable el régimen general del personal funcionario de carrera en cuanto sea adecuado a la naturaleza de su condición temporal",
+    clave: "régimen general del personal funcionario de carrera",
+    e: "Conforme al artículo 10.5 del TREBEP, al personal funcionario interino le será aplicable, en cuanto sea adecuado a su condición temporal:",
+    ok: "El régimen general del personal funcionario de carrera.", mal: ["El Estatuto de los Trabajadores, de forma exclusiva.", "El régimen del personal eventual de confianza.", "El convenio colectivo del personal laboral."], d: 2 }),
+];

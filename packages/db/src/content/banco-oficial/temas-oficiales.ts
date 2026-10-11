@@ -72,29 +72,51 @@ export const TEMAS_OFICIALES: Record<string, Record<number, TemaOficial>> = {
   },
 };
 
+/** Extensión orientativa máxima de cada bloque (caracteres). */
+const LIMITE_BLOQUE = 12000;
+
 /**
- * Bloque de contenido de un tema del programa oficial creado por
+ * Bloques de contenido de un tema del programa oficial creado por
  * import-banco-oficial: epígrafe literal del programa y, por norma y en el
  * orden del BOE, el texto vigente completo de cada precepto que preguntan sus
- * preguntas (descargado del BOE consolidado al importar).
+ * preguntas (descargado del BOE consolidado al importar). Se parte en varios
+ * bloques, siempre entre artículos, para que ninguno resulte excesivo.
  */
-export async function bloqueOficial(slug: string, orden: number): Promise<string> {
+export async function bloquesOficiales(slug: string, orden: number): Promise<string[]> {
   const tema = TEMAS_OFICIALES[slug][orden];
   const preguntas = bancoOficial().filter((p) => p.destinos.some(([s, t]) => s === slug && t === orden));
   const porNorma = new Map<string, Set<string>>();
   for (const p of preguntas) porNorma.set(p.norma, (porNorma.get(p.norma) ?? new Set()).add(normalizar(p.art)));
-  const partes = [`## Programa oficial\n${tema.epigrafe}\n\n*Epígrafe literal del programa (${FUENTE_PROGRAMA[slug]}).*`];
+  const bloques: string[] = [];
+  let actual = `## Programa oficial\n${tema.epigrafe}\n\n*Epígrafe literal del programa (${FUENTE_PROGRAMA[slug]}).*`;
   for (const [norma, arts] of porNorma) {
     const n = NORMAS_OFICIALES[norma as keyof typeof NORMAS_OFICIALES];
     const nombre = n.nombre.replace(/^(el|la) /, "");
+    const titulo = nombre.charAt(0).toUpperCase() + nombre.slice(1);
     const textos = await textosDe(n.boeId);
-    const preceptos = [...textos].filter(([titulo]) => arts.has(titulo)).map(([titulo, texto]) => `#### ${titulo}\n\n${texto}`);
     const fuente = n.boeId.startsWith("DOUE-")
       ? `Versión consolidada publicada en el DOUE (C 83, 30.3.2010), reproducida en boe.es (${n.boeId.split("#")[0]})`
       : `Texto vigente del BOE consolidado (${n.boeId})`;
-    partes.push(`## ${nombre.charAt(0).toUpperCase() + nombre.slice(1)}\n*${fuente}.*\n\n${preceptos.join("\n\n")}`);
+    const cabecera = (seguido: boolean) => `## ${titulo}${seguido ? " (continuación)" : ""}\n*${fuente}.*`;
+    let conPreceptos = false;
+    actual += `\n\n${cabecera(false)}`;
+    for (const [art, texto] of textos) {
+      if (!arts.has(art)) continue;
+      const precepto = `#### ${art}\n\n${texto}`;
+      if (conPreceptos && actual.length + precepto.length > LIMITE_BLOQUE) {
+        bloques.push(actual);
+        actual = cabecera(true);
+      }
+      actual += `\n\n${precepto}`;
+      conPreceptos = true;
+    }
+    if (actual.length > LIMITE_BLOQUE) {
+      bloques.push(actual);
+      actual = "";
+    }
   }
-  return partes.join("\n\n");
+  if (actual) bloques.push(actual);
+  return bloques;
 }
 
 const cache = new Map<string, Promise<Map<string, string>>>();

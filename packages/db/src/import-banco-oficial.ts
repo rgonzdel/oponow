@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 import { preguntasDe, SLUGS_OFICIALES } from "./content/banco-oficial";
-import { bloqueOficial, TEMAS_OFICIALES } from "./content/banco-oficial/temas-oficiales";
+import { bloquesOficiales, TEMAS_OFICIALES } from "./content/banco-oficial/temas-oficiales";
 import { verificarBancoOficial } from "./verificar-banco-oficial";
 import { sslModeFor } from "./ssl";
 
@@ -41,7 +41,7 @@ async function main() {
       slug: string;
       oposicionId: string;
       filas: { temaId: string; p: ReturnType<typeof preguntasDe>[number]; id?: string }[];
-      bloques: { orden: number; contenido: string }[];
+      bloques: { orden: number; contenidos: string[] }[];
     }[] = [];
     for (const slug of slugs) {
       const banco = preguntasDe(slug);
@@ -71,8 +71,8 @@ async function main() {
         const temaId = temaIdPorOrden.get(p.temaOrden)!;
         return { temaId, p, id: idExistente.get(`${temaId}|${p.enunciado}`) };
       });
-      const bloques = Object.keys(oficiales).map(Number).filter((o) => ordenes.includes(o)).map((o) => ({ orden: o, contenido: "" }));
-      for (const b of bloques) b.contenido = await bloqueOficial(slug, b.orden);
+      const bloques = Object.keys(oficiales).map(Number).filter((o) => ordenes.includes(o)).map((o) => ({ orden: o, contenidos: [] as string[] }));
+      for (const b of bloques) b.contenidos = await bloquesOficiales(slug, b.orden);
       planes.push({ slug, filas, oposicionId: op.id, bloques });
       for (const o of crear) console.log(`  (se crea el tema ${o}: ${oficiales[o].titulo})`);
       console.log(`\n${slug}: ${banco.length} en el banco, ${filas.filter((f) => !f.id).length} nuevas`);
@@ -91,16 +91,22 @@ async function main() {
     await db.transaction(async (tx) => {
       for (const { slug, oposicionId, filas, bloques } of planes) {
         const idReal = new Map<string, string>();
-        for (const { orden, contenido } of bloques) {
+        for (const { orden, contenidos } of bloques) {
           const { titulo } = TEMAS_OFICIALES[slug][orden];
           let [tema] = await tx.select({ id: schema.temas.id }).from(schema.temas)
             .where(and(eq(schema.temas.oposicionId, oposicionId), eq(schema.temas.orden, orden))).limit(1);
           if (!tema) [tema] = await tx.insert(schema.temas).values({ oposicionId, orden, titulo, esGratuito: false }).returning({ id: schema.temas.id });
           idReal.set(`nuevo:${orden}`, tema.id);
-          const [bloque] = await tx.select({ id: schema.bloquesContenido.id }).from(schema.bloquesContenido)
-            .where(and(eq(schema.bloquesContenido.temaId, tema.id), eq(schema.bloquesContenido.orden, 1))).limit(1);
-          if (bloque) await tx.update(schema.bloquesContenido).set({ contenido }).where(eq(schema.bloquesContenido.id, bloque.id));
-          else await tx.insert(schema.bloquesContenido).values({ temaId: tema.id, orden: 1, contenido });
+          const previos = await tx.select({ id: schema.bloquesContenido.id, orden: schema.bloquesContenido.orden })
+            .from(schema.bloquesContenido).where(eq(schema.bloquesContenido.temaId, tema.id));
+          const porOrden = new Map(previos.map((b) => [b.orden, b.id]));
+          for (const [i, contenido] of contenidos.entries()) {
+            const id = porOrden.get(i + 1);
+            if (id) await tx.update(schema.bloquesContenido).set({ contenido }).where(eq(schema.bloquesContenido.id, id));
+            else await tx.insert(schema.bloquesContenido).values({ temaId: tema.id, orden: i + 1, contenido });
+          }
+          const sobran = previos.filter((b) => b.orden > contenidos.length).map((b) => b.id);
+          if (sobran.length) await tx.delete(schema.bloquesContenido).where(inArray(schema.bloquesContenido.id, sobran));
         }
         for (const { temaId: t, p, id } of filas) {
           const temaId = idReal.get(t) ?? t;

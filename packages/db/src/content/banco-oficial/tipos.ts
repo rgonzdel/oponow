@@ -34,6 +34,7 @@ export const NORMAS_OFICIALES = {
   ET: { boeId: "BOE-A-2015-11430", nombre: "el texto refundido de la Ley del Estatuto de los Trabajadores (RDLeg 2/2015)", corto: "Estatuto de los Trabajadores" },
   TUE: { boeId: "DOUE-Z-2010-70005", nombre: "el Tratado de la Unión Europea", corto: "TUE" },
   TFUE: { boeId: "DOUE-Z-2010-70002#TFUE", nombre: "el Tratado de Funcionamiento de la Unión Europea", corto: "TFUE" },
+  LINCOMP: { boeId: "BOE-A-1985-151", nombre: "la Ley 53/1984, de Incompatibilidades del Personal al Servicio de las Administraciones Públicas", corto: "Ley 53/1984" },
   RD486: { boeId: "BOE-A-1997-8669", nombre: "el Real Decreto 486/1997, sobre lugares de trabajo", corto: "RD 486/1997" },
   RD487: { boeId: "BOE-A-1997-8670", nombre: "el Real Decreto 487/1997, sobre manipulación manual de cargas", corto: "RD 487/1997" },
   RD488: { boeId: "BOE-A-1997-8671", nombre: "el Real Decreto 488/1997, sobre equipos con pantallas de visualización", corto: "RD 488/1997" },

@@ -1,4 +1,4 @@
-// Puente entre la página y el worker de Temis.
+// Puente entre la página y el worker de Silvia.
 import type { ContextoConversacion, MensajeDelWorker, Respuesta } from "./tipos";
 
 export interface Progreso {
@@ -7,7 +7,7 @@ export interface Progreso {
   preceptos: number;
 }
 
-export class ClienteTemis {
+export class ClienteSilvia {
   private readonly worker: Worker;
   private siguienteId = 1;
   private readonly pendientes = new Map<number, { resolver: (r: Respuesta) => void; rechazar: (e: Error) => void }>();

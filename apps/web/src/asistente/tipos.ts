@@ -1,4 +1,4 @@
-// Tipos compartidos por el motor de Temis (que corre en un Web Worker) y la
+// Tipos compartidos por el motor de Silvia (que corre en un Web Worker) y la
 // interfaz de chat. Todo es serializable: viaja por postMessage.
 
 /** Entrada de normativa/fuentes.json. */

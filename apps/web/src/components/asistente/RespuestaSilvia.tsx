@@ -136,7 +136,7 @@ function BloqueVista({ bloque, onConsulta }: { bloque: Bloque; onConsulta: (q: s
   }
 }
 
-export function RespuestaTemis({
+export function RespuestaSilvia({
   respuesta,
   onConsulta,
   mostrarSugerencias,

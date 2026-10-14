@@ -1,4 +1,4 @@
-// Verifica el conocimiento de Temis contra el texto del BOE descargado
+// Verifica el conocimiento de Silvia contra el texto del BOE descargado
 // (src/asistente/normativa/textos). Falla si:
 //  - una cita no aparece LITERALMENTE en el precepto que dice citar;
 //  - un precepto o una norma citada no existe;
@@ -74,4 +74,4 @@ if (errores.length) {
   console.error(`\n${errores.length} error(es):\n- ${errores.join("\n- ")}`);
   process.exit(1);
 }
-console.log("Todo el conocimiento de Temis coincide con el texto consolidado del BOE.");
+console.log("Todo el conocimiento de Silvia coincide con el texto consolidado del BOE.");

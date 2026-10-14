@@ -1,14 +1,14 @@
-// Plantillas de respuesta de Temis. Cada intención tiene una estructura fija
+// Plantillas de respuesta de Silvia. Cada intención tiene una estructura fija
 // (respuesta directa → fundamento literal → claves de examen → trampas →
 // siguiente paso) para que todas las respuestas tengan la misma calidad y
 // se lean igual. Los textos fijos de aquí no contienen datos normativos:
 // esos vienen siempre de las fichas verificadas o del texto del BOE.
 import type { Bloque, FuenteRespuesta, Respuesta, ContextoConversacion } from "./tipos";
 
-export const NOMBRE = "Temis";
+export const NOMBRE = "Silvia";
 
 export const AVISO_GENERAL =
-  "Temis responde con el texto consolidado del BOE que lleva incorporado (no consulta internet). Para un examen, contrasta siempre con la convocatoria y con la versión vigente en boe.es.";
+  "Silvia responde con el texto consolidado del BOE que lleva incorporado (no consulta internet). Para un examen, contrasta siempre con la convocatoria y con la versión vigente en boe.es.";
 
 export function respuesta(
   intencion: string,

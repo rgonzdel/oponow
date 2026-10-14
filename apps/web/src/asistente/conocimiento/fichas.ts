@@ -1,4 +1,4 @@
-// Fichas de Temis: respuestas preparadas a las preguntas más frecuentes de
+// Fichas de Silvia: respuestas preparadas a las preguntas más frecuentes de
 // los opositores. Regla de oro (ver memoria del proyecto): cada dato
 // normativo sale de una cita literal del texto consolidado del BOE, y
 // `pnpm --filter @oponow/web verificar-asistente` comprueba que cada

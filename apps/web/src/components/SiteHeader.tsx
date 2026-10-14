@@ -5,7 +5,7 @@ import { buttonClass } from "./button";
 
 const NAV_LINKS = [
   { to: "/oposiciones", label: "Oposiciones" },
-  { to: "/asistente", label: "Asistente Temis" },
+  { to: "/asistente", label: "Asistente Silvia" },
 ];
 
 export function SiteHeader() {

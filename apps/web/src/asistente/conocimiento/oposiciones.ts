@@ -1,8 +1,8 @@
-// Catálogo de oposiciones de España que conoce Temis. Cubre las grandes
+// Catálogo de oposiciones de España que conoce Silvia. Cubre las grandes
 // familias (Justicia, AGE, Hacienda, Seguridad, Educación, Sanidad, Local,
 // cuerpos generales de cada comunidad autónoma y Correos), no cada
 // convocatoria concreta: plazas, temarios exactos y fechas cambian con cada
-// boletín oficial, y Temis no consulta ninguna fuente en vivo.
+// boletín oficial, y Silvia no consulta ninguna fuente en vivo.
 //
 // `grupoVerificado` / `titulacionVerificada` solo pueden ser true si `citas`
 // contiene el texto literal que lo respalda (lo comprueba

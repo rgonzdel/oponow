@@ -1,7 +1,7 @@
 // Descarga el texto consolidado VIGENTE de cada norma de
 // src/asistente/normativa/fuentes.json desde la API de datos abiertos del
 // BOE y lo guarda en src/asistente/normativa/textos/<clave>.json, que es lo
-// único que lee el asistente (Temis) en el navegador: en tiempo de ejecución
+// único que lee el asistente (Silvia) en el navegador: en tiempo de ejecución
 // no se consulta ninguna API.
 //
 // Uso:  node scripts/descargar-normativa.mjs            (todas)

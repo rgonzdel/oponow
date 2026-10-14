@@ -102,7 +102,7 @@ export function DashboardPage() {
                 to="/asistente"
                 className="rounded-lg border border-ink-divider bg-ink-surface p-5 transition-colors hover:border-accent"
               >
-                <h2 className="text-sm font-medium text-ink-text">Asistente Temis</h2>
+                <h2 className="text-sm font-medium text-ink-text">Asistente Silvia</h2>
                 <p className="mt-1 text-xs text-neutral-500">
                   Pregunta artículos, plazos y oposiciones con el texto literal del BOE, y pide tests.
                 </p>

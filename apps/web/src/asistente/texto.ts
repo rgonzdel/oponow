@@ -1,4 +1,4 @@
-// Utilidades de texto en español para Temis: normalización, tokens, raíces
+// Utilidades de texto en español para Silvia: normalización, tokens, raíces
 // y lectura de números escritos con letra («ciento ochenta y dos»), que es
 // como numeran sus artículos la LOPJ, la LOTC o el EOMF.
 

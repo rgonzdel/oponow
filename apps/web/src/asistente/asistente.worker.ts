@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-// Temis corre en un Web Worker para no bloquear la interfaz mientras indexa
+// Silvia corre en un Web Worker para no bloquear la interfaz mientras indexa
 // ~13.000 preceptos. Las normas son JSON del propio bundle (import.meta.glob
 // las convierte en chunks estáticos de la web): no se llama a ninguna API.
 import fuentesJson from "./normativa/fuentes.json";

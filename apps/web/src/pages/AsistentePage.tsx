@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "../components/SiteHeader";
 import { buttonClass } from "../components/button";
-import { RespuestaTemis } from "../components/asistente/RespuestaTemis";
-import { ClienteTemis, type Progreso } from "../asistente/cliente";
+import { RespuestaSilvia } from "../components/asistente/RespuestaSilvia";
+import { ClienteSilvia, type Progreso } from "../asistente/cliente";
 import { NOMBRE, SUGERENCIAS_INICIO } from "../asistente/plantillas";
 import type { ContextoConversacion, Respuesta } from "../asistente/tipos";
 
-type Mensaje = { id: number; de: "usuario"; texto: string } | { id: number; de: "temis"; respuesta: Respuesta } | { id: number; de: "error"; texto: string };
+type Mensaje = { id: number; de: "usuario"; texto: string } | { id: number; de: "silvia"; respuesta: Respuesta } | { id: number; de: "error"; texto: string };
 
 export function AsistentePage() {
-  const cliente = useRef<ClienteTemis | null>(null);
+  const cliente = useRef<ClienteSilvia | null>(null);
   const contexto = useRef<ContextoConversacion>({});
   const final = useRef<HTMLDivElement>(null);
   const siguienteId = useRef(1);
@@ -19,7 +19,7 @@ export function AsistentePage() {
   const [pensando, setPensando] = useState(false);
 
   useEffect(() => {
-    cliente.current = new ClienteTemis(setProgreso);
+    cliente.current = new ClienteSilvia(setProgreso);
     return () => cliente.current?.cerrar();
   }, []);
 
@@ -36,7 +36,7 @@ export function AsistentePage() {
     try {
       const r = await cliente.current.preguntar(q, contexto.current);
       contexto.current = r.contexto;
-      setMensajes((m) => [...m, { id: siguienteId.current++, de: "temis", respuesta: r }]);
+      setMensajes((m) => [...m, { id: siguienteId.current++, de: "silvia", respuesta: r }]);
     } catch (e) {
       setMensajes((m) => [...m, { id: siguienteId.current++, de: "error", texto: e instanceof Error ? e.message : "Error inesperado" }]);
     } finally {
@@ -44,7 +44,7 @@ export function AsistentePage() {
     }
   }
 
-  const ultimaTemis = [...mensajes].reverse().find((m) => m.de === "temis")?.id;
+  const ultimaSilvia = [...mensajes].reverse().find((m) => m.de === "silvia")?.id;
   const cargando = progreso && progreso.cargadas < progreso.total;
 
   return (
@@ -55,7 +55,7 @@ export function AsistentePage() {
         {mensajes.length === 0 && (
           <section className="mt-6 text-center">
             <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-accent text-lg font-semibold text-accent">
-              T
+              S
             </span>
             <h1 className="mt-4 text-2xl font-medium tracking-tight text-ink-text">{NOMBRE}, tu asistente de oposiciones</h1>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-neutral-400">
@@ -84,8 +84,8 @@ export function AsistentePage() {
               <div key={m.id} className="flex justify-end">
                 <p className="max-w-[85%] rounded-lg border border-accent/40 bg-accent-900/50 px-4 py-2.5 text-sm text-ink-text">{m.texto}</p>
               </div>
-            ) : m.de === "temis" ? (
-              <RespuestaTemis key={m.id} respuesta={m.respuesta} onConsulta={preguntar} mostrarSugerencias={m.id === ultimaTemis && !pensando} />
+            ) : m.de === "silvia" ? (
+              <RespuestaSilvia key={m.id} respuesta={m.respuesta} onConsulta={preguntar} mostrarSugerencias={m.id === ultimaSilvia && !pensando} />
             ) : (
               <p key={m.id} className="text-sm text-red-400">
                 No he podido responder: {m.texto}

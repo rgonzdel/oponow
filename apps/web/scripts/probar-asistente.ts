@@ -1,4 +1,4 @@
-// Banco de pruebas de Temis en Node: carga todas las normas desde disco y
+// Banco de pruebas de Silvia en Node: carga todas las normas desde disco y
 // lanza preguntas típicas de opositor, mostrando intención, título y primer
 // bloque de cada respuesta. Sirve para revisar a ojo la calidad de las
 // respuestas tras tocar fichas, reglas o plantillas.

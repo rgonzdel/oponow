@@ -1,4 +1,4 @@
-// Motor de Temis: decide qué se ha preguntado y compone la respuesta con las
+// Motor de Silvia: decide qué se ha preguntado y compone la respuesta con las
 // plantillas, usando solo (1) las fichas verificadas, (2) el catálogo de
 // oposiciones y (3) el texto consolidado del BOE que lleva la propia web.
 // No hace ninguna petición de red.

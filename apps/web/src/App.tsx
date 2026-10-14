@@ -19,7 +19,6 @@ import { FallosPage } from "./pages/FallosPage";
 import { AgendaPage } from "./pages/AgendaPage";
 import { LegalPage } from "./pages/LegalPage";
 import { AdminPage } from "./pages/AdminPage";
-import { AsistentePage } from "./pages/AsistentePage";
 import { RecuperarContrasenaPage } from "./pages/RecuperarContrasenaPage";
 import { FlashcardsOposicionesPage, FlashcardsPage } from "./pages/FlashcardsPage";
 import { FlashcardsSesionPage } from "./pages/FlashcardsSesionPage";
@@ -118,7 +117,6 @@ export function App() {
               </RequireAuth>
             }
           />
-          <Route path="/asistente" element={<AsistentePage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
           <Route
             path="/admin"

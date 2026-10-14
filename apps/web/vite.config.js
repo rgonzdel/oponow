@@ -3,4 +3,6 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
     plugins: [react()],
     server: { port: 5173 },
+    // Silvia (src/asistente) usa un worker que carga la normativa por trozos.
+    worker: { format: "es" },
 });

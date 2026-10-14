@@ -3,7 +3,10 @@ import { useAuth } from "../auth/AuthContext";
 import { OponowLogo } from "./OponowLogo";
 import { buttonClass } from "./button";
 
-const NAV_LINKS = [{ to: "/oposiciones", label: "Oposiciones" }];
+const NAV_LINKS = [
+  { to: "/oposiciones", label: "Oposiciones" },
+  { to: "/asistente", label: "Asistente Silvia" },
+];
 
 export function SiteHeader() {
   const { status } = useAuth();

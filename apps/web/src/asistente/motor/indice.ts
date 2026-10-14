@@ -29,6 +29,15 @@ export class IndiceBM25<T> {
     }
   }
 
+  /** Nº de documentos que contienen el término (0 si es desconocido). */
+  df(termino: string): number {
+    return (this.postings.get(termino)?.length ?? 0) / 2;
+  }
+
+  vocabulario(): IterableIterator<string> {
+    return this.postings.keys();
+  }
+
   /** Frecuencia documental relativa (0-1) de un término: sirve para saber si es raro. */
   rareza(termino: string): number {
     const df = (this.postings.get(termino)?.length ?? 0) / 2;

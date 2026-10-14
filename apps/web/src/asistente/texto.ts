@@ -51,6 +51,32 @@ export function terminos(texto: string): string[] {
     .map(raiz);
 }
 
+/**
+ * Arregla erratas de tecleo que rompen palabras clave: un cero en lugar de
+ * una «o» dentro de una palabra («articul0», «c0nstitucion»).
+ */
+export function corregirTecleo(textoNormalizado: string): string {
+  return textoNormalizado.replace(/([a-z])0(?=[a-z]|\b)/g, "$1o").replace(/\b0(?=[a-z])/g, "o");
+}
+
+/** Distancia de edición (Levenshtein) con corte: devuelve max+1 si la supera. */
+export function distancia(a: string, b: string, max: number): number {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let previa = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const actual = [i];
+    let minimo = i;
+    for (let j = 1; j <= b.length; j++) {
+      const v = Math.min(previa[j] + 1, actual[j - 1] + 1, previa[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      actual.push(v);
+      if (v < minimo) minimo = v;
+    }
+    if (minimo > max) return max + 1;
+    previa = actual;
+  }
+  return previa[b.length];
+}
+
 // ===== Números escritos con letra =====
 
 const UNIDADES: Record<string, number> = {

@@ -3,7 +3,7 @@
 // que las reglas priorizan no inventar (ante la duda, se busca en el texto
 // de las normas y se enseña lo encontrado).
 import type { ContextoConversacion, FuenteNorma, OposicionCatalogo } from "../tipos";
-import { leerNumero, normalizar, type ClavePrecepto } from "../texto";
+import { corregirTecleo, distancia, leerNumero, normalizar, type ClavePrecepto } from "../texto";
 
 export type Matiz = "plazo" | "quien" | "definicion" | "requisitos" | "general";
 export type AspectoOposicion = "requisitos" | "temario" | "examen" | "grupo" | "general";
@@ -39,7 +39,18 @@ export function detectarNorma(q: string, fuentes: FuenteNorma[]): string | null 
       if (contiene(q, alias) && (!mejor || alias.length > mejor.largo)) mejor = { clave: f.clave, largo: alias.length };
     }
   }
-  return mejor?.clave ?? null;
+  if (mejor) return mejor.clave;
+  // Sin coincidencia exacta: tolera erratas en los nombres de una palabra
+  // larga («constitucon», «constitusion», «lecrin»).
+  const palabras = q.split(/\s+/);
+  for (const f of fuentes) {
+    for (const alias of f.alias) {
+      if (alias.includes(" ") || alias.length < 9 || /\d/.test(alias)) continue;
+      const max = alias.length >= 10 ? 2 : 1;
+      if (palabras.some((p) => p.length >= 5 && distancia(p, alias, max) <= max)) return f.clave;
+    }
+  }
+  return null;
 }
 
 export function detectarOposicion(q: string, catalogo: OposicionCatalogo[]): string | null {
@@ -57,11 +68,20 @@ const PALABRA_NUMERO =
   "(?:un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieci\\w+|veinte|veinti\\w+|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien|ciento|\\w+cientos|\\w+cientas|quinientos|mil|y|primer\\w*|segund\\w+|tercer\\w*|cuart\\w+|quint\\w+|sext\\w+|s[eé]ptim\\w+|octav\\w+|noven\\w+|d[eé]cim\\w*|und[eé]cim\\w+|duod[eé]cim\\w+|vig[eé]sim\\w+|trig[eé]sim\\w+|cuadrag[eé]sim\\w+|unic[oa])";
 
 /** «artículo 24», «art. 103 bis», «artículo ciento ochenta y dos», «DA 1.ª»… */
+/**
+ * «artículo» y sus erratas habituales: «art.», «arts», «articul», «artciulo»,
+ * «atriculo», «arituclo»… Basta con que la palabra empiece por una de estas
+ * raíces y vaya seguida del número.
+ */
+const PALABRA_ARTICULO = "(?:art|atr|arit|arct|aryi)[a-z]{0,10}";
+/** Unidades que indican que un número es un plazo o una cifra, no un artículo. */
+const UNIDAD_TRAS_NUMERO = "\\s+(?:dias?|mes|meses|anos?|horas?|semanas?|euros?|por ciento|miembros|diputados|senadores|vocales|de (?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre))\\b";
+
 export function detectarPrecepto(q: string, hayNorma: boolean): ClavePrecepto | null {
-  let m = new RegExp(`\\b(?:articulos?|arts?)\\.?\\s*(\\d+)(?:\\s*${SUFIJO})?`).exec(q);
+  let m = new RegExp(`\\b${PALABRA_ARTICULO}\\.?\\s*(\\d+)(?:\\s*${SUFIJO})?`).exec(q);
   if (m) return { tipo: "art", numero: Number(m[1]), sufijo: m[2] ?? "" };
 
-  m = new RegExp(`\\barticulos?\\s+((?:${PALABRA_NUMERO}\\b\\s*)+)`).exec(q);
+  m = new RegExp(`\\b${PALABRA_ARTICULO}\\s+((?:${PALABRA_NUMERO}\\b\\s*)+)`).exec(q);
   if (m) {
     const palabras = m[1].trim().split(/\s+/);
     let sufijo = "";
@@ -93,11 +113,18 @@ export function detectarPrecepto(q: string, hayNorma: boolean): ClavePrecepto | 
     if (m) return { tipo: "art", numero: Number(m[1]), sufijo: m[2] ?? "" };
     m = new RegExp(`^(\\d+)(?:\\s*${SUFIJO})?\\s+\\w`).exec(q);
     if (m) return { tipo: "art", numero: Number(m[1]), sufijo: m[2] ?? "" };
+    // Norma + número suelto que no es un plazo ni una cifra: «55 ce»,
+    // «la ce y su 55», «lopj 182». Los números de la propia norma («39/2015»)
+    // no cuentan porque van pegados a la barra.
+    if (!/\b(plazo|cuant[oa]s?|prescrib|dentro de)\b/.test(q)) {
+      m = new RegExp(`(?:^|\\s)(\\d{1,4})(?:\\s*${SUFIJO})?(?=\\s|$)(?!${UNIDAD_TRAS_NUMERO})`).exec(q);
+      if (m) return { tipo: "art", numero: Number(m[1]), sufijo: m[2] ?? "" };
+    }
   }
   return null;
 }
 
-const RE_TEST = /\b(ponme a prueba|hazme (un |una )?(test|pregunta|preguntas|examen)|preguntame|examiname|quiero (hacer )?(un )?test|test (de|sobre|del)|preguntas (de test )?(de|sobre)|practicar|ponme (un )?test)\b/;
+const RE_TEST = /\b(ponme a prueba|hazme (un |una )?(test|tets|tes|tset|pregunta|preguntas|examen)|preguntame|examiname|quiero (hacer )?(un )?(test|tets)|(test|tets|tes) (de|sobre|del)|preguntas (de test )?(de|sobre)|practicar|ponme (un )?(test|tets))\b/;
 const RE_LISTA = /\b(que oposiciones|cuales son las oposiciones|lista de oposiciones|oposiciones (hay|existen|puedo|de|con|para|del)|que puedo opositar|a que puedo presentarme|opositar con)\b/;
 const RE_NORMA_INFO = /\b(que es|estructura|de que trata|indice|esquema|titulos de|partes de|cuantos articulos|como se organiza|que regula|resumen de|contenido de|hablame de|explicame)\b/;
 
@@ -149,7 +176,7 @@ export function detectarIntencion(
   catalogo: OposicionCatalogo[],
   contexto: ContextoConversacion,
 ): Intencion {
-  const q = normalizar(texto).replace(/[¿?¡!]/g, " ").replace(/\s+/g, " ").trim();
+  const q = corregirTecleo(normalizar(texto).replace(/[¿?¡!]/g, " ").replace(/\s+/g, " ").trim());
   const palabras = q.split(" ").filter(Boolean);
 
   if (palabras.length <= 4 && /^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|ey|que tal|saludos)\b/.test(q)) return { tipo: "saludo" };

@@ -54,6 +54,12 @@ const PREGUNTAS = process.argv.slice(2).length
       "requisitos auxiliar administrativo galicia",
       "¿cuántos días de vacaciones tiene un funcionario?",
       "quien elige al defensor del pueblo",
+      // Erratas: deben entenderse igual.
+      "cual es el articul0 55 de la CE",
+      "que dice el 103 de la constitucon",
+      "plazo del recuso de alzda",
+      "silenzio administrativo positibo",
+      "hazme un tets del articulo 116 ce",
     ];
 
 function resumen(b: Bloque): string {
@@ -64,6 +70,7 @@ function resumen(b: Bloque): string {
     case "tabla": return `[tabla ${b.filas.length} filas] ${b.filas.slice(0, 3).map((f) => f.join(" / ")).join(" ; ")}`;
     case "test": return `[test ${b.preguntas.length}] ${b.preguntas[0]?.enunciado.slice(0, 160)} → ${b.preguntas[0]?.opciones.join(" | ")}`;
     case "resultados": return `[resultados] ${b.items.map((i) => `${i.precepto} ${i.norma}`).join(", ")}`;
+    case "aviso": return `[aviso] ${b.texto}`;
     default: return `[${b.tipo}]`;
   }
 }

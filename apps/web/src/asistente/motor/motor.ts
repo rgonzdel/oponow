@@ -24,8 +24,11 @@ import {
   mismaClave,
   nombreCorto,
   normalizar,
+  corregirTecleo,
+  distancia,
   raiz,
   terminos,
+  tokenizar,
   urlBoe,
   type ClavePrecepto,
 } from "../texto";
@@ -69,6 +72,17 @@ function terminosConSinonimos(texto: string): string[] {
   return terminos(texto).map((t) => SINONIMOS.find(([p]) => t.startsWith(p))?.[1] ?? t);
 }
 
+/** Palabras de las órdenes al asistente: nunca se «corrigen». */
+const ORDENES = [
+  "hazme", "ponme", "preguntame", "examiname", "practicar", "prueba", "test", "oposicion", "oposiciones", "opositar",
+  "opositor", "temario", "requisitos", "siguiente", "anterior", "estructura", "explicame", "hablame", "gracias",
+  "buenas", "diferencia", "diferencias", "comparar", "titulacion", "bachillerato", "convocatoria", "dashboard",
+  "ayuda", "puedes", "funcionas", "silvia",
+];
+
+/** Palabras gramaticales largas que no merece la pena corregir. */
+const STOPWORDS_CONSULTA = new Set(["cuales", "cuantos", "cuantas", "cuando", "donde", "porque", "quienes", "tambien", "entonces", "aunque", "sobre", "entre", "desde", "hasta", "segun", "puede", "pueden", "tiene", "tienen", "dice", "explica", "quiero", "saber"]);
+
 /** Normas que sobre todo modifican otras: se rebajan en el ranking para que gane el texto consolidado. */
 const PESO_NORMA: Record<string, number> = { loeficiencia: 0.55 };
 
@@ -91,6 +105,20 @@ export class Motor {
       const t = [...terminosConSinonimos(f.pregunta), ...variantes, ...variantes];
       this.indiceFichas.agregar(f, t);
       this.terminosFicha.set(f.id, new Set(t));
+      this.registrarPalabras([f.pregunta, ...f.variantes, f.respuesta].join(" "));
+    }
+    const propias = [
+      ...fuentes.flatMap((f) => f.alias),
+      ...OPOSICIONES_CATALOGO.flatMap((o) => [...o.alias, o.nombre]),
+      ...ORDENES,
+    ];
+    for (const frase of propias) {
+      for (const t of tokenizar(frase)) {
+        if (t.length >= 4 && !/\d/.test(t)) {
+          this.vocabularioPropio.add(raiz(t));
+          this.anotarForma(raiz(t), t);
+        }
+      }
     }
   }
 
@@ -117,12 +145,90 @@ export class Motor {
         ...terminos(p.p.join(" ")),
       ];
       this.indice.agregar({ norma: texto.clave, i }, t);
+      this.registrarPalabras(`${p.r ?? ""} ${p.p.join(" ")}`);
     });
   }
 
   // ===================================================================
 
+  /**
+   * Punto de entrada: corrige erratas, responde y, si ha tenido que
+   * interpretar la pregunta, lo dice al principio de la respuesta para que el
+   * opositor vea qué se ha entendido.
+   */
   async responder(consulta: string, contexto: ContextoConversacion): Promise<Respuesta> {
+    const { texto, cambios } = this.corregirConsulta(consulta);
+    const r = await this.responderInterno(texto, contexto);
+    const avisos: string[] = [];
+    if (cambios.length) {
+      avisos.push(`He interpretado ${cambios.map(([de, a]) => `«${de}» como «${a}»`).join(", ")}.`);
+    }
+    const original = normalizar(consulta);
+    const q = corregirTecleo(original);
+    const canonica = /\b(articulos?|art\.?|disposicion|da|dt|df|dd)\s*\d/.test(original);
+    if (r.intencion === "precepto" && !canonica && !/^\s*(siguiente|anterior)/.test(q) && r.contexto.ultimaNorma && r.contexto.ultimoPrecepto !== undefined) {
+      const n = this.normas.get(r.contexto.ultimaNorma)!;
+      avisos.push(`Entiendo que preguntas por: ${n.texto.preceptos[r.contexto.ultimoPrecepto].n} — ${n.fuente.nombre}.`);
+    } else if (q !== original && !cambios.length) {
+      avisos.push(`He leído tu pregunta como «${q.trim()}».`);
+    }
+    if (avisos.length) r.bloques.unshift({ tipo: "aviso", texto: avisos.join(" ") });
+    return r;
+  }
+
+  /** Vocabulario reconocido: raíz → palabra completa (para mostrar las correcciones). */
+  private readonly formasDeRaiz = new Map<string, Set<string>>();
+
+  private anotarForma(r: string, palabra: string) {
+    let formas = this.formasDeRaiz.get(r);
+    if (!formas) this.formasDeRaiz.set(r, (formas = new Set()));
+    if (formas.size < 12) formas.add(palabra);
+  }
+  /** Palabras propias de las preguntas (órdenes, nombres de normas y oposiciones) que no hay que «corregir». */
+  private readonly vocabularioPropio = new Set<string>();
+
+  private registrarPalabras(texto: string) {
+    for (const t of tokenizar(texto)) {
+      if (t.length < 4 || /\d/.test(t)) continue;
+      this.anotarForma(raiz(t), t);
+    }
+  }
+
+  /**
+   * Corrige palabras que no existen en ninguna norma ni ficha sustituyéndolas
+   * por la más parecida del vocabulario (distancia de edición 1, o 2 si la
+   * palabra es larga), prefiriendo la más frecuente en la normativa.
+   */
+  private corregirConsulta(consulta: string): { texto: string; cambios: [string, string][] } {
+    const cambios: [string, string][] = [];
+    const conocida = (r: string) => this.indice.df(r) > 0 || this.indiceFichas.df(r) > 0 || this.vocabularioPropio.has(r);
+    const texto = corregirTecleo(normalizar(consulta)).replace(/[a-zñ]{5,}/g, (palabra) => {
+      if (STOPWORDS_CONSULTA.has(palabra)) return palabra;
+      const r = raiz(palabra);
+      if (conocida(r)) return palabra;
+      const max = palabra.length >= 9 ? 2 : 1;
+      let mejor: { r: string; d: number; df: number } | null = null;
+      const candidatos = [...this.indice.vocabulario(), ...this.indiceFichas.vocabulario(), ...this.vocabularioPropio];
+      for (const c of candidatos) {
+        if (/\d/.test(c) || Math.abs(c.length - r.length) > max) continue;
+        const d = distancia(r, c, max);
+        if (d > max) continue;
+        const df = this.indice.df(c) + this.indiceFichas.df(c) * 50;
+        if (!mejor || d < mejor.d || (d === mejor.d && df > mejor.df)) mejor = { r: c, d, df };
+      }
+      if (!mejor) return palabra;
+      // De las palabras con esa raíz, la más parecida a lo que se escribió
+      // («prosesal» → «procesal», no «procesales»).
+      const formas = [...(this.formasDeRaiz.get(mejor.r) ?? [mejor.r])];
+      const nueva = formas.sort((a, b) => distancia(palabra, a, 9) - distancia(palabra, b, 9) || a.length - b.length)[0];
+      if (raiz(nueva) === r) return palabra;
+      cambios.push([palabra, nueva]);
+      return nueva;
+    });
+    return { texto, cambios };
+  }
+
+  private async responderInterno(consulta: string, contexto: ContextoConversacion): Promise<Respuesta> {
     const intencion = detectarIntencion(consulta, this.fuentes, OPOSICIONES_CATALOGO, contexto);
     switch (intencion.tipo) {
       case "saludo":

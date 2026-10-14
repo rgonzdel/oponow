@@ -7,10 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build && vite build --ssr scripts/prerender-legal.tsx --outDir dist-prerender && node dist-prerender/prerender-legal.js",
     "preview": "vite preview",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "descargar-normativa": "node scripts/descargar-normativa.mjs",
-    "verificar-asistente": "node scripts/verificar-asistente.ts",
-    "probar-asistente": "tsx scripts/probar-asistente.ts"
+    "lint": "eslint \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
@@ -35,7 +32,6 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.6.3",
-    "vite": "^6.0.5",
-    "tsx": "^4.19.2"
+    "vite": "^6.0.5"
   }
 }

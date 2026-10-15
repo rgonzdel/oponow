@@ -20,6 +20,8 @@ const ebep = de("trebep", "ebep26");
 const lgp = de("lgp", "lgp26");
 const lgss = de("lgss", "lgss");
 const muface = de("muface", "muface");
+const lgs = de("lgs", "lgs");
+const lcsp = de("lcsp", "lcsp26");
 
 export const FLASHCARDS_2026: FlashcardSeed[] = [
   // ===== Retribuciones (TREBEP) =====
@@ -142,4 +144,50 @@ export const FLASHCARDS_2026: FlashcardSeed[] = [
   muface("17-1", 17, "17.1", "¿Cómo presta MUFACE la asistencia sanitaria?",
     "Directamente o por concierto, preferentemente con instituciones de la Seguridad Social.",
     "Estos conciertos se establecerán preferentemente con instituciones de la Seguridad Social.", ["muface"]),
+
+  // ===== Subvenciones (Ley 38/2003) =====
+  lgs("9-3", 9, "9.3", "¿Dónde se publican las bases reguladoras de las subvenciones?",
+    "En el «Boletín Oficial del Estado» o en el diario oficial correspondiente.",
+    "Las bases reguladoras de cada tipo de subvención se publicarán en el", ["subvenciones"]),
+  lgs("10-2", 10, "10.2", "¿Qué subvenciones requieren autorización previa del Consejo de Ministros?",
+    "Las de cuantía superior a 12 millones de euros.",
+    "la concesión de subvenciones de cuantía superior a 12 millones de euros requerirá la previa autorización del Consejo de Ministros", ["subvenciones"]),
+  lgs("19-3", 19, "19.3", "¿Qué límite tiene el importe de una subvención si concurre con otras ayudas?",
+    "No puede superar, aisladamente o en concurrencia con otras ayudas o ingresos, el coste de la actividad subvencionada.",
+    "supere el coste de la actividad subvencionada", ["subvenciones"]),
+  lgs("25-4", 25, "25.4", "¿Cuál es el plazo máximo para resolver y notificar la concesión de una subvención?",
+    "Seis meses, salvo que una ley o la normativa de la Unión Europea fije otro.",
+    "no podrá exceder de seis meses", ["subvenciones"]),
+  lgs("25-5", 25, "25.5", "¿Qué efecto tiene el silencio en el procedimiento de concesión de subvenciones?",
+    "Desestimatorio: el interesado puede entender desestimada su solicitud.",
+    "entender desestimada por silencio administrativo la solicitud de concesión de la subvención", ["subvenciones"]),
+  lgs("24-4", 24, "24.4", "¿Qué plazo de alegaciones hay tras la propuesta de resolución provisional?",
+    "10 días.",
+    "se concederá un plazo de 10 días para presentar alegaciones", ["gestionEconomica"]),
+  lgs("31-4", 31, "31.4.a)", "¿Durante cuánto tiempo deben destinarse al fin subvencionado los bienes adquiridos?",
+    "Mínimo cinco años si son inscribibles en un registro público y dos años para el resto.",
+    "no podrá ser inferior a cinco años en caso de bienes inscribibles en un registro público, ni a dos años para el resto de bienes", ["gestionEconomica"]),
+  lgs("40-1", 40, "40.1", "¿Qué deben devolver los obligados al reintegro de una subvención?",
+    "La totalidad o parte de lo percibido más los intereses de demora, con independencia de las sanciones.",
+    "deberán reintegrar la totalidad o parte de las cantidades percibidas más los correspondientes intereses de demora", ["gestionEconomica"]),
+
+  // ===== Gestión económica de los contratos (LCSP) =====
+  lcsp("106-1", 106, "106.1", "¿Se exige garantía provisional en la contratación pública?",
+    "Por regla general no; solo excepcionalmente y de forma motivada por el órgano de contratación.",
+    "no procederá la exigencia de garantía provisional", ["gestionEconomica"]),
+  lcsp("107-1", 107, "107.1", "¿Cuál es la garantía definitiva general?",
+    "Un 5 % del precio final ofertado, excluido el IVA.",
+    "una garantía de un 5 por 100 del precio final ofertado", ["gestionEconomica"]),
+  lcsp("103-5", 103, "103.5", "¿Cuándo procede la revisión periódica y predeterminada de precios?",
+    "Cuando se ha ejecutado al menos el 20 % del importe y ha pasado un año desde la formalización.",
+    "se hubiese ejecutado, al menos, en el 20 por ciento de su importe y hubiese transcurrido un año desde su formalización", ["gestionEconomica"]),
+  lcsp("198-4", 198, "198.4", "¿En qué plazo debe pagar la Administración al contratista?",
+    "Dentro de los treinta días siguientes a la aprobación de las certificaciones o documentos de conformidad.",
+    "dentro de los treinta días siguientes a la fecha de aprobación de las certificaciones de obra", ["gestionEconomica"]),
+  lcsp("198-5", 198, "198.5 y 198.6", "¿Qué puede hacer el contratista ante la demora en el pago?",
+    "Si supera cuatro meses, suspender el contrato; si supera seis meses, resolverlo y ser resarcido.",
+    "Si la demora en el pago fuese superior a cuatro meses", ["gestionEconomica"]),
+  lcsp("210-2", 210, "210.2", "¿Cómo se constata el cumplimiento del contrato?",
+    "Mediante un acto formal y positivo de recepción o conformidad, en general dentro del mes siguiente a la entrega.",
+    "dentro del mes siguiente a la entrega o realización del objeto del contrato", ["gestionEconomica"]),
 ];

@@ -41,6 +41,9 @@ export function CheckoutPage() {
 
   const pasarela = useQuery({ queryKey: ["billing", "pasarela"], queryFn: getPasarela, staleTime: Infinity });
   const [pagoAbierto, setPagoAbierto] = useState(false);
+  // Art. 98.2 TRLGDCU: el consumidor confirma expresamente que el pedido
+  // implica una obligación de pago antes de contratar.
+  const [aceptado, setAceptado] = useState(false);
   const irAStripe = useMutation({
     mutationFn: () => crearCheckout(slug, ciclo),
     // La página de pago es de Stripe: el número de tarjeta nunca pasa por Oponow.
@@ -78,6 +81,10 @@ export function CheckoutPage() {
   if (statusQuery.isLoading || pasarela.isLoading) return <LoadingScreen />;
 
   const nombre = statusQuery.data?.oposicionNombre ?? catalogEntry.nombre;
+  // La prueba gratuita es una vez por oposición: si ya hubo suscripción a
+  // esta oposición (aunque esté cancelada), el cobro es inmediato.
+  const conPrueba = !statusQuery.data?.estado;
+  const precio = `${PLAN_PRECIO[ciclo].valor}${PLAN_PRECIO[ciclo].sufijo}`;
 
   return (
     <div>
@@ -108,13 +115,21 @@ export function CheckoutPage() {
             </div>
 
             <div className="mt-6 rounded-lg border border-accent bg-ink-surface p-4 text-sm text-neutral-300">
-              <p>
-                <span className="font-medium text-ink-text">
-                  {TRIAL_DAYS} días gratis
-                </span>
-                , después {PLAN_PRECIO[ciclo].valor}
-                {PLAN_PRECIO[ciclo].sufijo}. Cancela cuando quieras antes de
-                que acabe la prueba y no se te cobrará nada.
+              {conPrueba ? (
+                <p>
+                  <span className="font-medium text-ink-text">{TRIAL_DAYS} días gratis</span>, después{" "}
+                  <span className="font-medium text-ink-text">{precio}</span> (IVA incluido). Cancela
+                  cuando quieras antes de que acabe la prueba y no se te cobrará nada.
+                </p>
+              ) : (
+                <p>
+                  <span className="font-medium text-ink-text">{precio}</span> (IVA incluido). Ya
+                  disfrutaste la prueba gratuita de esta oposición, así que el primer cobro es inmediato.
+                </p>
+              )}
+              <p className="mt-2 text-xs text-neutral-500">
+                Se renueva automáticamente cada {ciclo === "anual" ? "año" : "mes"} hasta que la canceles
+                desde «Mi cuenta», sin permanencia. Tienes 14 días para desistir con devolución íntegra.
               </p>
             </div>
 
@@ -133,13 +148,38 @@ export function CheckoutPage() {
                     {irAStripe.error instanceof ApiError ? irAStripe.error.message : "No se ha podido abrir la página de pago"}
                   </p>
                 )}
+                <label className="flex items-start gap-2.5 text-xs leading-relaxed text-neutral-400">
+                  <input
+                    type="checkbox"
+                    checked={aceptado}
+                    onChange={(e) => setAceptado(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 flex-none accent-accent"
+                  />
+                  <span>
+                    He leído y acepto los{" "}
+                    <Link to="/legal/terminos" target="_blank" className="text-accent hover:underline">
+                      Términos y condiciones
+                    </Link>{" "}
+                    y la{" "}
+                    <Link to="/legal/privacidad" target="_blank" className="text-accent hover:underline">
+                      Política de privacidad
+                    </Link>
+                    , y entiendo que el pedido implica la obligación de pagar {precio}
+                    {conPrueba ? ` al terminar los ${TRIAL_DAYS} días de prueba si no cancelo antes` : ""}, con
+                    renovación automática hasta que cancele.
+                  </span>
+                </label>
                 <button
                   type="button"
                   onClick={() => (pasarela.data?.clavePublica ? setPagoAbierto(true) : irAStripe.mutate())}
-                  disabled={irAStripe.isPending || irAStripe.isSuccess}
+                  disabled={!aceptado || irAStripe.isPending || irAStripe.isSuccess}
                   className={buttonClass("primary", "w-full")}
                 >
-                  {irAStripe.isPending || irAStripe.isSuccess ? "Abriendo el pago seguro…" : "Continuar al pago seguro"}
+                  {irAStripe.isPending || irAStripe.isSuccess
+                    ? "Abriendo el pago seguro…"
+                    : conPrueba
+                      ? "Contratar con obligación de pago (7 días gratis)"
+                      : "Contratar con obligación de pago"}
                 </button>
                 <p className="flex items-center justify-center gap-1.5 text-center text-xs text-neutral-500">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>

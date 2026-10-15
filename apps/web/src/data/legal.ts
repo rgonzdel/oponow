@@ -22,7 +22,7 @@ export interface LegalPagina {
 const TITULAR =
   "Rafael González de la Torre, con NIF 54900651L y domicilio en Calle Toledo, 5, 45222 Borox (Toledo)";
 const CONTACTO = "info@oponow.com";
-const ACTUALIZADO = "7 de octubre de 2026";
+const ACTUALIZADO = "15 de octubre de 2026";
 const POLITICA_API_GOOGLE =
   "https://developers.google.com/terms/api-services-user-data-policy";
 
@@ -55,7 +55,7 @@ export const LEGAL_PAGINAS: Record<string, LegalPagina> = {
               "Datos de estudio: los tests que haces, las respuestas que eliges, si son correctas, tus puntuaciones y las fechas, para mostrarte tu progreso y repasar tus fallos.",
               "Agenda de estudio: las tareas que creas (título, descripción opcional, fecha y si están completadas).",
               "Google Calendar (opcional): si conectas tu calendario, los datos que se describen en la sección «Datos obtenidos de Google».",
-              "Suscripción: el plan contratado, la oposición elegida, las fechas de inicio, fin y periodo de prueba, el estado de la suscripción y su identificador en la pasarela de pago. Oponow no guarda los datos de tu tarjeta.",
+              "Suscripción: el plan contratado, la oposición elegida, las fechas de inicio, fin y periodo de prueba, el estado de la suscripción, su identificador en la pasarela de pago y la marca, los cuatro últimos dígitos y la caducidad de la tarjeta. Oponow nunca recibe el número completo de la tarjeta ni su código de seguridad.",
               "Registro de acceso al temario: cuando abres un bloque del temario de pago guardamos la fecha y hora, el bloque consultado, tu dirección IP y tu correo electrónico, para detectar y acreditar usos indebidos del contenido.",
               "Datos técnicos: como cualquier servicio web, nuestros proveedores de alojamiento registran de forma automática datos de las peticiones (dirección IP, fecha y hora, dirección solicitada y tipo de navegador) por motivos de seguridad y funcionamiento.",
             ],
@@ -73,7 +73,8 @@ export const LEGAL_PAGINAS: Record<string, LegalPagina> = {
               "Sincronizar tus tareas de estudio con Google Calendar, solo si lo activas tú. Base legal: tu consentimiento, que das al conectar el calendario y puedes retirar en cualquier momento (art. 6.1.a RGPD).",
               "Gestionar la suscripción y los cobros. Base legal: ejecución del contrato y cumplimiento de obligaciones legales, como las fiscales (art. 6.1.b y 6.1.c RGPD).",
               "Prevenir el fraude y la redistribución no autorizada del contenido de pago. Base legal: interés legítimo en proteger el contenido y el servicio (art. 6.1.f RGPD).",
-              "Enviarte correos necesarios para el servicio, como los códigos de verificación y avisos sobre tu cuenta o tu suscripción. Base legal: ejecución del contrato. No te enviaremos comunicaciones comerciales sin tu consentimiento previo.",
+              "Enviarte correos necesarios para el servicio, como los códigos de verificación, la confirmación de la contratación, el recordatorio de fin de la prueba gratuita y avisos sobre tu cuenta o tu suscripción. Base legal: ejecución del contrato.",
+              "Enviarte comunicaciones comerciales sobre Oponow (novedades, ofertas) solo si nos has dado tu consentimiento o, si ya eres cliente, sobre servicios de Oponow similares a los contratados, como permite el artículo 21 de la Ley 34/2002 (LSSI-CE). Puedes oponerte en cualquier momento, gratis, desde el enlace que incluye cada comunicación o escribiendo a info@oponow.com. Base legal: consentimiento o interés legítimo (art. 6.1.a y 6.1.f RGPD).",
             ],
           },
         ],
@@ -122,9 +123,9 @@ export const LEGAL_PAGINAS: Record<string, LegalPagina> = {
               "Render Services, Inc. (Estados Unidos): alojamiento del servidor de la aplicación (api.oponow.com), con servidores en Estados Unidos.",
               "Supabase, Inc. (Estados Unidos): base de datos, alojada en Amazon Web Services en Estados Unidos (región de Oregón).",
               "Hostinger International Ltd. (Unión Europea): correo electrónico de Oponow (info@oponow.com), desde el que se envían los códigos de verificación y los avisos de la cuenta.",
-              "Pasarela de pago: cuando se active el cobro con tarjeta, el proveedor de pagos tratará los datos necesarios para procesarlo. Oponow no guarda los datos de tu tarjeta.",
             ],
           },
+          "Pagos: Stripe (Stripe Technology Europe, Limited, en Irlanda, y sus empresas del grupo) procesa los pagos de las suscripciones a través de su servicio Link. Con nuestra configuración de pagos, Link actúa como vendedor registrado del pago y trata los datos de pago, facturación y prevención del fraude como responsable independiente, conforme a su propia política de privacidad: https://stripe.com/es/privacy. Oponow solo recibe de Stripe el estado de tu suscripción y su identificador y, para mostrártelos en «Mi cuenta», la marca, los cuatro últimos dígitos y la fecha de caducidad de la tarjeta; nunca el número completo ni el código de seguridad.",
           "Google LLC trata los datos de inicio de sesión con Google y de Google Calendar como responsable independiente, de acuerdo con su propia política de privacidad: https://policies.google.com/privacy.",
           "Algunos de estos proveedores están en Estados Unidos, lo que implica una transferencia internacional de datos. Estas transferencias se realizan con las garantías previstas en el RGPD: el Marco de Privacidad de Datos UE-EE. UU. cuando el proveedor está adherido o, en su defecto, las cláusulas contractuales tipo aprobadas por la Comisión Europea.",
         ],
@@ -194,14 +195,16 @@ export const LEGAL_PAGINAS: Record<string, LegalPagina> = {
     slug: "terminos",
     titulo: "Términos y condiciones",
     descripcion:
-      "Condiciones de uso de Oponow, la plataforma de preparación de oposiciones: cuenta, inicio de sesión, suscripción, uso del contenido e integración opcional con Google Calendar.",
+      "Condiciones de uso y de contratación de Oponow, la plataforma de tests para preparar oposiciones: cuenta, precio y pago, prueba gratuita, renovación y cancelación, derecho de desistimiento, uso del contenido, responsabilidad y ley aplicable.",
     actualizado: ACTUALIZADO,
     secciones: [
       {
         titulo: "1. Titular y objeto del servicio",
         bloques: [
           `Oponow (oponow.com) es un servicio de ${TITULAR}. Contacto: ${CONTACTO}.`,
-          "Oponow ofrece acceso a temario digital, a un banco de tests de práctica basados en exámenes oficiales y a una agenda de estudio para preparar oposiciones. Existe un nivel de acceso gratuito limitado (un tema por oposición y un test diario) y planes de pago con acceso completo al temario y tests ilimitados de la oposición elegida.",
+          "Oponow es una plataforma online para preparar oposiciones practicando con tests: bancos de preguntas tipo test por tema, preguntas de exámenes de convocatorias oficiales, simulacros, flashcards, seguimiento de fallos y progreso, temario digital de apoyo y una agenda de estudio.",
+          "Existe un nivel de acceso gratuito limitado y planes de pago con acceso completo a los contenidos de la oposición elegida. Las funciones concretas de cada plan se describen en la página de cada oposición y en la de contratación.",
+          "Estos términos regulan el uso de Oponow y, cuando contratas un plan de pago, el contrato entre tú y el titular. Al registrarte o contratar declaras haberlos leído y aceptado. Puedes guardarlos o imprimirlos desde esta página en cualquier momento.",
         ],
       },
       {
@@ -209,47 +212,141 @@ export const LEGAL_PAGINAS: Record<string, LegalPagina> = {
         bloques: [
           "Para usar Oponow necesitas una cuenta. Puedes crearla con tu correo electrónico y una contraseña, o iniciar sesión con tu cuenta de Google.",
           "Cuando inicias sesión con contraseña desde un navegador o dispositivo nuevo, te enviamos un código de verificación a tu correo electrónico. Ese navegador o dispositivo queda recordado durante 30 días.",
-          "Eres responsable de mantener la confidencialidad de tu contraseña y del acceso a tu correo, y de la actividad que se realice desde tu cuenta. Avísanos en cuanto detectes un uso no autorizado.",
-          "Debes ser mayor de 14 años, o contar con el consentimiento de tus padres o tutores, para crear una cuenta.",
+          "Los datos que facilites deben ser veraces. Eres responsable de mantener la confidencialidad de tu contraseña y del acceso a tu correo, y de la actividad que se realice desde tu cuenta. Avísanos en cuanto detectes un uso no autorizado.",
+          "La cuenta es personal: no puede compartirse ni cederse a terceros.",
+          "Debes ser mayor de 14 años, o contar con el consentimiento de tus padres o tutores, para crear una cuenta. Para contratar un plan de pago debes ser mayor de edad o contar con la autorización de tus padres o tutores.",
         ],
       },
       {
-        titulo: "3. Suscripción, prueba gratuita y cancelación",
+        titulo: "3. Cómo se contrata un plan de pago",
         bloques: [
-          "La suscripción de pago incluye un periodo de prueba gratuito (actualmente 7 días) durante el cual puedes cancelar sin coste alguno. Pasado ese periodo, se cobrará automáticamente el importe correspondiente al ciclo elegido (mensual o anual) hasta que canceles.",
-          "Puedes cancelar tu suscripción en cualquier momento desde tu cuenta; la cancelación surtirá efecto al final del periodo ya pagado, sin penalización ni permanencia.",
+          "La contratación se hace íntegramente online y en castellano, siguiendo estos pasos:",
+          {
+            lista: [
+              "Eliges la oposición y el ciclo de facturación (mensual o anual) en la página de contratación, donde se muestran el precio total con impuestos, la duración del periodo de prueba y las condiciones de renovación y cancelación.",
+              "Aceptas estos términos y confirmas expresamente que el pedido implica una obligación de pago.",
+              "Introduces tus datos de pago en el formulario seguro de pago de Stripe. Antes de confirmar puedes revisar y corregir los datos introducidos, o cerrar el formulario sin contratar.",
+              "Al confirmar, el contrato queda celebrado. Recibirás por correo electrónico la confirmación de la contratación con sus condiciones, además del recibo y la factura del pago.",
+            ],
+          },
+          "Oponow conserva el registro electrónico de cada contratación (fecha, plan, precio y estado), al que puedes acceder desde tu cuenta y del que te enviaremos copia si nos lo pides.",
         ],
       },
       {
-        titulo: "4. Integración con Google Calendar",
+        titulo: "4. Precio, pago y renovación",
+        bloques: [
+          "El precio de cada plan es el que se muestra en la página de contratación en el momento de contratar, expresado en euros y con el IVA incluido. No hay gastos adicionales.",
+          "El pago se realiza con tarjeta u otros medios que admita la pasarela (por ejemplo, Apple Pay o Google Pay). Los pagos se gestionan a través de Link, un servicio de Stripe, que actúa como vendedor registrado del pago («merchant of record»): cobra el precio, calcula e ingresa los impuestos aplicables y te envía directamente el recibo y la factura. Por eso el cargo aparece en tu extracto como «LINK.COM* Oponow» o similar. Al pagar se aplican también las condiciones de compra de Link que se muestran en el formulario de pago.",
+          "Oponow es quien te presta el servicio y responde frente a ti de su contenido y funcionamiento en los términos de estas condiciones. Oponow no recibe ni guarda los datos completos de tu tarjeta.",
+          "La suscripción se renueva automáticamente al final de cada periodo (mensual o anual) por el mismo periodo, y se cobra el precio vigente al inicio de cada periodo, hasta que la canceles.",
+          "Si cambiamos el precio de un plan, te avisaremos por correo con al menos 30 días de antelación a la siguiente renovación. Si no estás de acuerdo, puedes cancelar antes de esa fecha sin coste; si no cancelas, el nuevo precio se aplicará desde la siguiente renovación.",
+          "Si un cobro no se puede realizar, la pasarela lo reintentará durante unos días y te avisaremos para que actualices el medio de pago. Si finalmente no se puede cobrar, la suscripción se cancelará y la cuenta pasará al nivel gratuito, sin perder tu historial de estudio.",
+        ],
+      },
+      {
+        titulo: "5. Prueba gratuita y cancelación",
+        bloques: [
+          "La primera contratación de un plan incluye un periodo de prueba gratuito (actualmente de 7 días), durante el cual no se te cobra nada. Si no cancelas antes de que termine, al final de la prueba se cobra automáticamente el primer periodo del ciclo elegido. Te enviaremos un recordatorio por correo unos días antes de que termine la prueba. La prueba se ofrece una sola vez por oposición: si vuelves a contratar la misma oposición, el cobro es inmediato.",
+          "Puedes cancelar la suscripción en cualquier momento desde «Mi cuenta», sin penalización ni permanencia. La cancelación impide las renovaciones futuras y surte efecto al final del periodo ya pagado, hasta el cual conservas el acceso. Si cancelas durante la prueba, no se te cobrará nada.",
+          "Lo anterior no limita tu derecho de desistimiento, que se explica en el apartado siguiente.",
+        ],
+      },
+      {
+        titulo: "6. Derecho de desistimiento",
+        bloques: [
+          "Si contratas como consumidor, tienes derecho a desistir del contrato en un plazo de 14 días naturales desde el día de la contratación, sin necesidad de justificación y sin ninguna penalización (artículos 102 y 104 del texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios).",
+          `Para ejercerlo, comunícanos tu decisión de forma inequívoca antes de que venza el plazo: escribiendo a ${CONTACTO} desde el correo de tu cuenta o usando el modelo de formulario que figura más abajo, aunque su uso no es obligatorio.`,
+          "Si desistes en plazo, te devolveremos todos los importes que se te hayan cobrado por esa contratación, sin descontar la parte del servicio ya utilizada, en un plazo máximo de 14 días naturales desde que recibamos tu comunicación, por el mismo medio de pago que usaste, sin ningún coste para ti. Desde ese momento dejarás de tener acceso a los contenidos de pago y deberás abstenerte de utilizarlos.",
+          "Modelo de formulario de desistimiento (solo debe cumplimentar y enviar el presente formulario si desea desistir del contrato):",
+          {
+            lista: [
+              `A la atención de: ${TITULAR}. Correo electrónico: ${CONTACTO}.`,
+              "Por la presente le comunico/comunicamos (*) que desisto de mi/desistimos de nuestro (*) contrato de prestación del siguiente servicio (*): suscripción a Oponow — [oposición y plan].",
+              "Pedido el/recibido el (*): [fecha de la contratación].",
+              "Nombre del consumidor y usuario o de los consumidores y usuarios.",
+              "Domicilio del consumidor y usuario o de los consumidores y usuarios.",
+              "Firma del consumidor y usuario o de los consumidores y usuarios (solo si el presente formulario se presenta en papel).",
+              "Fecha.",
+              "(*) Táchese lo que no proceda.",
+            ],
+          },
+        ],
+      },
+      {
+        titulo: "7. Uso permitido y uso prohibido",
+        bloques: [
+          "El acceso a los contenidos es personal, intransferible y para tu estudio. Te comprometes a usar Oponow de buena fe y conforme a la ley y a estos términos. En particular, queda prohibido:",
+          {
+            lista: [
+              "Compartir tu cuenta, ceder tus credenciales o permitir el acceso de terceros.",
+              "Copiar, descargar de forma masiva, capturar, redistribuir, revender, publicar o poner a disposición de terceros los contenidos de pago (preguntas, explicaciones, flashcards, temario, simulacros), total o parcialmente, gratis o a cambio de un precio.",
+              "Extraer contenidos de forma automatizada (robots, scrapers u otras herramientas) o utilizarlos para entrenar, ajustar o alimentar sistemas de inteligencia artificial.",
+              "Intentar acceder a cuentas o datos de otros usuarios, eludir las medidas de seguridad o de control de acceso, realizar ingeniería inversa o sobrecargar deliberadamente la plataforma.",
+              "Usar Oponow para fines ilícitos o que perjudiquen a otros usuarios, al titular o a terceros.",
+            ],
+          },
+          "Para proteger el contenido, Oponow registra internamente (correo electrónico y dirección IP) el acceso a cada bloque de temario, tal y como se describe en la [Política de privacidad](/legal/privacidad).",
+          "Si incumples este apartado, podremos suspender o cancelar tu cuenta tras avisarte por correo, salvo que la gravedad del incumplimiento (por ejemplo, la redistribución masiva del contenido o un ataque a la plataforma) justifique la suspensión inmediata. Si la cuenta se cancela por un incumplimiento grave imputable a ti, no se devolverá la parte del periodo ya pagado, sin perjuicio de los derechos que te reconozca la ley y de las acciones legales que procedan.",
+        ],
+      },
+      {
+        titulo: "8. Naturaleza del contenido",
+        bloques: [
+          "Los tests, explicaciones, flashcards y el temario de Oponow son material de práctica y apoyo al estudio elaborado por Oponow. No son publicaciones oficiales ni sustituyen a la convocatoria, a sus bases, al programa oficial ni al texto de las normas publicado en el Boletín Oficial del Estado o en el boletín autonómico correspondiente, que prevalecen siempre. Te corresponde consultar la convocatoria vigente de tu oposición.",
+          "Las preguntas de legislación se redactan a partir del texto consolidado de las normas publicado por el BOE en la fecha de su elaboración. Las normas cambian y puede transcurrir un tiempo hasta que una reforma se refleje en la plataforma.",
+          "Las preguntas de exámenes de convocatorias anteriores se reproducen con fines de preparación, indicando su procedencia, y se presentan tal y como figuraron en el examen y en la plantilla de respuestas publicada; pueden no reflejar cambios normativos posteriores al examen.",
+          `Ponemos el máximo cuidado en la exactitud de los contenidos, pero pueden contener errores. Si encuentras uno, escríbenos a ${CONTACTO}: lo revisaremos y, si procede, lo corregiremos.`,
+          "Oponow es una herramienta de preparación: el resultado de cualquier proceso selectivo depende de muchos factores ajenos a la plataforma, por lo que no podemos garantizar que apruebes ni la obtención de una plaza.",
+        ],
+      },
+      {
+        titulo: "9. Disponibilidad del servicio",
+        bloques: [
+          "Trabajamos para que Oponow esté disponible de forma continua, pero puede haber interrupciones puntuales por mantenimiento, actualizaciones, fallos de nuestros proveedores técnicos o causas de fuerza mayor. Cuando sea posible, avisaremos con antelación de las interrupciones programadas.",
+          "Podemos mejorar, actualizar o modificar las funciones y los contenidos de la plataforma. Si un cambio supone una reducción sustancial del servicio contratado, te avisaremos con antelación y podrás cancelar y obtener la devolución de la parte proporcional del periodo pagado y no disfrutado.",
+        ],
+      },
+      {
+        titulo: "10. Responsabilidad",
+        bloques: [
+          "El titular responde del correcto cumplimiento del contrato en los términos previstos por la ley. Si el servicio no se presta conforme a lo contratado, puedes exigir que se ponga en conformidad, una reducción proporcional del precio o la resolución del contrato, de acuerdo con la normativa de consumidores.",
+          "Oponow no responde de los daños derivados del uso de la plataforma contrario a estos términos, de la falta de diligencia del usuario en la custodia de sus credenciales, de las decisiones que el usuario tome basándose exclusivamente en los contenidos sin consultar la normativa y la convocatoria oficiales, ni de las interrupciones causadas por terceros ajenos a su control o por fuerza mayor.",
+          "Nada de lo dispuesto en estos términos excluye ni limita la responsabilidad del titular en los casos en que la ley no permite excluirla o limitarla, ni los derechos que te reconoce como consumidor la normativa vigente, que prevalecerá en caso de contradicción.",
+        ],
+      },
+      {
+        titulo: "11. Propiedad intelectual",
+        bloques: [
+          "Los contenidos propios de Oponow (redacción de las preguntas y explicaciones, flashcards, resúmenes, selección y estructura de los bancos de preguntas, diseño, marca y software) están protegidos por la normativa de propiedad intelectual e industrial. La suscripción te concede únicamente una licencia personal, no exclusiva e intransferible para su uso con fines de estudio mientras dure tu acceso, sin cesión de ningún otro derecho.",
+          "Las normas legales y reglamentarias y los actos de los organismos públicos no son objeto de propiedad intelectual (artículo 13 del texto refundido de la Ley de Propiedad Intelectual). Más información en el [Aviso legal](/legal/aviso-legal).",
+        ],
+      },
+      {
+        titulo: "12. Integración con Google Calendar",
         bloques: [
           "La agenda de estudio puede conectarse, si tú lo decides, a tu Google Calendar para que tus tareas de estudio aparezcan en tu calendario y para ver tus eventos junto a ellas. La conexión es opcional y puedes desconectarla en cualquier momento desde la agenda o desde https://myaccount.google.com/permissions.",
           "Lo que hace Oponow con los datos de Google se explica en la [Política de privacidad](/legal/privacidad), en la sección «Datos obtenidos de Google».",
         ],
       },
       {
-        titulo: "5. Uso permitido del contenido",
+        titulo: "13. Baja de la cuenta",
         bloques: [
-          "El acceso al temario y a los tests es personal e intransferible. Queda prohibido descargar, capturar, redistribuir o compartir el contenido de pago con terceros no suscritos.",
-          "Para proteger el contenido, Oponow registra internamente (correo electrónico y dirección IP) el acceso a cada bloque de temario. Este registro se usa únicamente como evidencia interna ante un uso indebido detectado, tal y como se describe en la [Política de privacidad](/legal/privacidad).",
+          `Puedes pedir la eliminación de tu cuenta en cualquier momento desde «Mi cuenta» o escribiendo a ${CONTACTO}. Si tienes una suscripción activa, se cancelará. Al eliminar la cuenta se borran tus datos, salvo los que debamos conservar por obligación legal, tal y como se indica en la [Política de privacidad](/legal/privacidad).`,
         ],
       },
       {
-        titulo: "6. Naturaleza del contenido",
+        titulo: "14. Modificación de estos términos",
         bloques: [
-          "El temario y las preguntas de Oponow son un material de apoyo al estudio, no un sustituto de las bases oficiales de la convocatoria ni del BOE. Es responsabilidad del usuario consultar siempre la convocatoria vigente publicada por el organismo correspondiente.",
+          "Podemos actualizar estos términos para reflejar cambios en el servicio o en la normativa. Publicaremos siempre la versión vigente en esta página con su fecha. Si los cambios afectan a tu suscripción, te los comunicaremos por correo con al menos 30 días de antelación; si no estás de acuerdo, podrás cancelar antes de que entren en vigor sin coste. Las condiciones aplicables a cada contratación son las vigentes en el momento en que se realizó, hasta que entren en vigor las nuevas.",
         ],
       },
       {
-        titulo: "7. Baja de la cuenta",
+        titulo: "15. Reclamaciones, ley aplicable y jurisdicción",
         bloques: [
-          `Puedes pedir la eliminación de tu cuenta en cualquier momento escribiendo a ${CONTACTO}. Al eliminarla se borran tus datos, salvo los que debamos conservar por obligación legal, tal y como se indica en la [Política de privacidad](/legal/privacidad).`,
-        ],
-      },
-      {
-        titulo: "8. Modificación de estos términos",
-        bloques: [
-          "Oponow podrá actualizar estos términos para reflejar cambios en el servicio o en la normativa aplicable. Los cambios sustanciales se notificarán a los usuarios registrados con antelación razonable.",
+          `Si tienes cualquier queja o reclamación, escríbenos a ${CONTACTO}. Te responderemos lo antes posible y, en todo caso, en el plazo máximo de un mes.`,
+          "Si no quedas satisfecho, puedes acudir a los servicios de consumo de tu comunidad autónoma o de tu ayuntamiento, o al sistema arbitral de consumo si ambas partes aceptan someterse a él.",
+          "Estos términos se rigen por la ley española. Si eres consumidor, para cualquier controversia serán competentes los juzgados y tribunales de tu domicilio, y conservas la protección que te otorguen las normas imperativas del país en el que residas.",
+          "Si alguna cláusula de estos términos fuera declarada nula, el resto seguirá siendo válido.",
           `Última actualización: ${ACTUALIZADO}.`,
         ],
       },
@@ -271,23 +368,38 @@ export const LEGAL_PAGINAS: Record<string, LegalPagina> = {
       {
         titulo: "2. Objeto",
         bloques: [
-          "Oponow es una plataforma online de preparación de oposiciones que ofrece temario digital y bancos de tests basados en exámenes oficiales de convocatorias públicas.",
+          "Oponow es una plataforma online para preparar oposiciones practicando con tests: bancos de preguntas por tema, preguntas de exámenes de convocatorias oficiales, simulacros, flashcards y seguimiento del progreso, con temario digital de apoyo.",
           "El acceso y uso de este sitio web atribuye la condición de usuario e implica la aceptación de las condiciones incluidas en este Aviso legal, en la [Política de privacidad](/legal/privacidad), en la [Política de cookies](/legal/cookies) y en los [Términos y condiciones](/legal/terminos).",
         ],
       },
       {
         titulo: "3. Propiedad intelectual e industrial",
         bloques: [
-          "El diseño de la plataforma, los textos, marcas, logotipos y demás elementos gráficos de Oponow, así como el resumen, estructura y presentación del temario, son propiedad de Oponow o de sus licenciantes, salvo cuando se indique lo contrario.",
-          "El contenido de las preguntas de test se basa en exámenes de convocatorias oficiales publicadas por los organismos correspondientes. Oponow no reclama la titularidad de dichas convocatorias oficiales; su reproducción se realiza al amparo del carácter de dominio público o uso permitido de los documentos administrativos de acceso público, con fines exclusivamente educativos.",
-          "Queda prohibida la reproducción, distribución o comunicación pública total o parcial de los contenidos de esta plataforma sin autorización expresa, salvo para el uso personal del usuario suscrito.",
+          "El diseño y el software de la plataforma, la marca y el logotipo de Oponow, y los contenidos elaborados por Oponow (la redacción de las preguntas, opciones y explicaciones, las flashcards, los resúmenes y la selección, estructura y presentación de los bancos de preguntas y del temario) son titularidad de Oponow o de sus licenciantes y están protegidos por la normativa de propiedad intelectual e industrial.",
+          "«No son objeto de propiedad intelectual las disposiciones legales o reglamentarias y sus correspondientes proyectos, las resoluciones de los órganos jurisdiccionales y los actos, acuerdos, deliberaciones y dictámenes de los organismos públicos» (artículo 13 del texto refundido de la Ley de Propiedad Intelectual, aprobado por el Real Decreto Legislativo 1/1996). Al amparo de este precepto, Oponow reproduce el texto de normas publicadas en el BOE y las preguntas de exámenes de convocatorias publicadas por los organismos convocantes, indicando su procedencia. Oponow no reclama ningún derecho sobre esos textos oficiales.",
+          "Si eres titular de derechos sobre algún contenido publicado en Oponow y consideras que su uso no está amparado por la ley, escríbenos a info@oponow.com indicando el contenido y el derecho afectado: lo revisaremos con rapidez y, si procede, lo retiraremos.",
+          "Queda prohibida la reproducción, distribución, comunicación pública, transformación o extracción, total o parcial, de los contenidos propios de Oponow sin autorización expresa, salvo el uso personal de estudio que permite la suscripción y los usos que autorice la ley.",
         ],
       },
       {
-        titulo: "4. Exclusión de responsabilidad",
+        titulo: "4. Responsabilidad",
         bloques: [
-          "El contenido de Oponow tiene carácter divulgativo y de apoyo al estudio. No constituye una fuente oficial: la convocatoria, las bases y el temario vigentes publicados en el BOE (o boletín autonómico correspondiente) prevalecen siempre sobre cualquier resumen o adaptación disponible en esta plataforma.",
-          "Oponow no garantiza la ausencia de errores en los contenidos ni el resultado de ningún proceso selectivo, y no se hace responsable de las decisiones que el usuario tome basándose exclusivamente en el contenido de la plataforma.",
+          "Los contenidos de Oponow son material de práctica y apoyo al estudio. No constituyen una fuente oficial: la convocatoria, las bases, el programa y el texto de las normas publicados en el BOE (o en el boletín autonómico correspondiente) prevalecen siempre.",
+          "Oponow pone el máximo cuidado en la exactitud y actualización de los contenidos, pero no puede garantizar la ausencia total de errores ni el resultado de ningún proceso selectivo. No responde de las decisiones que el usuario tome basándose exclusivamente en los contenidos sin contrastarlos con la normativa y la convocatoria oficiales, ni de los daños causados por un uso de la plataforma contrario a la ley o a los [Términos y condiciones](/legal/terminos).",
+          "Lo anterior se entiende sin perjuicio de la responsabilidad que, conforme a la ley, no pueda excluirse o limitarse, y de los derechos que la normativa de consumidores reconoce a los usuarios.",
+        ],
+      },
+      {
+        titulo: "5. Enlaces a sitios de terceros",
+        bloques: [
+          "Oponow puede incluir enlaces a sitios de terceros, como el BOE o las sedes de los organismos convocantes, para facilitar la consulta de las fuentes oficiales. Oponow no controla esos sitios ni responde de sus contenidos, salvo que, teniendo conocimiento efectivo de que un contenido enlazado es ilícito, no retire el enlace con diligencia (artículo 17 de la Ley 34/2002, LSSI-CE).",
+        ],
+      },
+      {
+        titulo: "6. Legislación aplicable",
+        bloques: [
+          "Este sitio web se rige por la legislación española. Las controversias con usuarios consumidores se someterán a los juzgados y tribunales de su domicilio.",
+          `Última actualización: ${ACTUALIZADO}.`,
         ],
       },
     ],

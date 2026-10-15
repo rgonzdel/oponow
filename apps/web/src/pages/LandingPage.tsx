@@ -77,13 +77,14 @@ export function LandingPage() {
               Oposiciones de la Administración General del Estado
             </p>
             <h1 className="mt-3 text-4xl font-medium leading-tight tracking-tight text-ink-text">
-              Aprueba tu oposición con exámenes reales, no genéricos
+              Haz tests, detecta tus fallos y aprueba tu oposición
             </h1>
             <p className="mt-4 text-neutral-400">
-              Temario oficial estructurado como el BOE y un banco de tests
-              hecho con preguntas literales de convocatorias reales —
-              anuladas incluidas, marcadas igual que en la plantilla del
-              tribunal.
+              Practica con tests tipo examen de cada tema, preguntas de
+              convocatorias oficiales y flashcards para repasar. Al fallar
+              ves la respuesta correcta y, en las preguntas de legislación,
+              el artículo que lo dice. Tus fallos se guardan para que los
+              repases hasta dominarlos.
             </p>
 
             <div className="mt-7 flex flex-wrap gap-3">
@@ -328,8 +329,7 @@ export function LandingPage() {
       <footer className="border-t border-ink-divider">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-10 text-center sm:flex-row sm:justify-between sm:text-left">
           <p className="text-sm text-neutral-500">
-            © {new Date().getFullYear()} Oponow. Contenido no oficial, no
-            sustituye al BOE ni a la convocatoria vigente.
+            © {new Date().getFullYear()} Oponow
           </p>
           <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-neutral-400">
             <Link to="/legal/aviso-legal" className="hover:text-ink-text">

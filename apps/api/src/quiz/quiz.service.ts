@@ -55,6 +55,8 @@ export interface ResumenDashboard {
   testsRealizados: number;
   fallos: number | null;
   dias: 7 | 14 | 30;
+  /** Un elemento por día de la ventana, del más antiguo a hoy. */
+  actividad: { dia: string; tests: number; notaMedia: number | null }[];
 }
 
 function inicioDeHoy(): Date {
@@ -387,7 +389,7 @@ export class QuizService {
     const cotaInferior = ancla;
 
     const intentosCompletados = await db
-      .select({ fecha: schema.intentosTest.fecha })
+      .select({ fecha: schema.intentosTest.fecha, puntuacion: schema.intentosTest.puntuacion })
       .from(schema.intentosTest)
       .where(
         and(
@@ -423,6 +425,28 @@ export class QuizService {
       fallos = filasFallos.filter((f) => clavesVentana.has(claveDeDia(f.fecha))).length;
     }
 
-    return { streak, testsRealizados, fallos, dias };
+    // Tests y nota media (0-10) por día natural español de la ventana.
+    const porDia = new Map<string, { tests: number; suma: number; conNota: number }>();
+    for (const i of intentosCompletados) {
+      const clave = claveDeDia(i.fecha);
+      if (!clavesVentana.has(clave)) continue;
+      const d = porDia.get(clave) ?? { tests: 0, suma: 0, conNota: 0 };
+      d.tests += 1;
+      if (i.puntuacion !== null) {
+        d.suma += Number(i.puntuacion);
+        d.conNota += 1;
+      }
+      porDia.set(clave, d);
+    }
+    const actividad = [...clavesVentana].reverse().map((dia) => {
+      const d = porDia.get(dia);
+      return {
+        dia,
+        tests: d?.tests ?? 0,
+        notaMedia: d && d.conNota ? Math.round((d.suma / d.conNota) * 100) / 100 : null,
+      };
+    });
+
+    return { streak, testsRealizados, fallos, dias, actividad };
   }
 }

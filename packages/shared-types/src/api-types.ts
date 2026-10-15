@@ -67,6 +67,8 @@ export interface ResumenDashboard {
   testsRealizados: number;
   fallos: number | null;
   dias: 7 | 14 | 30;
+  /** Un elemento por día de la ventana, del más antiguo a hoy (día natural español «AAAA-MM-DD»). */
+  actividad: { dia: string; tests: number; notaMedia: number | null }[];
 }
 
 export interface GoogleEventOcurrencia {

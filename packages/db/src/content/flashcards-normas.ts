@@ -25,6 +25,9 @@ export const NORMAS = {
   lprl: { boeId: "BOE-A-1995-24292", nombre: "Ley 31/1995, de Prevención de Riesgos Laborales", corta: "LPRL" },
   confianza: { boeId: "BOE-A-2020-14046", nombre: "Ley 6/2020, de servicios electrónicos de confianza", corta: "Ley 6/2020" },
   ens: { boeId: "BOE-A-2022-7191", nombre: "Real Decreto 311/2022, Esquema Nacional de Seguridad", corta: "ENS" },
+  lgss: { boeId: "BOE-A-2015-11724", nombre: "Texto refundido de la Ley General de la Seguridad Social (RDLeg. 8/2015)", corta: "LGSS" },
+  lgs: { boeId: "BOE-A-2003-20977", nombre: "Ley 38/2003, General de Subvenciones", corta: "LGS" },
+  muface: { boeId: "BOE-A-2000-12140", nombre: "Texto refundido de la Ley sobre Seguridad Social de los Funcionarios Civiles del Estado (RDLeg. 4/2000)", corta: "RDLeg. 4/2000" },
 } satisfies Record<string, Norma>;
 
 export type ClaveNorma = keyof typeof NORMAS;
@@ -59,6 +62,16 @@ export const GRUPOS = {
   prl: [["correos", 11]],
   firma: [["gestion-sistemas-informacion", 4]],
   ciberseguridad: [["gestion-sistemas-informacion", 5], ["tai", 16]],
+  // Ampliación de octubre de 2026 (ver flashcards-2026.ts).
+  situaciones: [["administrativo-estado", 26]],
+  muface: [["administrativo-estado", 29]],
+  segSocialLaboral: [["administrativo-estado", 31]],
+  principiosPresupuestarios: [["administrativo-estado", 32]],
+  ejecucionGasto: [["administrativo-estado", 34]],
+  retribuciones: [["administrativo-estado", 35]],
+  gastosPagos: [["administrativo-estado", 36]],
+  subvenciones: [["administrativo-estado", 20]],
+  gestionEconomica: [["administrativo-estado", 37]],
 } satisfies Record<string, readonly Tema[]>;
 
 export type Grupo = keyof typeof GRUPOS;

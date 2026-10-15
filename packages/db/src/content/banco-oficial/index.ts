@@ -7,6 +7,7 @@ import type { PreguntaBancoTai } from "../tai-banco-preguntas";
 import { TAI_BANCO_BOE, type PreguntaBoe } from "../tai-banco-boe";
 import { NORMAS_OFICIALES, type Destino, type PreguntaOficial } from "./tipos";
 import { POOLS } from "./pools";
+import { NUEVAS_2026 } from "./nuevas-2026";
 
 export { NORMAS_OFICIALES } from "./tipos";
 export type { Destino, PreguntaOficial } from "./tipos";
@@ -113,7 +114,8 @@ export function bancoOficial(): PreguntaOficial[] {
     const p = porId.get(a.id);
     porId.set(a.id, p ? { ...p, destinos: [...p.destinos, ...a.destinos] } : a);
   }
-  return [...porId.values()];
+  // Las nuevas van aparte y al final (ver nuevas-2026.ts).
+  return [...porId.values(), ...NUEVAS_2026];
 }
 
 export const SLUGS_OFICIALES = ["auxiliar-administrativo", "administrativo-estado", "gestion-sistemas-informacion", "correos", "tai"] as const;
@@ -121,7 +123,9 @@ export const SLUGS_OFICIALES = ["auxiliar-administrativo", "administrativo-estad
 /** Preguntas de una oposición, listas para importar (con su tema). */
 export function preguntasDe(slug: string): PreguntaBancoTai[] {
   const base = bancoBase();
-  const lista = [...base, ...ampliados(base)].flatMap((p) =>
+  // NUEVAS_2026 al final: no cambia la rotación de la respuesta correcta de
+  // las preguntas ya importadas (el historial de los usuarios depende de ella).
+  const lista = [...base, ...ampliados(base), ...NUEVAS_2026].flatMap((p) =>
     p.destinos.filter(([s]) => s === slug).map(([, tema]) => ({ p, tema })),
   );
   return lista.map(({ p, tema }, i) => {

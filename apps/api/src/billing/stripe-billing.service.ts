@@ -12,6 +12,7 @@ import { and, eq, sql as dsql } from "drizzle-orm";
 import Stripe from "stripe";
 import { schema } from "@oponow/db";
 import { getRequestDb } from "../database/request-context";
+import { CorreoService } from "../correo/correo.service";
 
 const TRIAL_DAYS = 7;
 // Claves de los precios en Stripe (ver scripts/stripe-configurar.mjs): así
@@ -55,7 +56,10 @@ export class StripeBillingService {
   private readonly managedPayments: boolean;
   private precios: Partial<Record<Ciclo, string>> = {};
 
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private readonly correo: CorreoService,
+  ) {
     const clave = config.get<string>("STRIPE_SECRET_KEY");
     this.stripe = clave ? new Stripe(clave) : null;
     this.secretoWebhook = config.get<string>("STRIPE_WEBHOOK_SECRET");
@@ -181,13 +185,21 @@ export class StripeBillingService {
     switch (evento.type) {
       case "checkout.session.completed": {
         const subId = typeof obj.subscription === "string" ? obj.subscription : obj.subscription?.id;
-        if (subId) await this.sincronizar(subId);
+        if (subId) {
+          await this.sincronizar(subId);
+          if (this.primeraVez(evento.id)) await this.avisar(subId, "contratacion");
+        }
         break;
       }
+      case "customer.subscription.trial_will_end":
+        if (obj.id) {
+          await this.sincronizar(obj.id);
+          if (this.primeraVez(evento.id)) await this.avisar(obj.id, "fin-prueba");
+        }
+        break;
       case "customer.subscription.created":
       case "customer.subscription.updated":
       case "customer.subscription.deleted":
-      case "customer.subscription.trial_will_end":
         if (obj.id) await this.sincronizar(obj.id);
         break;
       case "customer.updated":
@@ -310,6 +322,75 @@ export class StripeBillingService {
       this.configPortal = lista.data.find((c) => c.metadata?.app === "oponow")?.id ?? null;
     }
     return this.configPortal;
+  }
+
+  /** Stripe reintenta los webhooks: evita mandar el mismo correo dos veces
+   * por el mismo evento mientras el proceso siga vivo (mejor esfuerzo). */
+  private readonly eventosAvisados = new Set<string>();
+  private primeraVez(eventoId: string): boolean {
+    if (this.eventosAvisados.has(eventoId)) return false;
+    this.eventosAvisados.add(eventoId);
+    if (this.eventosAvisados.size > 5_000) this.eventosAvisados.clear();
+    return true;
+  }
+
+  /**
+   * Correos propios de la contratación, además de los recibos y facturas que
+   * envía Link (Stripe): la confirmación en soporte duradero con las
+   * condiciones (art. 98.7 TRLGDCU) y el recordatorio de fin de la prueba,
+   * que Stripe no envía en pruebas de 7 días o menos. Un fallo de envío no
+   * debe tumbar el webhook: se registra y se sigue.
+   */
+  private async avisar(subscriptionId: string, tipo: "contratacion" | "fin-prueba"): Promise<void> {
+    try {
+      const sub = await this.cliente().subscriptions.retrieve(subscriptionId, { expand: ["customer"] });
+      const cliente = sub.customer as Stripe.Customer | Stripe.DeletedCustomer;
+      const email = "email" in cliente ? cliente.email : null;
+      if (!email) return;
+      const slug = sub.metadata?.oposicionSlug;
+      const nombre = slug ? (await this.oposicion(slug).catch(() => null))?.nombre ?? slug : "tu oposición";
+      const item = sub.items.data[0];
+      const anual = item?.price.recurring?.interval === "year";
+      const importe = item?.price.unit_amount != null ? (item.price.unit_amount / 100).toFixed(2).replace(".", ",") : null;
+      const precio = importe ? `${importe} € ${anual ? "al año" : "al mes"} (IVA incluido)` : "el precio del plan contratado";
+      const fecha = (s: number) => new Date(s * 1000).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Madrid" });
+      const finPrueba = sub.status === "trialing" && sub.trial_end ? fecha(sub.trial_end) : null;
+      const terminos = `${this.web}/legal/terminos`;
+
+      if (tipo === "contratacion") {
+        await this.correo.enviarAviso({
+          email,
+          asunto: `Confirmación de tu suscripción a Oponow — ${nombre}`,
+          titulo: "Tu suscripción está activa",
+          parrafos: [
+            `Has contratado el plan ${anual ? "anual" : "mensual"} de Oponow para ${nombre}.`,
+            finPrueba
+              ? `Estás en el periodo de prueba gratuito hasta el ${finPrueba}. Si no cancelas antes, ese día se cobrarán ${precio} y la suscripción se renovará automáticamente cada ${anual ? "año" : "mes"}.`
+              : `Precio: ${precio}. La suscripción se renueva automáticamente cada ${anual ? "año" : "mes"}.`,
+            "Puedes cancelar cuando quieras desde «Mi cuenta», sin permanencia: la cancelación surte efecto al final del periodo ya pagado.",
+            "Tienes 14 días naturales desde hoy para desistir del contrato sin dar explicaciones: escríbenos a info@oponow.com y te devolveremos íntegramente lo cobrado.",
+            "Los pagos los gestiona Link (Stripe), que te enviará por separado el recibo y la factura. Estas son las condiciones aplicables a tu contratación:",
+          ],
+          boton: { texto: "Ver los Términos y condiciones", enlace: terminos },
+          motivo: "Has recibido este correo porque has contratado una suscripción en Oponow.",
+        });
+      } else if (finPrueba) {
+        await this.correo.enviarAviso({
+          email,
+          asunto: `Tu prueba gratuita de Oponow termina el ${finPrueba}`,
+          titulo: "Tu prueba gratuita termina pronto",
+          parrafos: [
+            `Tu periodo de prueba de ${nombre} termina el ${finPrueba}.`,
+            `Si quieres seguir, no tienes que hacer nada: ese día se cobrarán ${precio} y la suscripción se renovará automáticamente cada ${anual ? "año" : "mes"}.`,
+            "Si no quieres continuar, cancela antes de esa fecha desde «Mi cuenta» y no se te cobrará nada.",
+          ],
+          boton: { texto: "Ir a Mi cuenta", enlace: `${this.web}/cuenta` },
+          motivo: "Has recibido este correo porque tienes una prueba gratuita activa en Oponow.",
+        });
+      }
+    } catch (e) {
+      this.logger.warn(`No se pudo enviar el correo de ${tipo} de la suscripción ${subscriptionId}: ${e instanceof Error ? e.message : String(e)}`);
+    }
   }
 
   private async oposicion(slug: string) {

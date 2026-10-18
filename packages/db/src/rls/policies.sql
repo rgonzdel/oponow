@@ -179,6 +179,12 @@ CREATE POLICY usuarios_admin_update ON usuarios
   USING (current_setting('app.is_admin', true) = 'true')
   WITH CHECK (current_setting('app.is_admin', true) = 'true');
 
+-- Crear cuentas de prueba y testeo desde el panel (solo administración; la
+-- API además exige el permiso crear_usuarios).
+DROP POLICY IF EXISTS usuarios_admin_insert ON usuarios;
+CREATE POLICY usuarios_admin_insert ON usuarios
+  FOR INSERT WITH CHECK (current_setting('app.current_role', true) = 'admin');
+
 DROP POLICY IF EXISTS usuarios_equipo_read ON usuarios;
 CREATE POLICY usuarios_equipo_read ON usuarios
   FOR SELECT USING (current_setting('app.current_role', true) IN ('admin', 'soporte', 'lectura'));

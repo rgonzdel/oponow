@@ -4,6 +4,7 @@ import { AdminService } from "./admin.service";
 import { ListUsuariosQueryDto } from "./dto/list-usuarios-query.dto";
 import { UpdatePlanDto } from "./dto/update-plan.dto";
 import { UpdateRolDto } from "./dto/update-rol.dto";
+import { CrearCuentaPruebaDto, UpdateAccesoDto } from "./dto/crear-cuenta-prueba.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { PermisoGuard, RequierePermiso } from "../auth/guards/permiso.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
@@ -42,6 +43,18 @@ export class AdminController {
   @RequierePermiso("ver_usuarios")
   listUsuarios(@Query() query: ListUsuariosQueryDto) {
     return this.adminService.listUsuarios(query);
+  }
+
+  @Post("usuarios/prueba")
+  @RequierePermiso("crear_usuarios")
+  crearCuentaPrueba(@CurrentUser() user: AuthenticatedUser, @Body() dto: CrearCuentaPruebaDto) {
+    return this.adminService.crearCuentaPrueba(user.id, dto);
+  }
+
+  @Patch("usuarios/:id/acceso")
+  @RequierePermiso("crear_usuarios")
+  updateAcceso(@CurrentUser() user: AuthenticatedUser, @Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateAccesoDto) {
+    return this.adminService.updateAcceso(user.id, id, dto.accesoExpira);
   }
 
   @Get("usuarios/:id")

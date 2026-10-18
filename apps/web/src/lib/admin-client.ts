@@ -1,6 +1,6 @@
 import { apiFetch } from "./api-client";
 
-export type PlanTipo = "free" | "lite" | "vip";
+export type PlanTipo = "free" | "lite" | "vip" | "prueba";
 // Refleja apps/api/src/auth/roles.ts.
 export type Rol = "opositor" | "admin" | "editor" | "soporte" | "lectura" | "contabilidad";
 export type Permiso =
@@ -11,15 +11,20 @@ export type Permiso =
   | "cambiar_plan"
   | "asignar_roles"
   | "asignar_oposiciones"
+  | "crear_usuarios"
   | "ver_contenido"
   | "ver_contabilidad";
 
 export interface UsuarioResumen {
   id: string;
   email: string | null;
+  /** Nombre de usuario de las cuentas de prueba (entran sin email). */
+  usuario: string | null;
   plan: PlanTipo;
   rol: Rol;
   planExpira: string | null;
+  /** Caducidad de la cuenta (cuentas de prueba), o null. */
+  accesoExpira: string | null;
   emailVerified: boolean;
   createdAt: string;
 }
@@ -111,6 +116,20 @@ export function asignarOposicion(usuarioId: string, oposicionId: string) {
 export function quitarOposicion(usuarioId: string, suscripcionId: string) {
   return apiFetch<UsuarioDetalle>(`/admin/usuarios/${usuarioId}/oposiciones/${suscripcionId}`, {
     method: "DELETE",
+  });
+}
+
+export function crearCuentaPrueba(datos: { usuario: string; password: string; oposicionIds: string[]; accesoExpira: string }) {
+  return apiFetch<UsuarioDetalle>("/admin/usuarios/prueba", {
+    method: "POST",
+    body: JSON.stringify(datos),
+  });
+}
+
+export function updateAcceso(id: string, accesoExpira: string) {
+  return apiFetch<UsuarioDetalle>(`/admin/usuarios/${id}/acceso`, {
+    method: "PATCH",
+    body: JSON.stringify({ accesoExpira }),
   });
 }
 

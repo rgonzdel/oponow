@@ -6,6 +6,10 @@ export interface DatosCuenta {
   emailVerificado: boolean;
   plan: string;
   planExpira: string | null;
+  /** Nombre de usuario (cuentas de prueba), o null. */
+  usuario: string | null;
+  /** Caducidad de la cuenta (cuentas de prueba), o null. */
+  accesoExpira: string | null;
   creadaEn: string;
   tieneContrasena: boolean;
   proveedores: string[];

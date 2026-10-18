@@ -60,8 +60,8 @@ export function LoginPage() {
         className="auth-stagger space-y-4"
         noValidate
       >
-        <FormField label="Email" error={errors.email?.message}>
-          <TextInput type="email" autoComplete="email" {...register("email")} />
+        <FormField label="Email o usuario" error={errors.email?.message}>
+          <TextInput type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} {...register("email")} />
         </FormField>
         <FormField label="Contraseña" error={errors.password?.message}>
           <TextInput
@@ -73,7 +73,7 @@ export function LoginPage() {
         <div className="-mt-2 text-right">
           <Link
             to="/recuperar-contrasena"
-            state={{ email: watch("email") }}
+            state={{ email: watch("email")?.includes("@") ? watch("email") : "" }}
             className="text-xs text-neutral-400 transition-colors hover:text-accent"
           >
             ¿Has olvidado tu contraseña?

@@ -16,6 +16,7 @@ const PLAN_LABEL: Record<string, string> = {
   free: "Free",
   lite: "Lite",
   vip: "VIP",
+  prueba: "Prueba y testeo",
 };
 
 const PERIODOS = [7, 14, 30] as const;
@@ -120,7 +121,7 @@ export function DashboardPage() {
   const subscriptionsQuery = useQuery({
     queryKey: ["billing", "subscriptions", "mine"],
     queryFn: listMySubscriptions,
-    enabled: user?.plan === "lite" || user?.plan === "vip",
+    enabled: user?.plan === "lite" || user?.plan === "vip" || user?.plan === "prueba",
   });
   const miOposicion = subscriptionsQuery.data?.[0];
   const slug = miOposicion?.oposicionSlug;

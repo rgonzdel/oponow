@@ -2,7 +2,8 @@ import { z } from "zod";
 
 // Reflejan las reglas de apps/api/src/auth/dto/{login,register}.dto.ts.
 export const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
+  // Email, o el usuario de una cuenta de prueba creada por el equipo.
+  email: z.string().trim().min(3, "Escribe tu email o usuario"),
   password: z.string().min(1, "La contraseña es obligatoria"),
 });
 

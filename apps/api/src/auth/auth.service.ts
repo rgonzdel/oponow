@@ -31,6 +31,10 @@ import { CorreoService } from "../correo/correo.service";
 
 export interface DatosCuenta {
   email: string | null;
+  /** Nombre de usuario (cuentas de prueba creadas desde el panel). */
+  usuario: string | null;
+  /** Fecha en que caduca la cuenta, o null si no caduca. */
+  accesoExpira: Date | null;
   emailVerificado: boolean;
   plan: string;
   planExpira: Date | null;
@@ -83,6 +87,14 @@ const CAMBIO_EMAIL_TTL = "1h";
 const CONTRASENA_INCORRECTA = "La contraseña actual no es correcta";
 
 const INVALID_CREDENTIALS = "Credenciales inválidas";
+const FECHA_CADUCIDAD = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Madrid" });
+
+/** Cuentas de prueba: pasada su fecha de caducidad no pueden entrar ni renovar la sesión. */
+function comprobarCaducidad(accesoExpira: Date | null) {
+  if (accesoExpira && accesoExpira.getTime() <= Date.now()) {
+    throw new UnauthorizedException(`Esta cuenta de prueba caducó el ${FECHA_CADUCIDAD.format(accesoExpira)}`);
+  }
+}
 const INVALID_REFRESH = "Refresh token inválido o expirado";
 
 // Perfil "ligero" de OWASP para Argon2id (m=19456 KiB, t=2, p=1) en vez de
@@ -93,7 +105,7 @@ const INVALID_REFRESH = "Refresh token inválido o expirado";
 // no necesita estas opciones: los parámetros van codificados en el propio
 // hash almacenado, así que los hashes ya existentes (con los valores
 // antiguos) se siguen verificando igual sin ningún cambio.
-const ARGON2_OPTIONS = {
+export const ARGON2_OPTIONS = {
   type: argon2.argon2id,
   memoryCost: 19456,
   timeCost: 2,
@@ -170,9 +182,15 @@ export class AuthService {
         plan: schema.usuarios.plan,
         esAdmin: schema.usuarios.esAdmin,
         email: schema.usuarios.email,
+        accesoExpira: schema.usuarios.accesoExpira,
       })
       .from(schema.usuarios)
-      .where(eq(schema.usuarios.email, dto.email))
+      // Sin "@" es el nombre de usuario de una cuenta de prueba.
+      .where(
+        dto.email.includes("@")
+          ? eq(schema.usuarios.email, dto.email)
+          : eq(schema.usuarios.usuario, dto.email.trim().toLowerCase()),
+      )
       .limit(1);
 
     // Sin contraseña = la cuenta solo entra con Google/Facebook.
@@ -187,6 +205,7 @@ export class AuthService {
     if (!passwordOk) {
       throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
+    comprobarCaducidad(user.accesoExpira);
 
     const db = getRequestDb();
     await db.execute(dsql`SELECT
@@ -194,11 +213,12 @@ export class AuthService {
       set_config('app.current_plan', ${user.plan}, false),
       set_config('app.is_admin', ${String(user.esAdmin)}, false)`);
 
-    if (!this.mfaActivo() || (await this.dispositivoDeConfianza(db, user.id, tokenDispositivo))) {
+    // Sin email (cuentas de prueba con usuario) no hay dónde mandar el código.
+    if (!user.email || !this.mfaActivo() || (await this.dispositivoDeConfianza(db, user.id, tokenDispositivo))) {
       return this.issueTokens(db, user.id, user.plan, user.esAdmin, userAgent);
     }
     try {
-      return await this.crearDesafioMfa(db, user.id, user.email ?? dto.email, userAgent);
+      return await this.crearDesafioMfa(db, user.id, user.email, userAgent);
     } catch (e) {
       // Si el código no se puede enviar (SMTP caído o bloqueado), es mejor
       // dejar entrar con la contraseña correcta que dejar a nadie fuera.
@@ -523,6 +543,8 @@ export class AuthService {
     const [u] = await db
       .select({
         email: schema.usuarios.email,
+        usuario: schema.usuarios.usuario,
+        accesoExpira: schema.usuarios.accesoExpira,
         emailVerificado: schema.usuarios.emailVerified,
         plan: schema.usuarios.plan,
         planExpira: schema.usuarios.planExpira,
@@ -778,7 +800,7 @@ export class AuthService {
       .where(eq(schema.refreshTokens.id, stored.id));
 
     const [user] = await this.authDb
-      .select({ plan: schema.usuarios.plan, esAdmin: schema.usuarios.esAdmin })
+      .select({ plan: schema.usuarios.plan, esAdmin: schema.usuarios.esAdmin, accesoExpira: schema.usuarios.accesoExpira })
       .from(schema.usuarios)
       .where(eq(schema.usuarios.id, stored.usuarioId))
       .limit(1);
@@ -786,6 +808,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException(INVALID_REFRESH);
     }
+    comprobarCaducidad(user.accesoExpira);
 
     const db = getRequestDb();
     await db.execute(dsql`SELECT
@@ -894,11 +917,12 @@ export class AuthService {
 
   private async iniciarSesion(userId: string, userAgent?: string): Promise<AuthTokens> {
     const [user] = await this.authDb
-      .select({ plan: schema.usuarios.plan, esAdmin: schema.usuarios.esAdmin })
+      .select({ plan: schema.usuarios.plan, esAdmin: schema.usuarios.esAdmin, accesoExpira: schema.usuarios.accesoExpira })
       .from(schema.usuarios)
       .where(eq(schema.usuarios.id, userId))
       .limit(1);
     if (!user) throw new UnauthorizedException(INVALID_CREDENTIALS);
+    comprobarCaducidad(user.accesoExpira);
 
     const db = getRequestDb();
     await db.execute(dsql`SELECT

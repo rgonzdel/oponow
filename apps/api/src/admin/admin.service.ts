@@ -1,10 +1,14 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { and, count, countDistinct, eq, gte, ilike, ne, sql } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
+import * as argon2 from "argon2";
+import { and, count, countDistinct, eq, gte, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { schema } from "@oponow/db";
 import { getRequestDb } from "../database/request-context";
 import { DEFINICION_ROLES, PERMISOS, ROLES, type Rol } from "../auth/roles";
 import type { ListUsuariosQueryDto } from "./dto/list-usuarios-query.dto";
 import type { UpdatePlanDto } from "./dto/update-plan.dto";
+import type { CrearCuentaPruebaDto } from "./dto/crear-cuenta-prueba.dto";
+import { ARGON2_OPTIONS } from "../auth/auth.service";
 
 const DEFAULT_PAGE_SIZE = 20;
 // Orden en el panel: de más a menos permisos, y el opositor al final.
@@ -38,7 +42,7 @@ export class AdminService {
     const estado = (e: string) => porEstado.find((x) => x.estado === e)?.n ?? 0;
     return {
       usuarios: porPlan.reduce((n, x) => n + x.n, 0),
-      porPlan: { free: plan("free"), lite: plan("lite"), vip: plan("vip") },
+      porPlan: { free: plan("free"), lite: plan("lite"), vip: plan("vip"), prueba: plan("prueba") },
       equipo: Object.fromEntries(ROLES.filter((r) => r !== "opositor").map((r) => [r, porRol.find((x) => x.rol === r)?.n ?? 0])),
       altas: { dias7: altas7?.n ?? 0, dias30: altas30?.n ?? 0 },
       suscripciones: {
@@ -113,7 +117,7 @@ export class AdminService {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
     const filtros = [
-      query.q ? ilike(schema.usuarios.email, `%${query.q}%`) : undefined,
+      query.q ? or(ilike(schema.usuarios.email, `%${query.q}%`), ilike(schema.usuarios.usuario, `%${query.q}%`)) : undefined,
       query.rol ? eq(schema.usuarios.rol, query.rol) : undefined,
     ].filter(Boolean);
     const where = filtros.length ? and(...filtros) : undefined;
@@ -123,9 +127,11 @@ export class AdminService {
         .select({
           id: schema.usuarios.id,
           email: schema.usuarios.email,
+          usuario: schema.usuarios.usuario,
           plan: schema.usuarios.plan,
           rol: schema.usuarios.rol,
           planExpira: schema.usuarios.planExpira,
+          accesoExpira: schema.usuarios.accesoExpira,
           emailVerified: schema.usuarios.emailVerified,
           createdAt: schema.usuarios.createdAt,
         })
@@ -146,9 +152,11 @@ export class AdminService {
       .select({
         id: schema.usuarios.id,
         email: schema.usuarios.email,
+        usuario: schema.usuarios.usuario,
         plan: schema.usuarios.plan,
         rol: schema.usuarios.rol,
         planExpira: schema.usuarios.planExpira,
+        accesoExpira: schema.usuarios.accesoExpira,
         emailVerified: schema.usuarios.emailVerified,
         createdAt: schema.usuarios.createdAt,
       })
@@ -196,7 +204,7 @@ export class AdminService {
   async asignarOposicion(actorId: string, usuarioId: string, oposicionId: string) {
     const db = getRequestDb();
     const [usuario] = await db
-      .select({ email: schema.usuarios.email })
+      .select({ email: schema.usuarios.email, plan: schema.usuarios.plan, accesoExpira: schema.usuarios.accesoExpira })
       .from(schema.usuarios)
       .where(eq(schema.usuarios.id, usuarioId))
       .limit(1);
@@ -234,10 +242,11 @@ export class AdminService {
       activa: true,
       estado: "active" as const,
       fechaInicio: new Date(),
-      fechaFin: null,
+      // Cuentas de prueba: el acceso acaba cuando caduca la cuenta, y sin coste.
+      fechaFin: usuario.plan === "prueba" ? usuario.accesoExpira : null,
       trialEndsAt: null,
       stripeSubscriptionId: null,
-      importeCentimos: null,
+      importeCentimos: usuario.plan === "prueba" ? 0 : null,
       proximoCobro: null,
       metodoPago: null,
       tarjetaMarca: null,
@@ -301,6 +310,83 @@ export class AdminService {
     } else if (user?.plan === "lite" && n === 0) {
       await db.update(schema.usuarios).set({ plan: "free" }).where(eq(schema.usuarios.id, usuarioId));
     }
+  }
+
+  /**
+   * Cuenta de prueba y testeo: entra con un usuario corto y contraseña, sin
+   * email ni pago. Plan "prueba", acceso completo a las oposiciones elegidas
+   * (suscripciones sin pasarela ni importe) y caduca en accesoExpira: desde
+   * ese momento no puede entrar ni renovar la sesión (ver auth.service.ts).
+   */
+  async crearCuentaPrueba(actorId: string, dto: CrearCuentaPruebaDto) {
+    const db = getRequestDb();
+    const usuario = dto.usuario.trim().toLowerCase();
+    const accesoExpira = this.fechaCaducidad(dto.accesoExpira);
+    const oposicionIds = [...new Set(dto.oposicionIds)];
+
+    const [existente] = await db
+      .select({ id: schema.usuarios.id })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.usuario, usuario))
+      .limit(1);
+    if (existente) throw new ConflictException("Ya existe una cuenta con ese usuario");
+    if (oposicionIds.length) {
+      const encontradas = await db
+        .select({ id: schema.oposiciones.id })
+        .from(schema.oposiciones)
+        .where(inArray(schema.oposiciones.id, oposicionIds));
+      if (encontradas.length !== oposicionIds.length) throw new NotFoundException("Alguna oposición no existe");
+    }
+
+    const id = randomUUID();
+    await db.insert(schema.usuarios).values({
+      id,
+      usuario,
+      passwordHash: await argon2.hash(dto.password, ARGON2_OPTIONS),
+      plan: "prueba",
+      accesoExpira,
+    });
+    if (oposicionIds.length) {
+      await db.insert(schema.suscripcionesOposicion).values(
+        oposicionIds.map((oposicionId) => ({
+          usuarioId: id,
+          oposicionId,
+          activa: true,
+          estado: "active" as const,
+          fechaFin: accesoExpira,
+          importeCentimos: 0,
+        })),
+      );
+    }
+    this.logger.log(`Cuenta de prueba creada por ${actorId}: ${usuario} (caduca ${accesoExpira.toISOString()})`);
+    return this.getUsuario(id, true);
+  }
+
+  /** Cambia la fecha de caducidad de una cuenta de prueba (alargarla o adelantarla). */
+  async updateAcceso(actorId: string, id: string, fecha: string) {
+    const db = getRequestDb();
+    const accesoExpira = this.fechaCaducidad(fecha);
+    const [u] = await db
+      .select({ plan: schema.usuarios.plan, usuario: schema.usuarios.usuario })
+      .from(schema.usuarios)
+      .where(eq(schema.usuarios.id, id))
+      .limit(1);
+    if (!u) throw new NotFoundException("Usuario no encontrado");
+    if (u.plan !== "prueba") throw new BadRequestException("Solo las cuentas de prueba y testeo tienen caducidad");
+    await db.update(schema.usuarios).set({ accesoExpira }).where(eq(schema.usuarios.id, id));
+    await db
+      .update(schema.suscripcionesOposicion)
+      .set({ fechaFin: accesoExpira })
+      .where(and(eq(schema.suscripcionesOposicion.usuarioId, id), eq(schema.suscripcionesOposicion.activa, true)));
+    this.logger.log(`Caducidad cambiada por ${actorId}: ${u.usuario ?? id} → ${accesoExpira.toISOString()}`);
+    return this.getUsuario(id, true);
+  }
+
+  private fechaCaducidad(iso: string): Date {
+    const fecha = new Date(iso);
+    if (Number.isNaN(fecha.getTime())) throw new BadRequestException("Fecha de caducidad no válida");
+    if (fecha.getTime() <= Date.now()) throw new BadRequestException("La fecha de caducidad tiene que ser futura");
+    return fecha;
   }
 
   async updatePlan(id: string, dto: UpdatePlanDto) {

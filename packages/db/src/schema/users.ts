@@ -27,9 +27,15 @@ export const usuarios = pgTable("usuarios", {
   // iguales dos NULL.
   email: text("email"),
   passwordHash: text("password_hash"),
+  // Nombre de usuario corto para entrar sin email (cuentas de prueba creadas
+  // desde el panel). Siempre en minúsculas; único como el email.
+  usuario: text("usuario"),
   emailVerified: boolean("email_verified").notNull().default(false),
   plan: planTipoEnum("plan").notNull().default("free"),
   planExpira: timestamp("plan_expira", { withTimezone: true }),
+  // A partir de esta fecha la cuenta ya no puede entrar ni renovar la sesión
+  // (cuentas de prueba). null = sin caducidad.
+  accesoExpira: timestamp("acceso_expira", { withTimezone: true }),
   // Nunca se puede fijar desde el propio registro/API pública — solo se
   // activa a mano en la base de datos. Viaja en el JWT (ver auth.service.ts)
   // y se expone como GUC de sesión app.is_admin (ver rls-context.middleware)
@@ -43,6 +49,7 @@ export const usuarios = pgTable("usuarios", {
     .defaultNow(),
 }, (t) => [
   uniqueIndex("usuarios_email_idx").on(t.email),
+  uniqueIndex("usuarios_usuario_idx").on(t.usuario),
 ]);
 
 // Cuentas de Google/Facebook vinculadas a un usuario. `sujeto` es el id

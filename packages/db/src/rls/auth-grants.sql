@@ -13,7 +13,9 @@
 --     el código, y contar los intentos fallidos.
 --   - restablecer la contraseña: localizar el enlace por el hash de su token
 --     antes de saber de qué usuario es.
-GRANT SELECT (id, email, password_hash, plan, plan_expira, email_verified, es_admin, rol)
+--   - login con nombre de usuario (cuentas de prueba) y comprobar si la
+--     cuenta ha caducado (acceso_expira) al entrar o renovar la sesión.
+GRANT SELECT (id, email, usuario, password_hash, plan, plan_expira, acceso_expira, email_verified, es_admin, rol)
   ON usuarios TO auth_service;
 
 GRANT SELECT (id, usuario_id, codigo_hash, intentos, reenvios, expira_en, enviado_en, usado_en)

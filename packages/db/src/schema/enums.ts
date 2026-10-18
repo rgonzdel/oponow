@@ -1,6 +1,8 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
-export const planTipoEnum = pgEnum("plan_tipo", ["free", "lite", "vip"]);
+// "prueba": cuentas de prueba y testeo creadas desde el panel; no pagan y
+// caducan en usuarios.acceso_expira.
+export const planTipoEnum = pgEnum("plan_tipo", ["free", "lite", "vip", "prueba"]);
 
 export const proveedorIdentidadEnum = pgEnum("proveedor_identidad", [
   "google",

@@ -23,7 +23,7 @@ import {
   pedirEnlaceContrasena,
 } from "../lib/cuenta-client";
 
-const PLAN: Record<string, string> = { free: "Gratis", lite: "Lite", vip: "VIP" };
+const PLAN: Record<string, string> = { free: "Gratis", lite: "Lite", vip: "VIP", prueba: "Prueba y testeo" };
 const ESTADO_SUSCRIPCION: Record<string, string> = {
   trialing: "Periodo de prueba",
   active: "Activa",
@@ -33,6 +33,7 @@ const ESTADO_SUSCRIPCION: Record<string, string> = {
 const PROVEEDOR: Record<string, string> = { google: "Google", facebook: "Facebook" };
 const EUROS = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" });
 const FECHA = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric" });
+const FECHA_HORA = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 const mensajeError = (e: unknown, porDefecto: string) => (e instanceof ApiError ? e.message : porDefecto);
 
@@ -59,7 +60,7 @@ export function CuentaPage() {
           <div className="mt-6 space-y-4">
             <Tarjeta>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="break-all text-base text-ink-text">{c.email ?? "Sin email"}</span>
+                <span className="break-all text-base text-ink-text">{c.email ?? c.usuario ?? "Sin email"}</span>
                 {c.email && (
                   <Chip tono={c.emailVerificado ? "ok" : "aviso"}>{c.emailVerificado ? "Verificado" : "Sin verificar"}</Chip>
                 )}
@@ -68,9 +69,16 @@ export function CuentaPage() {
                 <Dato titulo="Plan">
                   <Chip tono="acento">{PLAN[c.plan] ?? c.plan}</Chip>
                 </Dato>
-                <Dato titulo="Miembro desde">{FECHA.format(new Date(c.creadaEn))}</Dato>
+                {c.accesoExpira ? (
+                  <Dato titulo="Cuenta válida hasta">{FECHA_HORA.format(new Date(c.accesoExpira))}</Dato>
+                ) : (
+                  <Dato titulo="Miembro desde">{FECHA.format(new Date(c.creadaEn))}</Dato>
+                )}
                 <Dato titulo="Formas de entrar">
-                  {[c.tieneContrasena ? "Email y contraseña" : null, ...c.proveedores.map((p) => PROVEEDOR[p] ?? p)]
+                  {[
+                    c.tieneContrasena ? (c.email ? "Email y contraseña" : "Usuario y contraseña") : null,
+                    ...c.proveedores.map((p) => PROVEEDOR[p] ?? p),
+                  ]
                     .filter(Boolean)
                     .join(" · ") || "—"}
                 </Dato>
@@ -233,7 +241,9 @@ function SeccionSuscripcion({
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const pasarela = useQuery({ queryKey: ["billing", "pasarela"], queryFn: getPasarela, staleTime: Infinity });
   const portal = useMutation({ mutationFn: abrirPortalPagos, onSuccess: ({ url }) => window.location.assign(url) });
-  const conStripe = pasarela.data?.tipo === "stripe";
+  // Las cuentas de prueba y testeo no pagan: todo lo de pagos va a 0.
+  const esPrueba = plan === "prueba";
+  const conStripe = pasarela.data?.tipo === "stripe" && !esPrueba;
   const cancelar = useMutation({
     mutationFn: (slug: string) => cancelSubscription(slug),
     onSuccess: async () => {
@@ -252,9 +262,13 @@ function SeccionSuscripcion({
       ) : suscripciones.length === 0 ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-neutral-400">
-            {plan === "vip" ? "Tu plan VIP incluye todas las oposiciones." : "Estás en el plan gratuito: el tema 1 de cada oposición y un test al día."}
+            {esPrueba
+              ? "Cuenta de prueba y testeo, sin coste: todavía no tiene ninguna oposición asignada."
+              : plan === "vip"
+                ? "Tu plan VIP incluye todas las oposiciones."
+                : "Estás en el plan gratuito: el tema 1 de cada oposición y un test al día."}
           </p>
-          {plan !== "vip" && (
+          {plan !== "vip" && !esPrueba && (
             <Link to="/oposiciones" className={buttonClass("primary")}>
               Ver planes
             </Link>
@@ -270,7 +284,16 @@ function SeccionSuscripcion({
                 <Chip tono={s.estado === "past_due" ? "aviso" : "ok"}>{ESTADO_SUSCRIPCION[s.estado ?? ""] ?? "Activa"}</Chip>
               </div>
               {s.asignadaPorEquipo ? (
-                <p className="mt-3 text-sm text-neutral-400">Acceso concedido por el equipo de Oponow, sin coste para ti.</p>
+                <>
+                  <dl className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+                    <Dato titulo="Próximo pago">Ninguno</Dato>
+                    <Dato titulo="Importe">{EUROS.format(0)}</Dato>
+                    <Dato titulo="Método de pago">No necesario</Dato>
+                  </dl>
+                  <p className="mt-3 text-sm text-neutral-400">
+                    {esPrueba ? "Cuenta de prueba y testeo: no se te cobrará nada." : "Acceso concedido por el equipo de Oponow, sin coste para ti."}
+                  </p>
+                </>
               ) : (
               <dl className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
                 <Dato titulo="Próximo pago">

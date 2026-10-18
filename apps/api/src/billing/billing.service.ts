@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -10,7 +11,7 @@ import { schema } from "@oponow/db";
 import { getRequestDb } from "../database/request-context";
 import { PAYMENT_GATEWAY, type PaymentGateway } from "./gateway/payment-gateway";
 import type { SubscribeDto } from "./dto/subscribe.dto";
-import { StripeBillingService } from "./stripe-billing.service";
+import { CUENTA_PRUEBA_SIN_PAGO, StripeBillingService } from "./stripe-billing.service";
 
 const TRIAL_DAYS = 7;
 // Mismos precios que packages/shared-types/src/pricing.ts (PLAN_PRECIO), en
@@ -97,7 +98,7 @@ export class BillingService {
       // Asignada desde el panel: sin cobros ni método de pago.
       ...(r.externa
         ? {}
-        : { asignadaPorEquipo: true, importeCentimos: null, proximoPago: null, metodoPago: null, cancelaEl: null }),
+        : { asignadaPorEquipo: true, importeCentimos: 0, proximoPago: null, metodoPago: null, cancelaEl: null }),
     }));
   }
 
@@ -144,6 +145,7 @@ export class BillingService {
       .where(eq(schema.usuarios.id, userId))
       .limit(1);
     if (!user) throw new UnauthorizedException();
+    if (user.plan === "prueba") throw new BadRequestException(CUENTA_PRUEBA_SIN_PAGO);
 
     const oposicion = await this.findOposicionBySlug(dto.oposicionSlug);
 

@@ -1,7 +1,9 @@
-import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class LoginDto {
-  @IsEmail()
+  /** Email, o el nombre de usuario de una cuenta de prueba (sin "@"). */
+  @IsString()
+  @MinLength(3)
   @MaxLength(255)
   email!: string;
 

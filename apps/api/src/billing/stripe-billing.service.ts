@@ -14,6 +14,8 @@ import { schema } from "@oponow/db";
 import { getRequestDb } from "../database/request-context";
 import { CorreoService } from "../correo/correo.service";
 
+export const CUENTA_PRUEBA_SIN_PAGO = "Las cuentas de prueba y testeo no pagan: pide al equipo que te asigne la oposición.";
+
 const TRIAL_DAYS = 7;
 // Claves de los precios en Stripe (ver scripts/stripe-configurar.mjs): así
 // no hay que copiar ids de precio a variables de entorno.
@@ -91,11 +93,12 @@ export class StripeBillingService {
     const stripe = this.cliente();
     const db = getRequestDb();
     const [user] = await db
-      .select({ email: schema.usuarios.email })
+      .select({ email: schema.usuarios.email, plan: schema.usuarios.plan })
       .from(schema.usuarios)
       .where(eq(schema.usuarios.id, userId))
       .limit(1);
     if (!user) throw new UnauthorizedException();
+    if (user.plan === "prueba") throw new BadRequestException(CUENTA_PRUEBA_SIN_PAGO);
     const oposicion = await this.oposicion(oposicionSlug);
 
     const anteriores = await db

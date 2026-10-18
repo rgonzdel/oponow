@@ -7,6 +7,8 @@ import { LoadingScreen } from "../components/LoadingScreen";
 import { buttonClass } from "../components/button";
 import { ApiError } from "../lib/api-client";
 import {
+  crearCuentaPrueba,
+  updateAcceso,
   getContenido,
   getResumen,
   getRoles,
@@ -22,7 +24,7 @@ import {
   type Rol,
 } from "../lib/admin-client";
 
-const PLAN_LABEL: Record<PlanTipo, string> = { free: "Gratis", lite: "Lite", vip: "VIP" };
+const PLAN_LABEL: Record<PlanTipo, string> = { free: "Gratis", lite: "Lite", vip: "VIP", prueba: "Prueba y testeo" };
 const ROL_LABEL: Record<Rol, string> = {
   admin: "Administrador",
   contabilidad: "Contabilidad",
@@ -59,6 +61,15 @@ const PESTANAS: { id: Pestana; texto: string; permiso: Permiso }[] = [
 const fecha = (iso: string) =>
   new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
 const mensaje = (e: unknown, d: string) => (e instanceof ApiError ? e.message : d);
+const fechaHora = (iso: string) =>
+  new Date(iso).toLocaleString("es-ES", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const caducada = (iso: string | null) => !!iso && new Date(iso).getTime() <= Date.now();
+/** Valor para un <input type="datetime-local"> en la hora local del navegador. */
+const aInputLocal = (d: Date) => {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+const DURACIONES = [1, 3, 7, 15, 30, 90] as const;
 
 /** Panel del equipo: cada pestaña aparece solo si el rol tiene su permiso. */
 export function AdminPage() {
@@ -152,6 +163,7 @@ function SeccionUsuarios({ permisos, miId, rolInicial }: { permisos: Permiso[]; 
   const [filtroRol, setFiltroRol] = useState<Rol | "">(rolInicial in ROL_LABEL ? rolInicial : "");
   const [page, setPage] = useState(1);
   const [seleccionado, setSeleccionado] = useState<string | null>(null);
+  const [creando, setCreando] = useState(false);
 
   const usuarios = useQuery({
     queryKey: ["admin", "usuarios", q, filtroRol, page],
@@ -168,7 +180,7 @@ function SeccionUsuarios({ permisos, miId, rolInicial }: { permisos: Permiso[]; 
             type="search"
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(1); }}
-            placeholder="Buscar por email…"
+            placeholder="Buscar por email o usuario…"
             className="min-w-0 flex-1 rounded-md border border-ink-divider bg-ink-surface px-3 py-2 text-sm text-ink-text placeholder-neutral-600 outline-none focus:border-accent"
           />
           <select
@@ -182,12 +194,25 @@ function SeccionUsuarios({ permisos, miId, rolInicial }: { permisos: Permiso[]; 
               <option key={r} value={r}>{ROL_LABEL[r]}</option>
             ))}
           </select>
+          {permisos.includes("crear_usuarios") && (
+            <button type="button" onClick={() => setCreando((v) => !v)} className={buttonClass(creando ? "ghost" : "primary")}>
+              {creando ? "Cerrar" : "Nueva cuenta de prueba"}
+            </button>
+          )}
         </div>
+        {creando && (
+          <NuevaCuentaPrueba
+            onCreada={(id) => {
+              setSeleccionado(id);
+              queryClient.invalidateQueries({ queryKey: ["admin"] });
+            }}
+          />
+        )}
         <div className="mt-3 overflow-x-auto rounded-lg border border-ink-divider">
           <table className="w-full text-left text-sm">
             <thead className="bg-ink-surface text-xs text-neutral-500">
               <tr>
-                <th className="px-4 py-2 font-medium">Email</th>
+                <th className="px-4 py-2 font-medium">Email o usuario</th>
                 <th className="px-4 py-2 font-medium">Plan</th>
                 <th className="px-4 py-2 font-medium">Rol</th>
                 <th className="px-4 py-2 font-medium">Alta</th>
@@ -200,8 +225,15 @@ function SeccionUsuarios({ permisos, miId, rolInicial }: { permisos: Permiso[]; 
                   onClick={() => setSeleccionado(u.id)}
                   className={`cursor-pointer border-t border-ink-divider transition-colors hover:bg-ink-surface ${seleccionado === u.id ? "bg-ink-surface" : ""}`}
                 >
-                  <td className="max-w-[220px] truncate px-4 py-2.5 text-ink-text">{u.email ?? "(sin email)"}</td>
-                  <td className="px-4 py-2.5 text-neutral-300">{PLAN_LABEL[u.plan]}</td>
+                  <td className="max-w-[220px] truncate px-4 py-2.5 text-ink-text">{u.email ?? u.usuario ?? "(sin email)"}</td>
+                  <td className="px-4 py-2.5 text-neutral-300">
+                    {PLAN_LABEL[u.plan]}
+                    {u.accesoExpira && (
+                      <span className={`block text-[11px] ${caducada(u.accesoExpira) ? "text-red-400" : "text-neutral-500"}`}>
+                        {caducada(u.accesoExpira) ? "Caducada" : `Hasta ${fecha(u.accesoExpira)}`}
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-2.5">
                     <span className={`whitespace-nowrap rounded-md px-2 py-0.5 text-[11px] font-medium ${ROL_CHIP[u.rol]}`}>{ROL_LABEL[u.rol]}</span>
                   </td>
@@ -262,17 +294,24 @@ function FichaUsuario({ id, permisos, esYo, onCambio }: { id: string; permisos: 
 
   return (
     <Tarjeta>
-      <p className="break-all text-sm font-medium text-ink-text">{u.email ?? "(sin email)"}</p>
+      <p className="break-all text-sm font-medium text-ink-text">{u.email ?? u.usuario ?? "(sin email)"}</p>
       <p className="mt-1 text-xs text-neutral-500">
-        Alta el {fecha(u.createdAt)} · {u.emailVerified ? "email verificado" : "email sin verificar"}
+        Alta el {fecha(u.createdAt)} ·{" "}
+        {u.email ? (u.emailVerified ? "email verificado" : "email sin verificar") : u.usuario ? "entra con usuario y contraseña" : "sin email"}
       </p>
 
       <div className="mt-4 space-y-4">
+        {u.plan === "prueba" && (
+          <CaducidadCuenta key={u.accesoExpira ?? ""} usuarioId={id} accesoExpira={u.accesoExpira} editable={permisos.includes("crear_usuarios")} onCambio={onCambio} />
+        )}
         <Campo titulo="Plan">
           {permisos.includes("cambiar_plan") ? (
             <div className="flex gap-2">
               <select value={plan} onChange={(e) => { setPlan(e.target.value as PlanTipo); cambiarPlan.reset(); }} className="flex-1 rounded-md border border-ink-divider bg-ink px-2 py-1.5 text-sm text-ink-text outline-none focus:border-accent">
-                {(Object.keys(PLAN_LABEL) as PlanTipo[]).map((p) => <option key={p} value={p}>{PLAN_LABEL[p]}</option>)}
+                {/* "Prueba y testeo" solo se da al crear la cuenta (necesita usuario y caducidad). */}
+                {(Object.keys(PLAN_LABEL) as PlanTipo[])
+                  .filter((p) => p !== "prueba" || u.plan === "prueba")
+                  .map((p) => <option key={p} value={p}>{PLAN_LABEL[p]}</option>)}
               </select>
               <button type="button" disabled={plan === u.plan || cambiarPlan.isPending} onClick={() => cambiarPlan.mutate()} className={buttonClass("primary")}>
                 Guardar
@@ -448,6 +487,204 @@ function OposicionesUsuario({
       </p>
       {asignar.isSuccess && <p className="mt-1 text-xs text-green-400">Oposición asignada.</p>}
       {asignar.isError && <p className="mt-1 text-xs text-red-400">{mensaje(asignar.error, "No se ha podido asignar la oposición")}</p>}
+    </Campo>
+  );
+}
+
+/**
+ * Alta de una cuenta de prueba y testeo: usuario corto y contraseña (sin
+ * email), oposiciones con acceso completo y fecha de caducidad. No paga nada.
+ */
+function NuevaCuentaPrueba({ onCreada }: { onCreada: (id: string) => void }) {
+  const catalogo = useQuery({ queryKey: ["admin", "oposiciones"], queryFn: listOposiciones });
+  const [usuario, setUsuario] = useState("");
+  const [password, setPassword] = useState("");
+  const [oposiciones, setOposiciones] = useState<string[]>([]);
+  const [duracion, setDuracion] = useState("7");
+  const [fechaLibre, setFechaLibre] = useState(() => aInputLocal(new Date(Date.now() + 7 * 86_400_000)));
+  const [creada, setCreada] = useState<{ usuario: string; password: string; expira: string } | null>(null);
+
+  const expira = duracion === "otra" ? new Date(fechaLibre) : new Date(Date.now() + Number(duracion) * 86_400_000);
+  const usuarioValido = /^[a-z0-9._-]{3,30}$/.test(usuario);
+  const listo = usuarioValido && password.length >= 8 && !Number.isNaN(expira.getTime()) && expira.getTime() > Date.now();
+
+  const crear = useMutation({
+    mutationFn: () => crearCuentaPrueba({ usuario, password, oposicionIds: oposiciones, accesoExpira: expira.toISOString() }),
+    onSuccess: (datos) => {
+      setCreada({ usuario, password, expira: datos.accesoExpira ?? expira.toISOString() });
+      setUsuario("");
+      setPassword("");
+      setOposiciones([]);
+      onCreada(datos.id);
+    },
+  });
+
+  function generarContrasena() {
+    const letras = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const azar = crypto.getRandomValues(new Uint32Array(10));
+    setPassword(Array.from(azar, (n) => letras[n % letras.length]).join(""));
+    crear.reset();
+  }
+
+  const campo = "w-full rounded-md border border-ink-divider bg-ink px-2 py-1.5 text-sm text-ink-text outline-none focus:border-accent";
+
+  return (
+    <section className="mt-3 rounded-lg border border-accent/40 bg-ink-surface p-5">
+      <h2 className="text-sm font-medium text-ink-text">Nueva cuenta de prueba y testeo</h2>
+      <p className="mt-1 text-xs text-neutral-500">
+        Entra con usuario y contraseña, sin email. No paga nada y deja de poder entrar cuando caduca.
+      </p>
+      <form
+        className="mt-4 space-y-4"
+        noValidate
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (listo) crear.mutate();
+        }}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-1.5 block text-xs text-neutral-400">Usuario</span>
+            <input
+              value={usuario}
+              onChange={(e) => { setUsuario(e.target.value.trim().toLowerCase()); crear.reset(); }}
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              maxLength={30}
+              placeholder="p. ej. prueba1"
+              className={campo}
+            />
+            {usuario && !usuarioValido && (
+              <span className="mt-1 block text-xs text-amber-300">3-30 caracteres: letras, números, punto, guion o guion bajo.</span>
+            )}
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-xs text-neutral-400">Contraseña</span>
+            <span className="flex gap-2">
+              <input
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); crear.reset(); }}
+                autoComplete="new-password"
+                spellCheck={false}
+                maxLength={72}
+                className={campo}
+              />
+              <button type="button" onClick={generarContrasena} className={buttonClass("ghost")}>Generar</button>
+            </span>
+            {password && password.length < 8 && <span className="mt-1 block text-xs text-amber-300">Mínimo 8 caracteres.</span>}
+          </label>
+        </div>
+
+        <fieldset>
+          <legend className="mb-1.5 text-xs text-neutral-400">Oposiciones con acceso completo</legend>
+          {catalogo.isLoading ? (
+            <p className="text-sm text-neutral-500">Cargando…</p>
+          ) : (
+            <div className="grid gap-1.5 sm:grid-cols-2">
+              {(catalogo.data ?? []).map((o) => (
+                <label key={o.id} className="flex items-center gap-2 text-sm text-ink-text">
+                  <input
+                    type="checkbox"
+                    checked={oposiciones.includes(o.id)}
+                    onChange={(e) => setOposiciones((prev) => (e.target.checked ? [...prev, o.id] : prev.filter((x) => x !== o.id)))}
+                    className="accent-accent"
+                  />
+                  {o.nombre}
+                </label>
+              ))}
+            </div>
+          )}
+        </fieldset>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-1.5 block text-xs text-neutral-400">Caduca</span>
+            <select value={duracion} onChange={(e) => setDuracion(e.target.value)} className={campo}>
+              {DURACIONES.map((d) => <option key={d} value={String(d)}>Dentro de {d} {d === 1 ? "día" : "días"}</option>)}
+              <option value="otra">Elegir fecha y hora…</option>
+            </select>
+          </label>
+          {duracion === "otra" ? (
+            <label className="block">
+              <span className="mb-1.5 block text-xs text-neutral-400">Fecha y hora de caducidad</span>
+              <input type="datetime-local" value={fechaLibre} min={aInputLocal(new Date())} onChange={(e) => setFechaLibre(e.target.value)} className={campo} />
+            </label>
+          ) : (
+            <p className="self-end pb-2 text-xs text-neutral-500">Hasta el {fechaHora(expira.toISOString())}</p>
+          )}
+        </div>
+
+        {crear.isError && <p className="text-xs text-red-400">{mensaje(crear.error, "No se ha podido crear la cuenta")}</p>}
+        <button type="submit" disabled={!listo || crear.isPending} className={buttonClass("primary")}>
+          {crear.isPending ? "Creando…" : "Crear cuenta"}
+        </button>
+      </form>
+
+      {creada && (
+        <div className="mt-4 rounded-md border border-green-500/40 bg-green-500/10 p-3 text-sm text-neutral-300">
+          <p className="font-medium text-green-400">Cuenta creada. Pásale estos datos para entrar:</p>
+          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            <dt className="text-neutral-500">Usuario</dt>
+            <dd className="font-mono text-ink-text">{creada.usuario}</dd>
+            <dt className="text-neutral-500">Contraseña</dt>
+            <dd className="break-all font-mono text-ink-text">{creada.password}</dd>
+            <dt className="text-neutral-500">Caduca</dt>
+            <dd className="text-ink-text">{fechaHora(creada.expira)}</dd>
+          </dl>
+          <p className="mt-2 text-xs text-neutral-500">La contraseña no se vuelve a mostrar: cópiala ahora.</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** Caducidad de una cuenta de prueba, con opción de alargarla o adelantarla. */
+function CaducidadCuenta({
+  usuarioId,
+  accesoExpira,
+  editable,
+  onCambio,
+}: {
+  usuarioId: string;
+  accesoExpira: string | null;
+  editable: boolean;
+  onCambio: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const [valor, setValor] = useState(() => aInputLocal(accesoExpira ? new Date(accesoExpira) : new Date(Date.now() + 7 * 86_400_000)));
+  const guardar = useMutation({
+    mutationFn: () => updateAcceso(usuarioId, new Date(valor).toISOString()),
+    onSuccess: (datos) => {
+      queryClient.setQueryData(["admin", "usuario", usuarioId], datos);
+      onCambio();
+    },
+  });
+  const vencida = caducada(accesoExpira);
+
+  return (
+    <Campo titulo="Caducidad de la cuenta">
+      <p className={`text-sm ${vencida ? "text-red-400" : "text-ink-text"}`}>
+        {accesoExpira ? `${vencida ? "Caducó el" : "Hasta el"} ${fechaHora(accesoExpira)}` : "Sin caducidad"}
+      </p>
+      {editable && (
+        <>
+          <div className="mt-2 flex gap-2">
+            <input
+              type="datetime-local"
+              value={valor}
+              min={aInputLocal(new Date())}
+              onChange={(e) => { setValor(e.target.value); guardar.reset(); }}
+              aria-label="Nueva fecha de caducidad"
+              className="min-w-0 flex-1 rounded-md border border-ink-divider bg-ink px-2 py-1.5 text-sm text-ink-text outline-none focus:border-accent"
+            />
+            <button type="button" disabled={!valor || guardar.isPending} onClick={() => guardar.mutate()} className={buttonClass("primary")}>
+              Guardar
+            </button>
+          </div>
+          {guardar.isError && <p className="mt-1 text-xs text-red-400">{mensaje(guardar.error, "No se ha podido cambiar la caducidad")}</p>}
+        </>
+      )}
     </Campo>
   );
 }
